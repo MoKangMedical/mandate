@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandate · 课程体系</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#09090b;--bg2:#0f0f13;--card:#1c1c21;--card2:#222228;--card3:#2a2a32;
+  --border:#27272a;--border2:#3f3f46;
+  --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+  --gold:#e2b64f;--gold2:#f5d98a;--red:#c43a31;--green:#22c55e;
+  --serif:'Noto Serif SC',serif;--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --radius:16px;--radius-sm:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.7}
+a{color:inherit;text-decoration:none}
+.container{max-width:1000px;margin:0 auto;padding:0 24px}
+.section{padding:80px 0}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(9,9,11,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold)}
+.nav-back{color:var(--text2);font-size:0.85rem;transition:color .2s}
+.nav-back:hover{color:var(--gold)}
+
+.hero{padding:120px 0 60px;text-align:center}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 50% at 50% 30%,rgba(226,182,79,0.06),transparent)}
+.hero h1{font-family:var(--serif);font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:16px}
+.hero p{color:var(--text2);font-size:1.1rem;max-width:600px;margin:0 auto}
+.hero .stats{display:flex;justify-content:center;gap:36px;margin-top:32px}
+.hero .stat{text-align:center}
+.hero .stat .num{font-size:1.8rem;font-weight:800;color:var(--gold)}
+.hero .stat .desc{font-size:0.8rem;color:var(--text3)}
+
+.course-section{margin-bottom:80px}
+.course-section h2{font-family:var(--serif);font-size:1.5rem;color:var(--gold);margin-bottom:8px}
+.course-section .subtitle{color:var(--text2);font-size:0.95rem;margin-bottom:24px}
+
+.lesson-list{display:flex;flex-direction:column;gap:12px}
+.lesson-item{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;transition:all .2s}
+.lesson-item:hover{border-color:var(--border2)}
+.lesson-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#b8860b);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:#000;flex-shrink:0}
+.lesson-info{flex:1}
+.lesson-info h3{font-size:0.95rem;margin-bottom:4px}
+.lesson-info p{font-size:0.8rem;color:var(--text3)}
+.lesson-meta{display:flex;gap:12px;flex-shrink:0}
+.lesson-tag{padding:3px 10px;border-radius:6px;font-size:0.7rem;background:var(--card3);color:var(--text3)}
+
+.cta-section{text-align:center;padding:80px 0;background:var(--bg2)}
+.cta-section h2{font-family:var(--serif);font-size:1.5rem;margin-bottom:12px}
+.cta-section p{color:var(--text2);margin-bottom:24px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:var(--radius-sm);font-weight:600;font-size:0.95rem;transition:all .25s;border:none;cursor:pointer}
+.btn-primary{background:var(--gold);color:#000}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-2px)}
+
+.footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;font-size:0.8rem;color:var(--text3)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Mandate</a>
+    <a href="index.html" class="nav-back">← 返回首页</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>📚 帝王治理智慧 · 课程体系</h1>
+  <p>六大模块 · 30+课时 · 融合百家讲坛、影视、专著。<br>每课含知识点讲授 + AI帝王对话思辨。</p>
+  <div class="stats">
+    <div class="stat"><div class="num">6</div><div class="desc">课程模块</div></div>
+    <div class="stat"><div class="num">30+</div><div class="desc">课时</div></div>
+    <div class="stat"><div class="num">∞</div><div class="desc">AI思辨</div></div>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- Course 1 -->
+  <div class="course-section">
+    <h2>模块一 · 帝制起源 — 从禅让到家天下</h2>
+    <p class="subtitle">入门 · 3课时 · 2.5小时</p>
+    <div class="lesson-list">
+      <div class="lesson-item">
+        <div class="lesson-num">1</div>
+        <div class="lesson-info"><h3>天命观的形成：从神话到政治合法性</h3><p>夏商周三代如何用"天命"解释统治权</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">30分钟</span><span class="lesson-tag">含AI对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">2</div>
+        <div class="lesson-info"><h3>禅让到家天下：制度的质变</h3><p>大禹如何开创世袭制，以及分封制的逻辑与弊端</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">40分钟</span><span class="lesson-tag">含AI对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">3</div>
+        <div class="lesson-info"><h3>第一代亡国君：夏桀与商纣的多维评价</h3><p>他们真的是"坏"吗？正史与影视的差异解读</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span><span class="lesson-tag">含与夏桀对话</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course 2 -->
+  <div class="course-section">
+    <h2>模块二 · 大一统奠基 — 秦汉帝王</h2>
+    <p class="subtitle">核心 · 5课时 · 4小时</p>
+    <div class="lesson-list">
+      <div class="lesson-item">
+        <div class="lesson-num">1</div><div class="lesson-info"><h3>秦始皇：统一六国的功与过</h3><p>郡县制、书同文、焚书坑儒——哪些是功、哪些是过</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span><span class="lesson-tag">含与秦始皇对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">2</div><div class="lesson-info"><h3>汉高祖：布衣天子的用人之道</h3><p>刘邦为何能打败项羽——领导者最重要的能力是什么</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">40分钟</span><span class="lesson-tag">含与刘邦对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">3</div><div class="lesson-info"><h3>文景之治：休养生息的治理智慧</h3><p>文帝的节俭与景帝的削藩——经济恢复期的治理策略</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">40分钟</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">4</div><div class="lesson-info"><h3>汉武帝：中国版图的确立者</h3><p>北击匈奴、凿空西域、独尊儒术——塑造"汉"民族的帝王</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">50分钟</span><span class="lesson-tag">含与汉武帝对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">5</div><div class="lesson-info"><h3>从刘邦到刘询：西汉帝王的统治演化</h3><p>百余年间的制度变迁与皇帝角色的演变</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course 3 -->
+  <div class="course-section">
+    <h2>模块三 · 帝国巅峰 — 隋唐帝王</h2>
+    <p class="subtitle">深度 · 6课时 · 5小时</p>
+    <div class="lesson-list">
+      <div class="lesson-item">
+        <div class="lesson-num">1</div><div class="lesson-info"><h3>隋文帝：结束三百年分裂的制度设计师</h3><p>三省六部、科举——两个影响千年的制度创新</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">40分钟</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">2</div><div class="lesson-info"><h3>隋炀帝：大运河的功与亡国的过</h3><p>一个有伟大理想但操之过急的悲剧帝王</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span><span class="lesson-tag">含与隋炀帝对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">3</div><div class="lesson-info"><h3>唐太宗：贞观之治的团队密码</h3><p>李世民如何打造中国历史上最强管理团队——房谋杜断、魏征直谏</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">50分钟</span><span class="lesson-tag">含与唐太宗对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">4</div><div class="lesson-info"><h3>武则天：性别不是天花板</h3><p>中国唯一女皇帝的统治术——如何在男权世界中建立权威</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span><span class="lesson-tag">含与武则天对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">5</div><div class="lesson-info"><h3>唐玄宗的两张面孔</h3><p>同一个皇帝，如何从开元盛世走向安史之乱</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">50分钟</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">6</div><div class="lesson-info"><h3>大唐衰落：藩镇、宦官与朋党的三重困局</h3><p>安史之乱之后，唐朝为什么再也没有恢复过来</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course 4 -->
+  <div class="course-section">
+    <h2>模块四 · 文治的博弈 — 宋元帝王</h2>
+    <p class="subtitle">进阶 · 5课时 · 4小时</p>
+    <div class="lesson-list">
+      <div class="lesson-item">
+        <div class="lesson-num">1</div><div class="lesson-info"><h3>赵匡胤：杯酒释兵权的政治智慧</h3><p>不流血解决武将威胁——代价是什么？</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">40分钟</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">2</div><div class="lesson-info"><h3>宋仁宗：最仁慈的皇帝与最强的文人集团</h3><p>当皇帝选择克制——仁宗的"弱"如何成就了文化的"强"</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">3</div><div class="lesson-info"><h3>王安石变法：理想主义者的失败</h3><p>为什么一个好的改革方案会在执行中变味</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">50分钟</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">4</div><div class="lesson-info"><h3>宋高宗与岳飞：个人利益与国家利益的冲突</h3><p>十二道金牌的背后——一个皇帝的自私心路</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span><span class="lesson-tag">含与宋高宗对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">5</div><div class="lesson-info"><h3>忽必烈：草原帝国如何统治农耕中国</h3><p>少数民族统治汉地的挑战与妥协</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">40分钟</span><span class="lesson-tag">含与忽必烈对话</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course 5 -->
+  <div class="course-section">
+    <h2>模块五 · 专制巅峰 — 明清帝王</h2>
+    <p class="subtitle">深度 · 7课时 · 6小时</p>
+    <div class="lesson-list">
+      <div class="lesson-item">
+        <div class="lesson-num">1</div><div class="lesson-info"><h3>朱元璋：乞丐皇帝的治理之道</h3><p>底层视角如何塑造了一个帝国的底色</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">50分钟</span><span class="lesson-tag">含与朱元璋对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">2</div><div class="lesson-info"><h3>朱棣：篡位者的自证之路</h3><p>郑和下西洋与永乐大典——一个需要用功业洗白自己的皇帝</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">3</div><div class="lesson-info"><h3>万历怠政：一个皇帝为什么二十八年不上朝</h3><p>国本之争背后的制度性困局</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span><span class="lesson-tag">含与万历对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">4</div><div class="lesson-info"><h3>崇祯：勤政的亡国之君</h3><p>三重危机叠加——为什么努力的人也会失败</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">50分钟</span><span class="lesson-tag">含与崇祯对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">5</div><div class="lesson-info"><h3>康熙：千古一帝的完美模板</h3><p>擒鳌拜·平三藩·收台湾·征噶尔丹——一个少年的成长史</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">50分钟</span><span class="lesson-tag">含与康熙对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">6</div><div class="lesson-info"><h3>雍正：最孤独的皇帝</h3><p>铁腕反腐与孤臣之道——为什么好人难做皇帝</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span><span class="lesson-tag">含与雍正对话</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">7</div><div class="lesson-info"><h3>乾隆到溥仪：盛世崩塌的三个节点</h3><p>闭关锁国→鸦片战争→辛亥革命——帝国终结的内在逻辑</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">55分钟</span><span class="lesson-tag">含与溥仪对话</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course 6 -->
+  <div class="course-section">
+    <h2>模块六 · 帝王领导力 — 以史为鉴</h2>
+    <p class="subtitle">应用 · 4课时 · 3小时</p>
+    <div class="lesson-list">
+      <div class="lesson-item">
+        <div class="lesson-num">1</div><div class="lesson-info"><h3>人才管理：从刘邦到李世民，帝王如何用人</h3><p>识人、用人、留人——两千年的帝王人才经</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">2</div><div class="lesson-info"><h3>战略决策：从赤壁之战到靖难之役</h3><p>关键时刻的抉择——为什么正确的决策往往反直觉</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">45分钟</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">3</div><div class="lesson-info"><h3>危机管理：安史之乱·土木堡之变·庚子国变</h3><p>帝国危机时刻的应对——哪些是教科书级的，哪些是反面教材</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">50分钟</span></div>
+      </div>
+      <div class="lesson-item">
+        <div class="lesson-num">4</div><div class="lesson-info"><h3>继承人的难题：历代太子之争的启示</h3><p>九子夺嫡、国本之争——为什么选择接班人是帝王最大的考验</p></div>
+        <div class="lesson-meta"><span class="lesson-tag">40分钟</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="cta-section">
+  <h2>🚀 开始你的帝王治理之旅</h2>
+  <p>解锁全部课程 + 帝王数字分身对话</p>
+  <a href="index.html#pricing" class="btn btn-primary">查看定价方案 →</a>
+</div>
+
+<div class="footer">
+  <p>© 2026 Mandate · 课程内容综合百家讲坛、二十四史、学术专著及公开影视资料</p>
+</div>
+
+</body>
+</html>

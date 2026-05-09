@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandate — 四千年的权力答卷，由史料来打分</title>
+<meta name="description" content="中国历代帝王政绩评价平台。24朝·200+帝王·多维评价·AI数字分身。融合正史、影视、学术、民间叙事，与帝王直接对话。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════ RESET & VARIABLES ═══════════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#09090b;--bg2:#0f0f13;--bg3:#18181b;
+  --card:#1c1c21;--card2:#222228;--card3:#2a2a32;
+  --border:#27272a;--border2:#3f3f46;
+  --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+  --gold:#e2b64f;--gold2:#f5d98a;
+  --red:#c43a31;--red2:#e85d50;
+  --green:#22c55e;--blue:#3b82f6;--purple:#a78bfa;
+  --serif:'Noto Serif SC',serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --radius:16px;--radius-sm:10px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+a{color:inherit;text-decoration:none}img{max-width:100%}
+
+/* ═══════════════ TYPOGRAPHY ═══════════════ */
+.serif{font-family:var(--serif)}
+h1{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;line-height:1.15;letter-spacing:-0.02em}
+h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;line-height:1.25;letter-spacing:-0.01em}
+h3{font-size:1.2rem;font-weight:600}
+.label{font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold)}
+.body-lg{font-size:1.125rem;color:var(--text2);line-height:1.8}
+
+/* ═══════════════ LAYOUT ═══════════════ */
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.container-sm{max-width:800px;margin:0 auto;padding:0 24px}
+.section{padding:100px 0}
+.section-sm{padding:60px 0}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:32px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+@media(max-width:768px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.section{padding:60px 0}}
+@media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr)}}
+
+/* ═══════════════ NAV ═══════════════ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(9,9,11,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:all .3s}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:8px}
+.nav-logo .icon{width:28px;height:28px;color:var(--red)}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{font-size:0.875rem;color:var(--text2);transition:color .2s;font-weight:500}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--gold);color:#000;padding:8px 20px;border-radius:8px;font-weight:600;font-size:0.85rem;transition:all .2s}
+.nav-cta:hover{background:var(--gold2);transform:translateY(-1px)}
+@media(max-width:768px){.nav-links{display:none}}
+.hamburger{display:none;cursor:pointer;padding:8px}@media(max-width:768px){.hamburger{display:block}}
+
+/* ═══════════════ HERO ═══════════════ */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:64px}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 20%,rgba(226,182,79,0.08),transparent 70%),
+             radial-gradient(ellipse 60% 40% at 80% 80%,rgba(196,58,49,0.05),transparent 60%),
+             radial-gradient(ellipse 40% 30% at 20% 70%,rgba(59,130,246,0.03),transparent 50%)}
+.hero-content{position:relative;z-index:1;text-align:center;max-width:900px;margin:0 auto;padding:0 24px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(226,182,79,0.1);border:1px solid rgba(226,182,79,0.2);padding:6px 16px;border-radius:100px;font-size:0.8rem;color:var(--gold);margin-bottom:32px}
+.hero-badge .dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero h1{margin-bottom:20px}
+.hero h1 .gold{color:var(--gold)}
+.hero h1 .red{color:var(--red)}
+.hero-sub{font-size:1.15rem;color:var(--text2);max-width:620px;margin:0 auto 36px;line-height:1.7}
+.hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:var(--radius-sm);font-weight:600;font-size:0.95rem;transition:all .25s;border:none;cursor:pointer}
+.btn-primary{background:var(--gold);color:#000}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(226,182,79,0.3)}
+.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:var(--red2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(196,58,49,0.3)}
+.hero-stats{display:flex;justify-content:center;gap:48px;margin-top:56px;padding-top:36px;border-top:1px solid var(--border)}
+.hero-stat{text-align:center}
+.hero-stat .num{font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-stat .desc{font-size:0.8rem;color:var(--text3);margin-top:4px}
+@media(max-width:768px){.hero-stats{gap:20px}.hero-stat .num{font-size:1.4rem}}
+
+/* ═══════════════ QUOTE ═══════════════ */
+.quote-block{text-align:center;padding:80px 0;position:relative;background:var(--bg2)}
+.quote-block::before{content:'「';font-size:8rem;color:var(--gold);opacity:0.1;position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:var(--serif)}
+.quote-text{font-family:var(--serif);font-size:clamp(1.2rem,2.5vw,1.7rem);color:var(--text);max-width:700px;margin:0 auto;line-height:1.8;font-weight:400}
+.quote-author{margin-top:16px;font-size:0.9rem;color:var(--text3)}
+
+/* ═══════════════ SECTION HEADERS ═══════════════ */
+.section-header{text-align:center;max-width:700px;margin:0 auto 60px}
+.section-header .label{margin-bottom:12px}
+.section-header h2{margin-bottom:16px}
+.section-header p{color:var(--text2);font-size:1.05rem;line-height:1.7}
+
+/* ═══════════════ DYNASTY TIMELINE ═══════════════ */
+.timeline{position:relative;padding:0 0 60px}
+.timeline-scroll{overflow-x:auto;padding:20px 0 40px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.timeline-scroll::-webkit-scrollbar{height:4px}
+.timeline-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+.timeline-track{display:flex;gap:0;min-width:max-content;padding:0 40px;align-items:flex-end}
+.timeline-dot{position:relative;cursor:pointer;transition:all .3s;text-align:center;min-width:90px}
+.timeline-dot:hover .timeline-era{opacity:1;transform:translateY(-4px)}
+.timeline-dot .bar{width:4px;margin:0 auto 12px;border-radius:2px;transition:all .3s}
+.timeline-dot.active .bar{background:var(--gold);height:60px}
+.timeline-dot:not(.active) .bar{background:var(--border2);height:30px}
+.timeline-dot:hover .bar{background:var(--gold2)}
+.timeline-dot .era{font-family:var(--serif);font-size:0.8rem;color:var(--text3);margin-bottom:2px;transition:color .3s}
+.timeline-dot.active .era,.timeline-dot:hover .era{color:var(--gold)}
+.timeline-dot .years{font-size:0.65rem;color:var(--text3)}
+
+/* ═══════════════ DYNASTY FILTER ═══════════════ */
+.dynasty-filter{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px}
+.dynasty-pill{padding:8px 18px;border-radius:100px;font-size:0.8rem;font-weight:500;cursor:pointer;transition:all .25s;
+  background:var(--card2);color:var(--text2);border:1px solid transparent}
+.dynasty-pill:hover{border-color:var(--border2);color:var(--text)}
+.dynasty-pill.active{background:rgba(226,182,79,0.12);border-color:var(--gold);color:var(--gold)}
+
+/* ═══════════════ EMPEROR CARDS ═══════════════ */
+.emperor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.emperor-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;
+  cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.emperor-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;
+  background:radial-gradient(circle at top right,var(--gold),transparent 70%);opacity:0;transition:opacity .3s}
+.emperor-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 12px 40px rgba(226,182,79,0.08)}
+.emperor-card:hover::after{opacity:0.06}
+.emperor-card .card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.emperor-card .portrait{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;background:linear-gradient(135deg,rgba(226,182,79,0.15),rgba(196,58,49,0.1))}
+.emperor-card .rating{text-align:right}
+.emperor-card .rating .stars{color:var(--gold);font-size:0.85rem;letter-spacing:2px}
+.emperor-card .rating .score{font-size:0.7rem;color:var(--text3)}
+.emperor-card h3{font-family:var(--serif);font-size:1.1rem;margin-bottom:6px}
+.emperor-card .reign{font-size:0.8rem;color:var(--text3);margin-bottom:10px}
+.emperor-card .tagline{font-size:0.85rem;color:var(--text2);line-height:1.5;margin-bottom:14px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.emperor-card .tags{display:flex;gap:6px;flex-wrap:wrap}
+.emperor-card .tag{font-size:0.7rem;padding:3px 10px;border-radius:6px;background:var(--card3);color:var(--text3)}
+.emperor-card .tag.gold{background:rgba(226,182,79,0.1);color:var(--gold)}
+.emperor-card .chat-badge{position:absolute;bottom:16px;right:16px;font-size:0.7rem;padding:4px 10px;
+  border-radius:6px;background:var(--red);color:#fff;font-weight:600;animation:glow 3s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 8px rgba(196,58,49,0.3)}50%{box-shadow:0 0 20px rgba(196,58,49,0.7)}}
+
+/* ═══════════════ EVALUATION BAR ═══════════════ */
+.eval-bar{margin-top:12px}
+.eval-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.eval-label{font-size:0.7rem;color:var(--text3);width:40px;text-align:right;flex-shrink:0}
+.eval-track{flex:1;height:4px;background:var(--card3);border-radius:2px;overflow:hidden}
+.eval-fill{height:100%;border-radius:2px;transition:width 1s ease-out}
+.eval-fill.pos{background:var(--green)}.eval-fill.neg{background:var(--red)}
+
+/* ═══════════════ COURSE CARDS ═══════════════ */
+.course-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .3s;display:block}
+.course-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.course-inner{display:flex}
+.course-num{width:56px;min-height:56px;background:linear-gradient(135deg,var(--gold),#b8860b);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:#000;flex-shrink:0}
+.course-body{padding:20px 24px}
+.course-body h3{margin-bottom:6px}
+.course-body p{color:var(--text2);font-size:0.85rem;line-height:1.6}
+.course-tags{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.course-tag{font-size:0.7rem;padding:3px 10px;border-radius:6px;background:var(--card3);color:var(--text3)}
+
+/* ═══════════════ DIGITAL AVATAR HERO ═══════════════ */
+.avatar-hero{background:var(--bg2);position:relative;overflow:hidden}
+.avatar-hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse 60% 50% at 70% 50%,rgba(196,58,49,0.08),transparent 60%),
+             radial-gradient(ellipse 50% 50% at 30% 50%,rgba(226,182,79,0.04),transparent 50%)}
+.avatar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;position:relative;z-index:1}
+@media(max-width:900px){.avatar-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.avatar-grid{grid-template-columns:1fr}}
+.avatar-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 20px;
+  text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.avatar-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(196,58,49,0.05),transparent 60%);opacity:0;transition:opacity .3s}
+.avatar-card:hover{transform:translateY(-6px);border-color:var(--red);box-shadow:0 20px 50px rgba(196,58,49,0.1)}
+.avatar-card:hover::before{opacity:1}
+.avatar-card .avatar-icon{width:64px;height:64px;margin:0 auto 16px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(226,182,79,0.15),rgba(196,58,49,0.12));
+  display:flex;align-items:center;justify-content:center;font-size:2rem}
+.avatar-card h3{font-family:var(--serif);font-size:1.1rem;margin-bottom:4px}
+.avatar-card .avatar-dynasty{font-size:0.75rem;color:var(--text3);margin-bottom:10px}
+.avatar-card .avatar-quote{font-size:0.8rem;color:var(--text2);line-height:1.5;font-style:italic}
+.avatar-card .live-dot{display:inline-block;width:8px;height:8px;background:var(--red);border-radius:50%;margin-right:4px;animation:pulse 2s infinite}
+
+/* ═══════════════ PRICING ═══════════════ */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;margin:0 auto}
+@media(max-width:900px){.pricing-grid{grid-template-columns:1fr;max-width:420px}}
+.price-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px;position:relative;transition:all .3s}
+.price-card:hover{border-color:var(--border2);transform:translateY(-4px)}
+.price-card.featured{border-color:var(--gold);background:linear-gradient(180deg,rgba(226,182,79,0.05),transparent)}
+.price-card.featured::before{content:'最受欢迎';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--gold);color:#000;padding:4px 16px;border-radius:100px;font-size:0.75rem;font-weight:700}
+.price-name{font-size:0.9rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+.price-amount{font-size:2.5rem;font-weight:900;margin-bottom:4px}
+.price-amount .unit{font-size:0.9rem;font-weight:400;color:var(--text3)}
+.price-desc{font-size:0.85rem;color:var(--text3);margin-bottom:24px}
+.price-features{list-style:none;margin-bottom:32px}
+.price-features li{padding:8px 0;font-size:0.88rem;color:var(--text2);display:flex;align-items:flex-start;gap:10px}
+.price-features li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
+.price-features li.red::before{content:'✦';color:var(--red)}
+.price-btn{display:block;width:100%;text-align:center;padding:14px;border-radius:var(--radius-sm);font-weight:600;font-size:0.95rem;transition:all .25s;border:none;cursor:pointer}
+.price-btn-primary{background:var(--gold);color:#000}
+.price-btn-primary:hover{background:var(--gold2)}
+.price-btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.price-btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ═══════════════ CTA ═══════════════ */
+.cta-section{text-align:center;padding:100px 0;position:relative}
+.cta-section::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 50%,rgba(226,182,79,0.06),transparent),
+             radial-gradient(ellipse 50% 50% at 30% 70%,rgba(196,58,49,0.03),transparent)}
+.cta-content{position:relative;z-index:1}
+.cta-content h2{margin-bottom:16px}
+.cta-content p{color:var(--text2);font-size:1.1rem;margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto}
+
+/* ═══════════════ SEARCH ═══════════════ */
+.search-wrap{max-width:500px;margin:0 auto 40px;position:relative}
+.search-input{width:100%;padding:14px 20px 14px 48px;border-radius:var(--radius-sm);border:1px solid var(--border2);
+  background:var(--card);color:var(--text);font-size:0.95rem;font-family:var(--sans);outline:none;transition:border-color .2s}
+.search-input:focus{border-color:var(--gold)}
+.search-input::placeholder{color:var(--text3)}
+.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:1.1rem}
+
+/* ═══════════════ FOOTER ═══════════════ */
+.footer{border-top:1px solid var(--border);padding:48px 0;text-align:center}
+.footer-links{display:flex;justify-content:center;gap:32px;margin-bottom:24px;flex-wrap:wrap}
+.footer-links a{font-size:0.85rem;color:var(--text3);transition:color .2s}
+.footer-links a:hover{color:var(--gold)}
+.footer-copy{font-size:0.8rem;color:var(--text3)}
+.footer-disclaimer{font-size:0.75rem;color:var(--text3);max-width:550px;margin:10px auto 0;line-height:1.6}
+
+/* ═══════════════ ANIMATIONS ═══════════════ */
+.fade-in{opacity:0;transform:translateY(20px);transition:all .6s ease-out}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+/* ═══════════════ TOAST ═══════════════ */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--gold);color:#000;
+  padding:12px 24px;border-radius:100px;font-size:0.85rem;font-weight:600;z-index:200;
+  opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <svg class="icon" viewBox="0 0 28 28" fill="none">
+        <rect x="2" y="4" width="24" height="20" rx="2" stroke="#e2b64f" stroke-width="1.5"/>
+        <path d="M2 10h24" stroke="#e2b64f" stroke-width="1"/>
+        <path d="M2 16h24" stroke="#e2b64f" stroke-width="1"/>
+        <circle cx="14" cy="13" r="5" stroke="#c43a31" stroke-width="1.2" fill="none"/>
+      </svg>
+      Mandate
+    </a>
+    <div class="nav-links">
+      <a href="#emperors">帝王录</a>
+      <a href="#avatars">数字分身</a>
+      <a href="#courses">课程</a>
+      <a href="#pricing">定价</a>
+      <a href="#avatars" class="nav-cta">与帝王对话</a>
+    </div>
+    <div class="hamburger" onclick="document.getElementById('navLinks')?.classList.toggle('open')">☰</div>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot"></span> 24朝 · 200+帝王 · 四千年文明</div>
+    <h1 class="serif">四千年的<span class="gold">权力答卷</span><br>由<span class="red">史料</span>来打分</h1>
+    <p class="hero-sub">融合二十四史、四库全书、百家讲坛、影视作品、民间叙事——每一个帝王都不止一面。更有AI数字分身，让你与帝王直接对话。</p>
+    <div class="hero-actions">
+      <a href="#emperors" class="btn btn-primary">🔍 探索帝王录</a>
+      <a href="#avatars" class="btn btn-red">💬 与帝王对话</a>
+      <a href="#courses" class="btn btn-secondary">📚 课程体系</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">24</div><div class="desc">王朝迭代</div></div>
+      <div class="hero-stat"><div class="num">200+</div><div class="desc">帝王收录</div></div>
+      <div class="hero-stat"><div class="num">5</div><div class="desc">评价维度</div></div>
+      <div class="hero-stat"><div class="num">∞</div><div class="desc">AI数字分身</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ QUOTE ═══════════════ -->
+<div class="quote-block">
+  <div class="container-sm">
+    <p class="quote-text serif">「以铜为镜，可以正衣冠；以史为镜，可以知兴替；以人为镜，可以明得失。」</p>
+    <p class="quote-author">— 唐太宗 李世民</p>
+  </div>
+</div>
+
+<!-- ═══════════════ DYNASTY TIMELINE ═══════════════ -->
+<section id="timeline" class="section-sm">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="label">朝代脉络</div>
+      <h2>上下四千年，二十四个王朝</h2>
+      <p>从夏启家天下，到溥仪退位。每一个朝代都承载着治理的智慧与教训。</p>
+    </div>
+    <div class="timeline">
+      <div class="timeline-scroll">
+        <div class="timeline-track" id="dynastyTrack"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ EMPEROR BROWSER ═══════════════ -->
+<section id="emperors" class="section" style="background:var(--bg2)">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="label">帝王录</div>
+      <h2>每一位帝王，都不止一种评价</h2>
+      <p>正史、学术、影视、通俗、民间——五源交叉验证。点击任意帝王查看完整政绩与多维评价。</p>
+    </div>
+    <div class="search-wrap fade-in">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索帝王、庙号、朝代...（如：唐太宗、康熙、秦始皇）" oninput="renderEmperors()">
+    </div>
+    <div class="dynasty-filter fade-in" id="dynastyFilter"></div>
+    <div class="emperor-grid fade-in" id="emperorGrid"></div>
+  </div>
+</section>
+
+<!-- ═══════════════ DIGITAL AVATARS ═══════════════ -->
+<section id="avatars" class="section avatar-hero">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="label" style="color:var(--red)">🔥 数字分身</div>
+      <h2>穿越千年，与帝王<span style="color:var(--red)">面对面</span></h2>
+      <p>基于DeepSeek AI，每一位帝王都拥有独立的数字人格——包含其性格、政见、历史知识。你可以直接问秦始皇为何焚书坑儒，问唐太宗如何看待魏征。</p>
+    </div>
+    <div class="avatar-grid" id="avatarGrid"></div>
+  </div>
+</section>
+
+<!-- ═══════════════ COURSES ═══════════════ -->
+<section id="courses" class="section" style="background:var(--bg2)">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="label">课程体系</div>
+      <h2>从入门到深度，系统学习帝王治理智慧</h2>
+      <p>六大模块 · 24节课 · 融合百家讲坛+影视+专著 · 每课含AI互动思辨</p>
+    </div>
+    <div class="grid-2" style="max-width:900px;margin:0 auto">
+      <a href="courses.html#c1" class="course-card fade-in">
+        <div class="course-inner">
+          <div class="course-num">1</div>
+          <div class="course-body">
+            <h3>帝制起源 — 从禅让到家天下</h3>
+            <p>夏商周三代：天命观的形成与早期王权运作</p>
+            <div class="course-tags"><span class="course-tag">入门</span><span class="course-tag">3课时</span><span class="course-tag">含AI对话</span></div>
+          </div>
+        </div>
+      </a>
+      <a href="courses.html#c2" class="course-card fade-in">
+        <div class="course-inner">
+          <div class="course-num">2</div>
+          <div class="course-body">
+            <h3>大一统奠基 — 秦汉帝王</h3>
+            <p>秦始皇到汉武帝：郡县制、独尊儒术、帝国雏形</p>
+            <div class="course-tags"><span class="course-tag">核心</span><span class="course-tag">5课时</span><span class="course-tag">含AI对话</span></div>
+          </div>
+        </div>
+      </a>
+      <a href="courses.html#c3" class="course-card fade-in">
+        <div class="course-inner">
+          <div class="course-num">3</div>
+          <div class="course-body">
+            <h3>帝国巅峰 — 隋唐帝王</h3>
+            <p>贞观之治到开元盛世：盛世治理的核心密码</p>
+            <div class="course-tags"><span class="course-tag">深度</span><span class="course-tag">6课时</span><span class="course-tag">含AI对话</span></div>
+          </div>
+        </div>
+      </a>
+      <a href="courses.html#c4" class="course-card fade-in">
+        <div class="course-inner">
+          <div class="course-num">4</div>
+          <div class="course-body">
+            <h3>文治的博弈 — 宋元帝王</h3>
+            <p>重文轻武的代价、蒙古帝国的统治实验</p>
+            <div class="course-tags"><span class="course-tag">进阶</span><span class="course-tag">5课时</span><span class="course-tag">含AI对话</span></div>
+          </div>
+        </div>
+      </a>
+      <a href="courses.html#c5" class="course-card fade-in">
+        <div class="course-inner">
+          <div class="course-num">5</div>
+          <div class="course-body">
+            <h3>专制巅峰 — 明清帝王</h3>
+            <p>朱元璋到乾隆：集权顶峰、闭关锁国、近代转型</p>
+            <div class="course-tags"><span class="course-tag">深度</span><span class="course-tag">7课时</span><span class="course-tag">含AI对话</span></div>
+          </div>
+        </div>
+      </a>
+      <a href="courses.html#c6" class="course-card fade-in">
+        <div class="course-inner">
+          <div class="course-num">6</div>
+          <div class="course-body">
+            <h3>帝王领导力 — 以史为鉴</h3>
+            <p>战略决策、人才管理、危机应对的古今对照</p>
+            <div class="course-tags"><span class="course-tag">应用</span><span class="course-tag">4课时</span><span class="course-tag">含AI对话</span></div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PRICING ═══════════════ -->
+<section id="pricing" class="section">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="label">定价方案</div>
+      <h2>选择你的历史学习深度</h2>
+      <p>从免费浏览到深度研习，找到最适合你的方式。</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card fade-in">
+        <div class="price-name">探索者</div>
+        <div class="price-amount">免费</div>
+        <div class="price-desc">浏览帝王录与多方评价</div>
+        <ul class="price-features">
+          <li>帝王录完整浏览</li>
+          <li>五源评价对比查看</li>
+          <li>朝代时间轴导航</li>
+          <li>社区讨论（只读）</li>
+        </ul>
+        <button class="price-btn price-btn-secondary" onclick="showToast('直接开始浏览！')">免费开始</button>
+      </div>
+      <div class="price-card featured fade-in">
+        <div class="price-name">研习者</div>
+        <div class="price-amount">199<span class="unit">元/年</span></div>
+        <div class="price-desc">系统课程 + AI数字分身对话</div>
+        <ul class="price-features">
+          <li>探索者全部内容</li>
+          <li>24节完整课程体系</li>
+          <li>AI数字分身对话（20位帝王）</li>
+          <li class="red">DeepSeek AI深度洞察</li>
+          <li>帝王对比分析工具</li>
+          <li>课后测验 + AI批改论述题</li>
+          <li>学习成就勋章</li>
+        </ul>
+        <button class="price-btn price-btn-primary" onclick="showToast('即将开放购买！')">立即订阅</button>
+      </div>
+      <div class="price-card fade-in">
+        <div class="price-name">学者</div>
+        <div class="price-amount">999<span class="unit">元/年</span></div>
+        <div class="price-desc">全量数据 + 定制研究</div>
+        <ul class="price-features">
+          <li>研习者全部内容</li>
+          <li>200+帝王数字分身（无限制）</li>
+          <li class="red">自定义AI研究课题</li>
+          <li>原始史料全文检索</li>
+          <li>反事实推演工具</li>
+          <li>1v1导师研讨（季度）</li>
+          <li>年度帝王治理报告</li>
+        </ul>
+        <button class="price-btn price-btn-secondary" onclick="showToast('即将开放购买！')">申请加入</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CTA ═══════════════ -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content fade-in">
+      <h2 class="serif">今天你想和<span style="color:var(--red)">哪位帝王</span>对话？</h2>
+      <p>秦始皇的霸气、李世民的谦逊、康熙的睿智——选一位，开始穿越时空的对话。</p>
+      <a href="#avatars" class="btn btn-red" style="font-size:1.1rem;padding:16px 36px">💬 进入数字分身 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<div class="footer">
+  <div class="footer-links">
+    <a href="#emperors">帝王录</a>
+    <a href="#avatars">数字分身</a>
+    <a href="#courses">课程</a>
+    <a href="#pricing">定价</a>
+    <a href="#">关于Mandate</a>
+  </div>
+  <p class="footer-copy">© 2026 Mandate · 数据来源：二十四史、四库全书、百家讲坛、公开影视与学术文献</p>
+  <p class="footer-disclaimer">本平台评价综合多方史料，力求客观多元。历史评价本无绝对标准，仅供参考与思辨。</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

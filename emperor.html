@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Mandate · 帝王详情</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#09090b;--bg2:#0f0f13;--card:#1c1c21;--card2:#222228;--card3:#2a2a32;
+  --border:#27272a;--border2:#3f3f46;
+  --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+  --gold:#e2b64f;--gold2:#f5d98a;--red:#c43a31;--green:#22c55e;
+  --serif:'Noto Serif SC',serif;--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --radius:16px;--radius-sm:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.7}
+a{color:inherit;text-decoration:none}
+.container{max-width:900px;margin:0 auto;padding:0 24px}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(9,9,11,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold)}
+.nav-back{color:var(--text2);font-size:0.85rem;transition:color .2s}
+.nav-back:hover{color:var(--gold)}
+
+/* HEADER */
+.emperor-header{padding:100px 0 40px;text-align:center;position:relative}
+.emperor-header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse 60% 50% at 50% 30%,rgba(226,182,79,0.06),transparent),
+             radial-gradient(ellipse 40% 30% at 80% 80%,rgba(196,58,49,0.04),transparent)}
+.emperor-portrait{width:100px;height:100px;margin:0 auto 20px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(226,182,79,0.2),rgba(196,58,49,0.15));
+  display:flex;align-items:center;justify-content:center;font-size:3rem}
+.emperor-header h1{font-family:var(--serif);font-size:2.5rem;margin-bottom:8px}
+.emperor-header .sub{font-size:1rem;color:var(--text3)}
+.emperor-header .rating{margin-top:16px;font-size:1.2rem}
+.emperor-header .stars{color:var(--gold);letter-spacing:3px}
+.emperor-header .score{color:var(--text2);font-size:1.5rem;font-weight:700;margin-left:8px}
+
+/* TAGLINE QUOTE */
+.tagline-quote{text-align:center;padding:30px 0 50px;font-family:var(--serif);font-size:1.2rem;color:var(--text2);line-height:1.8;font-style:italic;max-width:600px;margin:0 auto}
+
+/* SECTIONS */
+.section{padding:40px 0}
+.section-title{font-family:var(--serif);font-size:1.3rem;color:var(--gold);margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+
+/* DIM BARS */
+.dim-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:16px}
+.dim-row{display:flex;align-items:center;gap:16px}
+.dim-label{font-family:var(--serif);font-size:0.9rem;color:var(--text2);width:60px;text-align:right;flex-shrink:0}
+.dim-track{flex:1;height:8px;background:var(--card3);border-radius:4px;overflow:hidden}
+.dim-fill{height:100%;border-radius:4px;transition:width 1.2s ease-out}
+.dim-fill.high{background:linear-gradient(90deg,var(--gold),var(--green))}
+.dim-fill.mid{background:linear-gradient(90deg,var(--gold),var(--text3))}
+.dim-fill.low{background:linear-gradient(90deg,var(--red),var(--text3))}
+.dim-score{font-size:0.85rem;color:var(--text2);font-weight:600;width:30px}
+
+/* ACHIEVEMENTS */
+.ach-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:600px){.ach-grid{grid-template-columns:1fr}}
+.ach-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px}
+.ach-card h4{font-size:0.9rem;color:var(--gold);margin-bottom:8px}
+.ach-card p{font-size:0.85rem;color:var(--text2);line-height:1.6}
+
+/* EVALUATIONS */
+.eval-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;margin-bottom:16px}
+.eval-card .eval-source{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.eval-source-icon{font-size:1.2rem}
+.eval-card .eval-source-name{font-weight:600;font-size:0.9rem}
+.eval-card .eval-source-type{font-size:0.7rem;color:var(--text3);padding:2px 8px;background:var(--card3);border-radius:4px}
+.eval-card .eval-text{font-size:0.9rem;color:var(--text2);line-height:1.7;font-style:italic}
+.eval-card .eval-rating{font-size:0.8rem;color:var(--gold);margin-top:8px}
+
+/* CHAT CTA */
+.chat-cta{text-align:center;padding:60px 0;position:relative}
+.chat-cta::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(196,58,49,0.08),transparent)}
+.chat-cta-content{position:relative;z-index:1}
+.chat-cta h2{font-family:var(--serif);font-size:1.5rem;margin-bottom:12px}
+.chat-cta p{color:var(--text2);margin-bottom:24px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:var(--radius-sm);font-weight:600;font-size:0.95rem;transition:all .25s;border:none;cursor:pointer}
+.btn-red{background:var(--red);color:#fff;font-size:1.05rem}
+.btn-red:hover{background:#e85d50;transform:translateY(-2px);box-shadow:0 8px 30px rgba(196,58,49,0.3)}
+.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border2);margin-left:12px}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+/* TAGS */
+.tags{margin-top:24px;display:flex;gap:8px;flex-wrap:wrap}
+.tag{padding:6px 14px;border-radius:100px;font-size:0.8rem;background:var(--card2);color:var(--text2);border:1px solid var(--border)}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;font-size:0.8rem;color:var(--text3)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Mandate</a>
+    <a href="index.html#emperors" class="nav-back">← 返回帝王录</a>
+  </div>
+</nav>
+
+<div id="app">
+  <div style="text-align:center;padding:200px 0;color:var(--text3)">
+    <p style="font-size:1.5rem;margin-bottom:12px">👑</p>
+    <p>加载中...</p>
+  </div>
+</div>
+
+<div class="footer">
+  <p>© 2026 Mandate · 历史评价综合多方史料，仅供参考与思辨</p>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+'use strict';
+
+function getQueryParam(name) {
+  const p = new URLSearchParams(window.location.search);
+  return p.get(name);
+}
+
+function getDynastyName(id) {
+  const d = DYNASTIES.find(d=>d.id===id);
+  return d ? d.name : id;
+}
+
+const emperorId = getQueryParam('id');
+if(!emperorId) {
+  document.getElementById('app').innerHTML = `<div style="text-align:center;padding:120px 0"><p>未指定帝王。请从<a href="index.html#emperors" style="color:var(--gold)">帝王录</a>中选择。</p></div>`;
+} else {
+  const emp = EMPERORS.find(e=>e.id===emperorId);
+  if(!emp) {
+    document.getElementById('app').innerHTML = `<div style="text-align:center;padding:120px 0"><p>未找到该帝王。请从<a href="index.html#emperors" style="color:var(--gold)">帝王录</a>中选择。</p></div>`;
+  } else {
+    renderEmperor(emp);
+  }
+}
+
+function renderEmperor(emp) {
+  document.title = `${emp.name}（${emp.temple}）— Mandate`;
+  
+  const stars = '★'.repeat(Math.floor(emp.stars)) + (emp.stars%1>=0.5?'☆':'');
+  
+  // Generate mock evaluations
+  const evaluations = generateEvaluations(emp);
+  
+  // Generate mock achievements
+  const achievements = generateAchievements(emp);
+  
+  document.getElementById('app').innerHTML = `
+    <!-- HEADER -->
+    <div class="emperor-header">
+      <div class="emperor-portrait">👑</div>
+      <h1>${emp.name}</h1>
+      <div class="sub">${emp.temple} · ${getDynastyName(emp.dynasty)} · ${emp.reign}</div>
+      <div class="rating"><span class="stars">${stars}</span><span class="score">${emp.score}</span><span style="color:var(--text3);font-size:0.9rem">/10</span></div>
+      <div class="tags" style="justify-content:center">${emp.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>
+    
+    <div class="tagline-quote container">「${emp.tagline}」</div>
+    
+    <div class="container">
+      <!-- DIMENSIONS -->
+      <div class="section">
+        <div class="section-title">五维评价</div>
+        <div class="dim-grid">
+          ${renderDim('大一统贡献', emp.dims.unity)}
+          ${renderDim('民生福祉', emp.dims.livelihood)}
+          ${renderDim('制度建设', emp.dims.system)}
+          ${renderDim('文化昌明', emp.dims.culture)}
+          ${renderDim('后世影响', emp.dims.legacy)}
+        </div>
+      </div>
+      
+      <!-- ACHIEVEMENTS -->
+      <div class="section">
+        <div class="section-title">核心政绩</div>
+        <div class="ach-grid">
+          ${achievements.map(a=>`
+            <div class="ach-card">
+              <h4>${a.category}</h4>
+              <p>${a.detail}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      
+      <!-- MULTI-SOURCE EVALUATIONS -->
+      <div class="section">
+        <div class="section-title">多源评价 · 交叉验证</div>
+        ${evaluations.map(ev=>`
+          <div class="eval-card">
+            <div class="eval-source">
+              <span class="eval-source-icon">${ev.icon}</span>
+              <span class="eval-source-name">${ev.source}</span>
+              <span class="eval-source-type">${ev.type}</span>
+            </div>
+            <div class="eval-text">「${ev.text}」</div>
+            <div class="eval-rating">${'★'.repeat(ev.rating)} ${ev.rating}/5</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    
+    <!-- AI CHAT CTA -->
+    <div class="chat-cta">
+      <div class="chat-cta-content">
+        <h2>想和${emp.name}直接对话吗？</h2>
+        <p>基于DeepSeek AI，${emp.name}的数字分身已就绪。<br>你可以问TA任何历史问题、政治理念，甚至进行跨越时空的辩论。</p>
+        <a href="chat.html?id=${emp.id}" class="btn btn-red">💬 与${emp.name}对话</a>
+        <a href="index.html#emperors" class="btn btn-secondary">← 浏览更多帝王</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderDim(label, val) {
+  let cls = val >= 7 ? 'high' : val >= 4 ? 'mid' : 'low';
+  return `<div class="dim-row">
+    <span class="dim-label">${label}</span>
+    <div class="dim-track"><div class="dim-fill ${cls}" style="width:${val*10}%"></div></div>
+    <span class="dim-score">${val}/10</span>
+  </div>`;
+}
+
+function generateEvaluations(emp) {
+  const evals = [];
+  // Official history (正史)
+  const zhengshiTexts = {
+    high: "其治世之功，垂范千古，后世帝王莫不引以为楷模。",
+    mid: "有为之君，然亦有可议之处。功过相参，史家各有评骘。",
+    low: "昏暴之主，贻祸无穷。虽有小善，难以掩大恶。"
+  };
+  const text = emp.score >= 8 ? 'high' : emp.score >= 5 ? 'mid' : 'low';
+  
+  evals.push({icon:'📜',source:'二十四史',type:'正史',text:zhengshiTexts[text],rating:Math.round(emp.score/2)});
+  
+  // Academic
+  evals.push({icon:'📖',source:'百家讲坛',type:'学术',text:`"${emp.name}是中国历史上${emp.score>=8?'极为重要':'颇具争议'}的一位帝王..."——学者评价摘录`,rating:Math.round(emp.score/2)});
+  
+  // TV/Film
+  const filmTexts = {
+    high: `在影视作品中，${emp.name}通常被塑造为一位雄才大略的正面形象，相关作品包括多部史诗级电视剧与电影。`,
+    mid: `影视作品中${emp.name}的形象较为复杂，既有正面刻画也有反面描写，反映出其历史评价的分歧。`,
+    low: `在影视改编中，${emp.name}多以负面形象出现，是历史剧中典型的反面教材。`
+  };
+  evals.push({icon:'🎬',source:'影视作品',type:'影视',text:filmTexts[text],rating:Math.round(emp.score/2)});
+  
+  // Popular
+  const popularTexts = {
+    high: `在民间叙事和通俗历史读物中，${emp.name}享有极高声誉，是中国人最熟悉和尊敬的帝王之一。`,
+    mid: `民间对${emp.name}的评价褒贬不一，有人欣赏其功业，有人批评其手段。`,
+    low: `民间口碑不佳，常被视为失败的统治者，相关的民间故事多以批判为主。`
+  };
+  evals.push({icon:'📚',source:'通俗读物',type:'通俗',text:popularTexts[text],rating:Math.round(emp.score/2)});
+  
+  // Online
+  const onlineTexts = {
+    high: `在知乎、豆瓣等平台，${emp.name}是常被讨论的热门帝王，大多数网友给予正面评价。`,
+    mid: `网络社区对${emp.name}的讨论较为热烈，观点两极分化，争论不休。`,
+    low: `网络上对${emp.name}的评价普遍负面，经常出现在"最差帝王"的讨论中。`
+  };
+  evals.push({icon:'🗣️',source:'网络社区',type:'民间',text:onlineTexts[text],rating:Math.round(emp.score/2)});
+  
+  return evals;
+}
+
+function generateAchievements(emp) {
+  const cats = ['军事', '经济', '文化', '吏治'];
+  const highAchs = {
+    military: ['开疆拓土，疆域达到历史极盛', '击退外敌入侵，维护国家安全', '统一战争，结束分裂局面'],
+    economy: ['轻徭薄赋，休养生息政策', '改革税制，减轻百姓负担', '促进农业与商业发展'],
+    culture: ['重视文教，推动文化繁荣', '编纂典籍，保存文化遗产', '包容多元文化，推动交流'],
+    governance: ['整顿吏治，打击贪腐', '改革官制，提升行政效率', '广纳贤才，知人善任']
+  };
+  const lowAchs = {
+    military: ['连年征战，耗尽国力', '军事失败，丧权辱国'],
+    economy: ['横征暴敛，民不聊生', '大兴土木，劳民伤财'],
+    culture: ['焚书坑儒，文化浩劫', '大兴文字狱，禁锢思想'],
+    governance: ['任用奸佞，朝政腐败', '猜忌功臣，滥杀无辜']
+  };
+  
+  const pool = emp.score >= 6 ? highAchs : lowAchs;
+  return [
+    {category:'⚔️ 军事',detail:pool.military[emp.id.length % pool.military.length]},
+    {category:'💰 经济',detail:pool.economy[emp.id.length % pool.economy.length]},
+    {category:'📚 文化',detail:pool.culture[emp.id.length % pool.culture.length]},
+    {category:'🏛️ 吏治',detail:pool.governance[emp.id.length % pool.governance.length]},
+  ];
+}
+</script>
+</body>
+</html>

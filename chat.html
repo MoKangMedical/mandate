@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandate Chat · 与帝王对话</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#09090b;--bg2:#0f0f13;--card:#1c1c21;--card2:#222228;
+  --border:#27272a;--border2:#3f3f46;
+  --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+  --gold:#e2b64f;--red:#c43a31;--red2:#e85d50;
+  --serif:'Noto Serif SC',serif;--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --radius:16px;--radius-sm:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column}
+
+/* CHAT LAYOUT */
+.chat-container{flex:1;display:flex;flex-direction:column;max-width:800px;margin:0 auto;width:100%;height:100vh}
+
+/* HEADER */
+.chat-header{display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(9,9,11,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);flex-shrink:0}
+.chat-header .avatar-icon{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,rgba(226,182,79,0.2),rgba(196,58,49,0.15));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.chat-header .info{flex:1;min-width:0}
+.chat-header .name{font-family:var(--serif);font-weight:700;font-size:1rem}
+.chat-header .dynasty{font-size:0.75rem;color:var(--text3)}
+.chat-header .status{font-size:0.7rem;color:var(--green);display:flex;align-items:center;gap:4px}
+.chat-header .status .dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.chat-header .back-btn{color:var(--text3);font-size:0.8rem;transition:color .2s;flex-shrink:0}
+.chat-header .back-btn:hover{color:var(--gold)}
+
+/* MESSAGES */
+.chat-messages{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:20px}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+.message{max-width:85%;animation:msgIn .3s ease-out}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.message.emperor{align-self:flex-start}
+.message.user{align-self:flex-end}
+
+.message .bubble{padding:14px 18px;border-radius:var(--radius-sm);line-height:1.7;font-size:0.92rem}
+.message.emperor .bubble{background:var(--card);border:1px solid var(--border);border-top-left-radius:2px}
+.message.user .bubble{background:rgba(226,182,79,0.1);border:1px solid rgba(226,182,79,0.2);border-top-right-radius:2px;color:var(--text)}
+
+.message .meta{font-size:0.7rem;color:var(--text3);margin-top:6px;padding:0 4px}
+.message.user .meta{text-align:right}
+
+/* TYPING INDICATOR */
+.typing .bubble{display:flex;gap:6px;padding:16px 20px}
+.typing .bubble span{width:6px;height:6px;background:var(--text3);border-radius:50%;animation:bounce 1.4s infinite}
+.typing .bubble span:nth-child(2){animation-delay:.2s}
+.typing .bubble span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+
+/* WELCOME MESSAGE */
+.welcome-card{background:linear-gradient(135deg,rgba(226,182,79,0.05),rgba(196,58,49,0.05));border:1px solid var(--border);border-radius:var(--radius);padding:28px;text-align:center;margin-bottom:8px}
+.welcome-card .welcome-icon{font-size:3rem;margin-bottom:12px}
+.welcome-card h2{font-family:var(--serif);font-size:1.3rem;margin-bottom:8px}
+.welcome-card p{font-size:0.85rem;color:var(--text2);line-height:1.7;margin-bottom:16px}
+.welcome-suggestions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.welcome-suggestion{padding:8px 16px;background:var(--card2);border:1px solid var(--border);border-radius:100px;font-size:0.8rem;color:var(--text2);cursor:pointer;transition:all .2s}
+.welcome-suggestion:hover{border-color:var(--gold);color:var(--gold)}
+
+/* INPUT */
+.chat-input-container{padding:16px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg2)}
+.chat-input-wrap{display:flex;gap:10px;align-items:flex-end}
+.chat-input{flex:1;padding:12px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--card);color:var(--text);font-size:0.9rem;font-family:var(--sans);resize:none;outline:none;line-height:1.5;min-height:44px;max-height:120px;transition:border-color .2s}
+.chat-input:focus{border-color:var(--gold)}
+.chat-input::placeholder{color:var(--text3)}
+.send-btn{width:44px;height:44px;border-radius:var(--radius-sm);border:none;background:var(--gold);color:#000;font-size:1.2rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.send-btn:hover{background:var(--gold2);transform:translateY(-1px)}
+.send-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.send-btn.loading{background:var(--card3);color:var(--text3)}
+
+/* ERROR */
+.error-card{background:rgba(196,58,49,0.08);border:1px solid rgba(196,58,49,0.2);border-radius:var(--radius-sm);padding:16px;text-align:center;margin:12px 0}
+.error-card p{color:var(--red);font-size:0.85rem}
+
+/* API CONFIG MODAL */
+.api-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+.api-modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px;max-width:440px;width:100%}
+.api-modal h3{font-family:var(--serif);margin-bottom:8px}
+.api-modal p{font-size:0.85rem;color:var(--text2);margin-bottom:20px}
+.api-modal label{display:block;font-size:0.8rem;color:var(--text3);margin-bottom:6px}
+.api-modal input, .api-modal select{width:100%;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--card);color:var(--text);margin-bottom:16px;font-size:0.9rem;font-family:var(--sans);outline:none}
+.api-modal input:focus,.api-modal select:focus{border-color:var(--gold)}
+.api-modal .btn-row{display:flex;gap:10px}
+.api-modal .btn{flex:1;padding:12px;border-radius:var(--radius-sm);font-weight:600;font-size:0.9rem;cursor:pointer;border:none;transition:all .2s;text-align:center}
+.api-modal .btn-save{background:var(--gold);color:#000}
+.api-modal .btn-save:hover{background:var(--gold2)}
+.api-modal .btn-cancel{background:var(--card);color:var(--text2);border:1px solid var(--border2)}
+.api-modal .btn-cancel:hover{border-color:var(--gold);color:var(--gold)}
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+  <!-- HEADER -->
+  <div class="chat-header">
+    <div class="avatar-icon">👑</div>
+    <div class="info">
+      <div class="name" id="chatEmperorName">加载中...</div>
+      <div class="dynasty" id="chatEmperorDynasty"></div>
+      <div class="status"><span class="dot"></span> 在线 · 数字分身</div>
+    </div>
+    <a href="index.html" class="back-btn">← 返回</a>
+  </div>
+  
+  <!-- MESSAGES -->
+  <div class="chat-messages" id="chatMessages">
+    <!-- Welcomes rendered by JS -->
+  </div>
+  
+  <!-- INPUT -->
+  <div class="chat-input-container">
+    <div class="chat-input-wrap">
+      <textarea class="chat-input" id="chatInput" placeholder="输入你想问的问题..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- API CONFIG MODAL -->
+<div class="api-modal-overlay" id="apiModal" style="display:none">
+  <div class="api-modal">
+    <h3>⚙️ 配置 DeepSeek API</h3>
+    <p>请输入你的 DeepSeek API Key 以激活帝王数字分身。API Key 仅保存在你的浏览器本地。</p>
+    <label>API Key</label>
+    <input type="password" id="apiKeyInput" placeholder="sk-...">
+    <label>API 地址</label>
+    <input type="text" id="apiUrlInput" value="https://api.deepseek.com/v1/chat/completions" placeholder="https://api.deepseek.com/v1/chat/completions">
+    <label>模型</label>
+    <select id="modelSelect">
+      <option value="deepseek-chat">deepseek-chat</option>
+      <option value="deepseek-v4-pro">deepseek-v4-pro</option>
+    </select>
+    <div class="btn-row">
+      <button class="btn btn-cancel" onclick="hideApiModal()">取消</button>
+      <button class="btn btn-save" onclick="saveApiConfig()">保存并开始</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+'use strict';
+
+function getQueryParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
+}
+
+function getDynastyName(id) {
+  const d = DYNASTIES.find(d=>d.id===id);
+  return d ? d.name : id;
+}
+
+// ═══════ STATE ═══════
+let currentEmperor = null;
+let messages = [];
+let isLoading = false;
+let apiKey = localStorage.getItem('mandate_deepseek_key') || '';
+let apiUrl = localStorage.getItem('mandate_deepseek_url') || 'https://api.deepseek.com/v1/chat/completions';
+let apiModel = localStorage.getItem('mandate_deepseek_model') || 'deepseek-chat';
+
+// ═══════ INIT ═══════
+const emperorId = getQueryParam('id');
+if(!emperorId) {
+  window.location.href = 'index.html#avatars';
+} else {
+  const emp = EMPERORS.find(e=>e.id===emperorId);
+  if(!emp) {
+    window.location.href = 'index.html#avatars';
+  } else {
+    currentEmperor = emp;
+    initChat();
+  }
+}
+
+function initChat() {
+  document.getElementById('chatEmperorName').textContent = currentEmperor.name;
+  document.getElementById('chatEmperorDynasty').textContent = `${getDynastyName(currentEmperor.dynasty)} · ${currentEmperor.reign}`;
+  document.title = `与${currentEmperor.name}对话 — Mandate`;
+  
+  // Check API key
+  if(!apiKey) {
+    showApiModal();
+  } else {
+    // Load saved messages
+    const saved = localStorage.getItem(`mandate_chat_${currentEmperor.id}`);
+    messages = saved ? JSON.parse(saved) : [];
+    renderMessages();
+    if(messages.length === 0) {
+      showWelcome();
+    }
+  }
+}
+
+// ═══════ WELCOME ═══════
+function showWelcome() {
+  const container = document.getElementById('chatMessages');
+  const suggestions = [
+    `你一生最得意的政绩是什么？`,
+    `你如何评价自己的统治？`,
+    `如果让你重新做一次皇帝，你会改变什么？`,
+    `你对后世的评价有什么想说的？`,
+    currentEmperor.tags[0] ? `聊聊关于"${currentEmperor.tags[0]}"的看法` : '你觉得自己是明君还是暴君？'
+  ];
+  
+  container.innerHTML = `
+    <div class="welcome-card">
+      <div class="welcome-icon">👑</div>
+      <h2>${currentEmperor.name} · 数字分身已就绪</h2>
+      <p>「${currentEmperor.avatar.quote}」<br><br>我是基于DeepSeek AI生成的${currentEmperor.name}数字人格，包含了TA的性格、政见与历史知识。你可以自由提问。</p>
+      <div class="welcome-suggestions">
+        ${suggestions.map(s=>`<span class="welcome-suggestion" onclick="sendSuggestion('${s.replace(/'/g,"\\'")}')">${s}</span>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function sendSuggestion(text) {
+  document.getElementById('chatInput').value = text;
+  sendMessage();
+}
+
+// ═══════ RENDER ═══════
+function renderMessages() {
+  const container = document.getElementById('chatMessages');
+  if(messages.length === 0) {
+    showWelcome();
+    return;
+  }
+  
+  container.innerHTML = messages.map(m => `
+    <div class="message ${m.role}">
+      <div class="bubble">${escapeHtml(m.content)}</div>
+      <div class="meta">${m.role==='emperor' ? currentEmperor.name : '你'} · ${m.time||''}</div>
+    </div>
+  `).join('');
+  
+  // Scroll to bottom
+  container.scrollTop = container.scrollHeight;
+}
+
+function addMessage(role, content) {
+  const now = new Date();
+  const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  messages.push({role, content, time});
+  
+  // Save
+  localStorage.setItem(`mandate_chat_${currentEmperor.id}`, JSON.stringify(messages.slice(-50)));
+  
+  renderMessages();
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML.replace(/\n/g, '<br>');
+}
+
+// ═══════ SEND ═══════
+function handleKeyDown(e) {
+  if(e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+async function sendMessage() {
+  if(isLoading) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  
+  if(!apiKey) {
+    showApiModal();
+    return;
+  }
+  
+  input.value = '';
+  input.style.height = 'auto';
+  addMessage('user', text);
+  
+  // Show typing indicator
+  isLoading = true;
+  document.getElementById('sendBtn').classList.add('loading');
+  showTyping();
+  
+  try {
+    const response = await callDeepSeek(text);
+    hideTyping();
+    addMessage('emperor', response);
+  } catch(err) {
+    hideTyping();
+    showError(err.message || '连接失败，请检查API配置');
+  } finally {
+    isLoading = false;
+    document.getElementById('sendBtn').classList.remove('loading');
+  }
+  
+  // Auto-resize input
+  input.style.height = 'auto';
+}
+
+function showTyping() {
+  const container = document.getElementById('chatMessages');
+  const typing = document.createElement('div');
+  typing.className = 'message emperor typing';
+  typing.id = 'typingIndicator';
+  typing.innerHTML = '<div class="bubble"><span></span><span></span><span></span></div>';
+  container.appendChild(typing);
+  container.scrollTop = container.scrollHeight;
+}
+
+function hideTyping() {
+  const typing = document.getElementById('typingIndicator');
+  if(typing) typing.remove();
+}
+
+function showError(msg) {
+  const container = document.getElementById('chatMessages');
+  const err = document.createElement('div');
+  err.className = 'error-card';
+  err.innerHTML = `<p>⚠️ ${escapeHtml(msg)}</p><button onclick="showApiModal()" style="margin-top:8px;padding:6px 16px;border-radius:6px;border:1px solid var(--red);background:transparent;color:var(--red);cursor:pointer;font-size:0.8rem">重新配置 API</button>`;
+  container.appendChild(err);
+  container.scrollTop = container.scrollHeight;
+}
+
+// ═══════ DEEPSEEK API ═══════
+async function callDeepSeek(userMessage) {
+  // Build conversation context
+  const systemPrompt = buildSystemPrompt();
+  const convMessages = [
+    {role:'system',content:systemPrompt},
+    ...messages.slice(-10).filter(m=>m.role!=='error').map(m=>({
+      role: m.role==='user'?'user':'assistant',
+      content: m.content
+    }))
+  ];
+  // Add current message (already in messages, but let's make sure)
+  if(convMessages[convMessages.length-1]?.role !== 'user') {
+    convMessages.push({role:'user',content:userMessage});
+  }
+  
+  const resp = await fetch(apiUrl, {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':`Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: apiModel,
+      messages: convMessages,
+      temperature: 0.8,
+      max_tokens: 800
+    })
+  });
+  
+  if(!resp.ok) {
+    const err = await resp.json().catch(()=>({}));
+    throw new Error(err.error?.message || `API 错误 (${resp.status})`);
+  }
+  
+  const data = await resp.json();
+  return data.choices[0].message.content;
+}
+
+function buildSystemPrompt() {
+  const e = currentEmperor;
+  return `你是${e.name}（${e.temple}），${getDynastyName(e.dynasty)}时期的皇帝，在位时间${e.reign}。
+
+${e.avatar.prompt}
+
+重要规则：
+- 你是${e.name}本人，用第一人称"朕"或"我"说话（根据你的性格选择）
+- 你只知道你活着时发生的事（${e.reign}及之前），不知道后世发生的事情
+- 如果有人提到后世的事件或评价，你会感到困惑或好奇
+- 保持你的性格特点：${e.avatar.personality}
+- 说话风格：${e.avatar.style}
+- 回复长度控制在2-4句话，不要太长
+- 你是古代帝王，不要使用现代网络用语`;
+}
+
+// ═══════ API CONFIG ═══════
+function showApiModal() {
+  document.getElementById('apiModal').style.display = 'flex';
+  document.getElementById('apiKeyInput').value = apiKey;
+  document.getElementById('apiUrlInput').value = apiUrl;
+  document.getElementById('modelSelect').value = apiModel;
+}
+
+function hideApiModal() {
+  document.getElementById('apiModal').style.display = 'none';
+}
+
+function saveApiConfig() {
+  apiKey = document.getElementById('apiKeyInput').value.trim();
+  apiUrl = document.getElementById('apiUrlInput').value.trim();
+  apiModel = document.getElementById('modelSelect').value;
+  
+  localStorage.setItem('mandate_deepseek_key', apiKey);
+  localStorage.setItem('mandate_deepseek_url', apiUrl);
+  localStorage.setItem('mandate_deepseek_model', apiModel);
+  
+  hideApiModal();
+  
+  if(!apiKey) return;
+  
+  // Reset and show welcome if first time
+  if(messages.length === 0) {
+    showWelcome();
+  }
+}
+</script>
+</body>
+</html>
