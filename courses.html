@@ -212,7 +212,7 @@ a{color:inherit;text-decoration:none}
 <div class="confetti-container" id="confettiBox"></div>
 
 <footer class="footer">
-  <p>Mandate © 2026 · MoKangMedical · 完成全部6课获得「帝王学分析师」认证</p>
+  <p>Mandate © 2026 · MoKangMedical · 完成全部100门课获得「帝王学分析师」认证</p>
 </footer>
 
 <script>
@@ -525,6 +525,11 @@ const COURSES = [
   }
 ];
 
+// ═══════════════ MERGE EXTENDED COURSES ═══════════════
+if (typeof COURSES_EXTENDED !== 'undefined') {
+  COURSES.push(...COURSES_EXTENDED);
+}
+
 // ═══════════════ STATE ═══════════════
 const KEY='mandate_learn_v1';
 let state=loadState();
@@ -711,7 +716,7 @@ function submitQuiz(ci){
        <button class="btn btn-green" onclick="toggleCourse(${nextC.id});document.getElementById('course-${nextC.id}').scrollIntoView({behavior:'smooth',block:'start'})">进入下一课 →</button>`
       :
       `<h4>🏆 全部完成！</h4>
-       <p>你答对了 <strong>${correct}/${c.quiz.length}</strong> 题，已完成全部6课！</p>
+       <p>你答对了 <strong>${correct}/${c.quiz.length}</strong> 题，已完成全部100门课！</p>
        <p style="color:var(--gold);font-weight:700;font-size:1.1rem;margin-top:8px">恭喜获得「帝王学分析师」认证 👑</p>`;
     document.getElementById('quiz-'+ci).after(banner);
   }
@@ -781,5 +786,6 @@ if(state.current<=COURSES.length){
   },300);
 }
 </script>
+<script src="js/courses-data.js"></script>
 </body>
 </html>
