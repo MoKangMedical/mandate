@@ -4,6 +4,8 @@ import os, json, re, time
 from typing import Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import httpx
 
@@ -161,6 +163,10 @@ async def list_emperors():
 @app.get("/health")
 async def health():
     return {"status": "ok", "emperors": len(EMPEROR_PROFILES)}
+
+@app.get("/")
+async def root():
+    return FileResponse("/root/.openclaw/workspace/mandate/chat.html")
 
 if __name__ == "__main__":
     import uvicorn
