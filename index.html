@@ -201,16 +201,29 @@ h3{font-size:1.2rem;font-weight:600}
 .eval-fill{height:100%;border-radius:2px;transition:width 1s ease-out}
 .eval-fill.pos{background:var(--green)}.eval-fill.neg{background:var(--red)}
 
-/* ═══════════════ COURSE CARDS ═══════════════ */
-.course-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .3s;display:block}
-.course-card:hover{border-color:var(--border2);transform:translateY(-2px)}
-.course-inner{display:flex}
-.course-num{width:56px;min-height:56px;background:linear-gradient(135deg,var(--gold),#b8860b);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:#000;flex-shrink:0}
-.course-body{padding:20px 24px}
-.course-body h3{margin-bottom:6px}
-.course-body p{color:var(--text2);font-size:0.85rem;line-height:1.6}
-.course-tags{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.course-tag{font-size:0.7rem;padding:3px 10px;border-radius:6px;background:var(--card3);color:var(--text3)}
+/* ═══════════════ HOME COURSE GRID ═══════════════ */
+.home-course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:1000px){.home-course-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.home-course-grid{grid-template-columns:1fr}}
+.hc-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:0;overflow:hidden;transition:all .3s;cursor:pointer;display:flex;flex-direction:column;text-decoration:none;color:inherit}
+.hc-card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 12px 40px rgba(226,182,79,0.08)}
+.hc-card-top{display:flex;align-items:flex-start;gap:14px;padding:20px 20px 12px}
+.hc-num{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#b8860b);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:900;color:#000;flex-shrink:0;font-family:var(--serif)}
+.hc-info{flex:1;min-width:0}
+.hc-info h3{font-size:0.92rem;margin-bottom:4px;line-height:1.4;font-weight:600}
+.hc-info .hc-desc{font-size:0.78rem;color:var(--text3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hc-tags{display:flex;gap:6px;padding:0 20px 16px;flex-wrap:wrap}
+.hc-tag{font-size:0.68rem;padding:2px 8px;border-radius:5px;background:var(--card3);color:var(--text3);font-weight:500;white-space:nowrap}
+.hc-tag.core{background:rgba(226,182,79,0.1);color:var(--gold)}
+.hc-tag.time{background:rgba(59,130,246,0.08);color:var(--blue)}
+.hc-tag.deep{background:rgba(167,139,250,0.1);color:var(--purple)}
+.hc-card .hc-arrow{display:none;position:absolute;bottom:16px;right:16px;font-size:0.8rem;color:var(--gold);opacity:0;transition:all .3s}
+.hc-card:hover .hc-arrow{opacity:1}
+.hc-card{position:relative}
+.hc-card:hover .hc-num{transform:scale(1.08);transition:transform .3s}
+/* Empty state */
+.courses-empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.courses-empty .icon{font-size:3rem;margin-bottom:16px;opacity:0.4}
 
 /* ═══════════════ DIGITAL AVATAR HERO ═══════════════ */
 .avatar-hero{background:var(--bg2);position:relative;overflow:hidden}
@@ -405,74 +418,29 @@ h3{font-size:1.2rem;font-weight:600}
   </div>
 </section>
 
-<!-- ═══════════════ COURSES ═══════════════ -->
+<!-- ═══════════════ COURSES (All 94) ═══════════════ -->
 <section id="courses" class="section" style="background:var(--bg2)">
   <div class="container">
     <div class="section-header fade-in">
       <div class="label">课程体系</div>
-      <h2>从入门到深度，系统学习帝王治理智慧</h2>
-      <p>六大模块 · 24节课 · 融合百家讲坛+影视+专著 · 每课含AI互动思辨</p>
+      <h2><span style="color:var(--gold)">94门</span>课程，从秦始皇到宣统帝</h2>
+      <p>每一门课都是一位帝王或一个时代的深度解析 — 全部开放 · 逐课解锁 · 含AI互动思辨</p>
     </div>
-    <div class="grid-2" style="max-width:900px;margin:0 auto">
-      <a href="courses.html#c1" class="course-card fade-in">
-        <div class="course-inner">
-          <div class="course-num">1</div>
-          <div class="course-body">
-            <h3>帝制起源 — 从禅让到家天下</h3>
-            <p>夏商周三代：天命观的形成与早期王权运作</p>
-            <div class="course-tags"><span class="course-tag">入门</span><span class="course-tag">3课时</span><span class="course-tag">含AI对话</span></div>
-          </div>
-        </div>
-      </a>
-      <a href="courses.html#c2" class="course-card fade-in">
-        <div class="course-inner">
-          <div class="course-num">2</div>
-          <div class="course-body">
-            <h3>大一统奠基 — 秦汉帝王</h3>
-            <p>秦始皇到汉武帝：郡县制、独尊儒术、帝国雏形</p>
-            <div class="course-tags"><span class="course-tag">核心</span><span class="course-tag">5课时</span><span class="course-tag">含AI对话</span></div>
-          </div>
-        </div>
-      </a>
-      <a href="courses.html#c3" class="course-card fade-in">
-        <div class="course-inner">
-          <div class="course-num">3</div>
-          <div class="course-body">
-            <h3>帝国巅峰 — 隋唐帝王</h3>
-            <p>贞观之治到开元盛世：盛世治理的核心密码</p>
-            <div class="course-tags"><span class="course-tag">深度</span><span class="course-tag">6课时</span><span class="course-tag">含AI对话</span></div>
-          </div>
-        </div>
-      </a>
-      <a href="courses.html#c4" class="course-card fade-in">
-        <div class="course-inner">
-          <div class="course-num">4</div>
-          <div class="course-body">
-            <h3>文治的博弈 — 宋元帝王</h3>
-            <p>重文轻武的代价、蒙古帝国的统治实验</p>
-            <div class="course-tags"><span class="course-tag">进阶</span><span class="course-tag">5课时</span><span class="course-tag">含AI对话</span></div>
-          </div>
-        </div>
-      </a>
-      <a href="courses.html#c5" class="course-card fade-in">
-        <div class="course-inner">
-          <div class="course-num">5</div>
-          <div class="course-body">
-            <h3>专制巅峰 — 明清帝王</h3>
-            <p>朱元璋到乾隆：集权顶峰、闭关锁国、近代转型</p>
-            <div class="course-tags"><span class="course-tag">深度</span><span class="course-tag">7课时</span><span class="course-tag">含AI对话</span></div>
-          </div>
-        </div>
-      </a>
-      <a href="courses.html#c6" class="course-card fade-in">
-        <div class="course-inner">
-          <div class="course-num">6</div>
-          <div class="course-body">
-            <h3>帝王领导力 — 以史为鉴</h3>
-            <p>战略决策、人才管理、危机应对的古今对照</p>
-            <div class="course-tags"><span class="course-tag">应用</span><span class="course-tag">4课时</span><span class="course-tag">含AI对话</span></div>
-          </div>
-        </div>
+
+    <!-- Search & Filter -->
+    <div class="search-wrap fade-in" style="margin-bottom:20px">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" id="courseSearch" placeholder="搜索课程...（如：秦始皇、贞观、王安石）" oninput="renderHomeCourses()">
+    </div>
+    <div class="dynasty-filter fade-in" id="courseTagFilter"></div>
+
+    <!-- Course Grid -->
+    <div id="homeCourseGrid" class="home-course-grid fade-in"></div>
+
+    <!-- View All CTA -->
+    <div style="text-align:center;margin-top:40px" class="fade-in">
+      <a href="courses.html" class="btn btn-primary" style="font-size:1.05rem;padding:16px 36px">
+        📚 进入完整课程体系（含测验 + 音频 + AI对话）→
       </a>
     </div>
   </div>
@@ -560,6 +528,80 @@ h3{font-size:1.2rem;font-weight:600}
 <div class="toast" id="toast"></div>
 
 <script src="js/data.js"></script>
+<script src="js/courses-meta.js"></script>
 <script src="js/app.js"></script>
+<script>
+// ═══════ Homepage Course Grid Renderer ═══════
+let homeCourseTag = null;
+
+function renderCourseTagFilter() {
+  const filter = document.getElementById('courseTagFilter');
+  if (!filter) return;
+  const tags = new Set();
+  (window.COURSES_META||[]).forEach(c => {
+    (c.tags||[]).forEach(t => {
+      const label = String(t).split('|')[0];
+      if (label) tags.add(label);
+    });
+  });
+  const allTags = ['全部', ...Array.from(tags).sort()];
+  filter.innerHTML = allTags.map(t =>
+    `<span class="dynasty-pill${homeCourseTag===t||(t==='全部'&&!homeCourseTag)?' active':''}" onclick="homeCourseTag=(t==='全部'?null:t);renderCourseTagFilter();renderHomeCourses()">${t}</span>`
+  ).join('');
+}
+
+function renderHomeCourses() {
+  const grid = document.getElementById('homeCourseGrid');
+  if (!grid || !window.COURSES_META) return;
+  const q = (document.getElementById('courseSearch')?.value||'').toLowerCase();
+  let courses = window.COURSES_META;
+  if (q) courses = courses.filter(c =>
+    c.title.includes(q) || c.desc.includes(q) || (c.tags||[]).some(t=>String(t).includes(q))
+  );
+  if (homeCourseTag) courses = courses.filter(c =>
+    (c.tags||[]).some(t=>String(t).split('|')[0]===homeCourseTag)
+  );
+  if (!courses.length) {
+    grid.innerHTML = '<div class="courses-empty"><div class="icon">📭</div><p>没有匹配的课程，试试其他关键词</p></div>';
+    return;
+  }
+  grid.innerHTML = courses.map(c => {
+    const tags = (c.tags||[]).map(t => {
+      const parts = String(t).split('|');
+      const label = parts[0];
+      const cls = label==='核心'||label==='深度'?'core':label.includes('分钟')?'time':'';
+      return `<span class="hc-tag${cls?' '+cls:''}">${label}</span>`;
+    }).join('');
+    return `<a href="courses.html?course=${c.id}" class="hc-card fade-in">
+      <div class="hc-card-top">
+        <div class="hc-num">${c.id}</div>
+        <div class="hc-info">
+          <h3>${c.title}</h3>
+          <div class="hc-desc">${c.desc||''}</div>
+        </div>
+      </div>
+      <div class="hc-tags">${tags||''}</div>
+      <span class="hc-arrow">→</span>
+    </a>`;
+  }).join('');
+  // Re-observe fade-in elements
+  document.querySelectorAll('#homeCourseGrid .fade-in').forEach(el => {
+    if (window._courseObserver) window._courseObserver.observe(el);
+  });
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.COURSES_META) {
+    renderCourseTagFilter();
+    renderHomeCourses();
+  }
+  // Create observer for course cards
+  window._courseObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, {threshold:0.1});
+  document.querySelectorAll('#homeCourseGrid .fade-in').forEach(el => window._courseObserver.observe(el));
+});
+</script>
 </body>
 </html>
