@@ -86,6 +86,53 @@ h3{font-size:1.2rem;font-weight:600}
 .hero-stat .desc{font-size:0.8rem;color:var(--text3);margin-top:4px}
 @media(max-width:768px){.hero-stats{gap:20px}.hero-stat .num{font-size:1.4rem}}
 
+/* ═══════════════ IMPERIAL ROBE GALLERY ═══════════════ */
+.imperial-section{background:var(--bg);position:relative;overflow:hidden}
+.imperial-section::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 20%,rgba(226,182,79,0.05),transparent 60%),
+             radial-gradient(ellipse 50% 40% at 80% 80%,rgba(184,134,11,0.04),transparent 50%),
+             radial-gradient(ellipse 50% 40% at 20% 70%,rgba(139,0,0,0.03),transparent 50%);}
+.imperial-scroll{overflow-x:auto;padding:16px 0 40px;-webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;scrollbar-color:var(--border2) transparent;cursor:grab}
+.imperial-scroll:active{cursor:grabbing}
+.imperial-scroll::-webkit-scrollbar{height:4px}
+.imperial-scroll::-webkit-scrollbar-thumb{background:linear-gradient(90deg,var(--gold),#b8860b);border-radius:4px}
+.imperial-track{display:flex;gap:12px;padding:0 40px;min-width:max-content}
+.imperial-card{flex-shrink:0;width:180px;background:linear-gradient(180deg,var(--card) 0%,#1a1410 100%);
+  border:1px solid rgba(184,134,11,0.25);border-radius:var(--radius);padding:20px 16px;
+  text-align:center;transition:all .4s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;
+  cursor:pointer}
+.imperial-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#8b6914,var(--gold),#daa520,var(--gold),#8b6914);opacity:0.6}
+.imperial-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;
+  background:linear-gradient(to top,rgba(184,134,11,0.15),transparent);opacity:0;transition:opacity .4s}
+.imperial-card:hover{transform:translateY(-8px);border-color:var(--gold);
+  box-shadow:0 16px 48px rgba(184,134,11,0.15),0 0 80px rgba(226,182,79,0.06)}
+.imperial-card:hover::after{opacity:1}
+.imperial-card .robe-icon{font-size:2.4rem;margin-bottom:10px;filter:drop-shadow(0 2px 8px rgba(226,182,79,0.2));
+  transition:transform .4s}
+.imperial-card:hover .robe-icon{transform:scale(1.15)}
+.imperial-card .emperor-name{font-family:var(--serif);font-size:1rem;font-weight:700;color:var(--gold);
+  margin-bottom:4px;letter-spacing:0.02em}
+.imperial-card .emperor-sub{font-size:0.7rem;color:var(--text3);line-height:1.4;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.imperial-card .emperor-id{position:absolute;top:10px;right:12px;font-size:0.65rem;color:rgba(226,182,79,0.25);
+  font-weight:700;font-family:var(--serif)}
+.imperial-card:nth-child(3n) .robe-icon{animation:robe-float 4s ease-in-out infinite}
+.imperial-card:nth-child(3n+1) .robe-icon{animation:robe-float 5s ease-in-out 1s infinite}
+.imperial-card:nth-child(3n+2) .robe-icon{animation:robe-float 4.5s ease-in-out .5s infinite}
+@keyframes robe-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.imperial-card:nth-child(5n){border-color:rgba(196,58,49,0.3)}
+.imperial-card:nth-child(5n):hover{border-color:var(--red);box-shadow:0 16px 48px rgba(196,58,49,0.15)}
+.imperial-card:nth-child(7n){border-color:rgba(59,130,246,0.2)}
+.imperial-card:nth-child(7n):hover{border-color:var(--blue);box-shadow:0 16px 48px rgba(59,130,246,0.1)}
+@media(max-width:768px){
+  .imperial-card{width:150px;padding:16px 12px}
+  .imperial-card .robe-icon{font-size:2rem}
+  .imperial-card .emperor-name{font-size:0.9rem}
+  .imperial-track{padding:0 20px;gap:10px}
+}
+
 /* ═══════════════ QUOTE ═══════════════ */
 .quote-block{text-align:center;padding:80px 0;position:relative;background:var(--bg2)}
 .quote-block::before{content:'「';font-size:8rem;color:var(--gold);opacity:0.1;position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:var(--serif)}
@@ -295,6 +342,23 @@ h3{font-size:1.2rem;font-weight:600}
     <p class="quote-author">— 唐太宗 李世民</p>
   </div>
 </div>
+
+<!-- ═══════════════ IMPERIAL ROBE GALLERY ═══════════════ -->
+<section id="imperial" class="imperial-section section">
+  <div class="container">
+    <div class="section-header fade-in">
+      <div class="label">👑 黄袍帝王录</div>
+      <h2>九十四位帝王，<span style="color:var(--gold)">一部权力史</span></h2>
+      <p>从秦始皇的龙袍到宣统帝的退位诏书——每一位帝王的名字，都是四千年文明的一个刻度。</p>
+    </div>
+  </div>
+  <div class="imperial-scroll" id="imperialScroll">
+    <div class="imperial-track" id="imperialTrack"></div>
+  </div>
+  <div style="text-align:center;margin-top:8px;padding-bottom:20px">
+    <span style="font-size:0.75rem;color:var(--text3)">← 横向滑动浏览全部帝王 →</span>
+  </div>
+</section>
 
 <!-- ═══════════════ DYNASTY TIMELINE ═══════════════ -->
 <section id="timeline" class="section-sm">

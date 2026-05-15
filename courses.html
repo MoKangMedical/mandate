@@ -168,7 +168,11 @@ h3{font-size:1.15rem;font-weight:600}
 .audio-btn.paused{background:var(--card3);color:var(--gold);border-color:var(--gold)}
 @keyframes pulse-audio{0%,100%{box-shadow:0 0 0 0 rgba(226,182,79,0.4)}50%{box-shadow:0 0 0 8px rgba(226,182,79,0)}}
 
-/* QUIZ */
+/* AUDIO PLAYER (Kangbo Academy Style) */
+.audio-player{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px;transition:border-color .3s}
+.audio-player:hover{border-color:rgba(226,182,79,0.2)}
+.audio-label{font-size:0.78rem;color:var(--text3);margin-bottom:2px}
+.audio-player audio{width:100%}/* QUIZ */
 .quiz-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:24px}
 .quiz-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
 .quiz-header h3{font-size:1.05rem;color:var(--gold)}
@@ -463,7 +467,17 @@ function openDetail(cid) {
       <button class="course-detail-close" onclick="closeDetail()">✕</button>
     </div>
     <div class="course-detail-body">
-      ${course.content ? `<button class="audio-btn" id="audioBtn-${course.id}" onclick="toggleAudio(${course.id})">🔊 朗读</button>` : ''}
+      <div class="audio-player">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:1.4rem">🎙️</span>
+          <div style="flex:1;min-width:0">
+            <div class="audio-label">课程音频 · 温暖浑厚男声</div>
+            <audio controls preload="none" style="width:100%;height:32px;filter:sepia(100%) saturate(300%) hue-rotate(350deg)">
+              <source src="audio/lesson${course.id}.mp3" type="audio/mpeg">
+            </audio>
+          </div>
+        </div>
+      </div>
       <div class="md">${content}</div>
       ${renderQuiz(course)}
     </div>
