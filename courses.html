@@ -748,7 +748,30 @@ function toggleAudio(cid) {
 }
 
 /* ═══════════════ INIT ═══════════════ */
-document.addEventListener('DOMContentLoaded', loadAllCourses);
+document.addEventListener('DOMContentLoaded', () => {
+  loadAllCourses();
+  // Handle ?course=N from homepage direct links
+  const params = new URLSearchParams(window.location.search);
+  const courseId = parseInt(params.get('course'));
+  if (courseId && !isNaN(courseId)) {
+    // Wait a tick for courses to load, then open
+    setTimeout(() => {
+      const c = allCourses.find(x => x.id === courseId);
+      if (c) openDetailDirect(courseId);
+    }, 200);
+  }
+});
+
+// Open detail without lock check (for direct homepage links)
+function openDetailDirect(cid) {
+  const course = allCourses.find(c => c.id === cid);
+  if (!course) return;
+  activeDetail = cid;
+  quizAnswers = {};
+  document.getElementById('detailOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderDetail(course);
+}
 
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
