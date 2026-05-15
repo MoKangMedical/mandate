@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>课程体系 — Mandate</title>
-<meta name="description" content="Mandate 交互式课程体系：6大模块·逐课解锁·每课含随堂测验和AI帝王对话。">
+<title>课程体系 — Mandate 帝王学</title>
+<meta name="description" content="Mandate 交互式课程体系：100门帝王学课程·逐课解锁·每课含随堂测验和AI帝王对话。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ═══════════════ RESET & VARIABLES ═══════════════ */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --bg:#09090b;--bg2:#0f0f13;--bg3:#18181b;
@@ -15,75 +16,139 @@
   --border:#27272a;--border2:#3f3f46;
   --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
   --gold:#e2b64f;--gold2:#f5d98a;
-  --red:#c43a31;--green:#22c55e;--blue:#3b82f6;--purple:#a78bfa;
+  --red:#c43a31;--red2:#e85d50;
+  --green:#22c55e;--blue:#3b82f6;--purple:#a78bfa;
   --serif:'Noto Serif SC',serif;
   --sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
   --radius:16px;--radius-sm:10px;
 }
 html{scroll-behavior:smooth}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
-a{color:inherit;text-decoration:none}
+a{color:inherit;text-decoration:none}img{max-width:100%}
 
-/* NAV */
-.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(9,9,11,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+/* ═══════════════ TYPOGRAPHY ═══════════════ */
+.serif{font-family:var(--serif)}
+h1{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:900;line-height:1.15;letter-spacing:-0.02em}
+h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;line-height:1.25;letter-spacing:-0.01em}
+h3{font-size:1.15rem;font-weight:600}
+.label{font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold)}
+.body-lg{font-size:1.125rem;color:var(--text2);line-height:1.8}
+.body-sm{font-size:0.875rem;color:var(--text3)}
+
+/* ═══════════════ LAYOUT ═══════════════ */
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.container-sm{max-width:800px;margin:0 auto;padding:0 24px}
+.section{padding:100px 0}
+.section-sm{padding:60px 0}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:32px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+@media(max-width:768px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.section{padding:60px 0}}
+@media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr)}}
+
+/* ═══════════════ NAV ═══════════════ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(9,9,11,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:all .3s}
 .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:8px}
+.nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:8px}
 .nav-logo svg{width:28px;height:28px}
-.nav-links{display:flex;gap:24px;align-items:center}
-.nav-links a{font-size:0.85rem;color:var(--text2);transition:color .2s;font-weight:500}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{font-size:0.875rem;color:var(--text2);transition:color .2s;font-weight:500}
 .nav-links a:hover,.nav-links a.active{color:var(--gold)}
+.nav-cta{background:var(--gold);color:#000;padding:8px 20px;border-radius:8px;font-weight:600;font-size:0.85rem;transition:all .2s}
+.nav-cta:hover{background:var(--gold2);transform:translateY(-1px)}
+@media(max-width:768px){.nav-links{display:none}}
+.hamburger{display:none;cursor:pointer;padding:8px}@media(max-width:768px){.hamburger{display:block}}
 
-/* PROGRESS BAR */
+/* ═══════════════ PROGRESS BAR ═══════════════ */
 .progress-bar{position:fixed;top:64px;left:0;right:0;height:3px;background:var(--border);z-index:99}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--red));transition:width .5s ease;width:0%}
 
-/* LAYOUT */
-.main{max-width:860px;margin:0 auto;padding:88px 24px 80px}
+/* ═══════════════ SECTION HEADER ═══════════════ */
+.section-header{text-align:center;max-width:700px;margin:0 auto 60px}
+.section-header .label{margin-bottom:12px}
+.section-header h2{margin-bottom:16px}
+.section-header p{color:var(--text2);font-size:1.05rem;line-height:1.7}
 
-/* HERO */
-.learn-hero{text-align:center;padding:20px 0 40px}
-.learn-hero .label{font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);margin-bottom:12px}
-.learn-hero h1{font-family:var(--serif);font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:900;margin-bottom:12px}
-.learn-hero h1 .gold{color:var(--gold)}
-.learn-hero p{color:var(--text2);font-size:1rem;max-width:560px;margin:0 auto}
+/* ═══════════════ HERO ═══════════════ */
+.hero{text-align:center;padding:100px 0 48px;position:relative}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 20%,rgba(226,182,79,0.06),transparent 70%),
+             radial-gradient(ellipse 60% 40% at 80% 80%,rgba(196,58,49,0.04),transparent 60%)}
+.hero>*{position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(226,182,79,0.1);border:1px solid rgba(226,182,79,0.2);padding:6px 16px;border-radius:100px;font-size:0.8rem;color:var(--gold);margin-bottom:24px}
+.hero-badge .dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero h1{margin-bottom:16px}
+.hero h1 .gold{color:var(--gold)}
+.hero p{color:var(--text2);font-size:1.1rem;max-width:600px;margin:0 auto;line-height:1.7}
 
-/* COURSE MAP */
-.course-map{display:flex;flex-direction:column;gap:12px;margin:32px 0}
+/* ═══════════════ STATS BAR ═══════════════ */
+.stats-bar{display:flex;justify-content:center;gap:48px;margin:40px 0 0;padding-top:32px;border-top:1px solid var(--border);flex-wrap:wrap}
+.stat-item{text-align:center;min-width:100px}
+.stat-num{font-size:2rem;font-weight:800;color:var(--gold)}
+.stat-item:nth-child(2) .stat-num{color:var(--red)}
+.stat-label{font-size:0.8rem;color:var(--text3);margin-top:4px}
+@media(max-width:768px){.stats-bar{gap:24px}.stat-num{font-size:1.4rem}}
 
-/* COURSE NODE */
-.c-node{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .3s;position:relative}
-.c-node.locked{opacity:0.5;pointer-events:none}
-.c-node.current{border-color:var(--gold);box-shadow:0 0 30px rgba(226,182,79,0.08)}
-.c-node.completed{border-color:var(--green)}
-.c-node-header{display:flex;align-items:center;padding:20px 24px;gap:16px;cursor:pointer;user-select:none}
-.c-node.locked .c-node-header{cursor:default}
-.c-num{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0}
-.c-node.locked .c-num{background:var(--card3);color:var(--text3)}
-.c-node.current .c-num{background:linear-gradient(135deg,var(--gold),#b8860b);color:#000}
-.c-node.completed .c-num{background:var(--green);color:#000}
-.c-info{flex:1}
-.c-info h3{font-size:1rem;margin-bottom:4px}
-.c-info p{font-size:0.82rem;color:var(--text3)}
-.c-tags{display:flex;gap:6px;margin-top:6px}
-.c-tag{font-size:0.7rem;padding:2px 8px;border-radius:4px;background:var(--card3);color:var(--text3)}
-.c-status{font-size:0.8rem;font-weight:600;flex-shrink:0;padding:4px 12px;border-radius:6px}
-.c-node.locked .c-status{color:var(--text3)}
-.c-node.current .c-status{color:var(--gold);background:rgba(226,182,79,0.1)}
-.c-node.completed .c-status{color:var(--green);background:rgba(34,197,94,0.1)}
+/* ═══════════════ MODULE TABS ═══════════════ */
+.module-tabs{display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap;justify-content:center}
+.module-tab{padding:8px 20px;border-radius:100px;font-size:0.85rem;font-weight:500;color:var(--text2);background:var(--card);border:1px solid var(--border);cursor:pointer;transition:all .2s}
+.module-tab:hover{border-color:var(--border2);color:var(--text)}
+.module-tab.active{background:rgba(226,182,79,0.1);border-color:var(--gold);color:var(--gold)}
 
-/* COURSE CONTENT */
-.c-body{display:none;border-top:1px solid var(--border)}
-.c-node.open .c-body{display:block}
-.c-content{padding:28px 24px;max-height:65vh;overflow-y:auto}
-.c-content::-webkit-scrollbar{width:4px}
-.c-content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+/* ═══════════════ COURSE GRID (Kangbo Style) ═══════════════ */
+.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.course-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .3s;cursor:pointer;display:flex;flex-direction:column}
+.course-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.3)}
+.course-card.current{border-color:var(--gold);box-shadow:0 0 30px rgba(226,182,79,0.1)}
+.course-card.completed{border-color:var(--green)}
+.course-card.locked{opacity:0.45;cursor:not-allowed;pointer-events:none}
+.course-card-header{display:flex;align-items:flex-start;gap:16px;padding:24px 24px 16px}
+.course-num{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:900;flex-shrink:0;font-family:var(--serif)}
+.course-card:not(.locked):not(.completed) .course-num{background:linear-gradient(135deg,var(--gold),#b8860b);color:#000}
+.course-card.completed .course-num{background:var(--green);color:#000}
+.course-card.locked .course-num{background:var(--card3);color:var(--text3)}
+.course-card-info{flex:1;min-width:0}
+.course-card-info h3{font-size:0.95rem;margin-bottom:6px;line-height:1.4}
+.course-card-info .desc{font-size:0.8rem;color:var(--text3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.course-card-body{padding:0 24px 20px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.course-tag{font-size:0.7rem;padding:3px 10px;border-radius:6px;background:var(--card3);color:var(--text3);font-weight:500}
+.course-tag.core{background:rgba(226,182,79,0.1);color:var(--gold)}
+.course-tag.time{background:rgba(59,130,246,0.08);color:var(--blue)}
+.course-status{font-size:0.75rem;font-weight:600;margin-left:auto;padding:3px 10px;border-radius:6px}
+.course-card.current .course-status{color:var(--gold);background:rgba(226,182,79,0.1)}
+.course-card.completed .course-status{color:var(--green);background:rgba(34,197,94,0.08)}
+.course-card.locked .course-status{color:var(--text3)}
+
+@media(max-width:768px){
+  .course-grid{grid-template-columns:1fr}
+  .course-card-header{padding:16px;gap:12px}
+  .course-num{width:42px;height:42px;font-size:1.1rem}
+  .course-card-body{padding:0 16px 14px}
+}
+
+/* ═══════════════ COURSE DETAIL (Expanded) ═══════════════ */
+.course-detail-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)}
+.course-detail-overlay.open{display:flex;align-items:flex-start;justify-content:center;padding:80px 16px 40px;overflow-y:auto}
+.course-detail{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:860px;max-height:calc(100vh - 120px);overflow:hidden;display:flex;flex-direction:column;animation:slideUp 0.3s ease-out}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.course-detail-header{display:flex;align-items:flex-start;gap:16px;padding:28px;border-bottom:1px solid var(--border);flex-shrink:0}
+.course-detail-header .course-num{width:56px;height:56px;font-size:1.5rem}
+.course-detail-info{flex:1}
+.course-detail-info h2{font-family:var(--serif);font-size:1.4rem;margin-bottom:8px}
+.course-detail-info .desc{color:var(--text2);font-size:0.9rem;line-height:1.6}
+.course-detail-close{width:36px;height:36px;border-radius:8px;background:var(--card3);border:none;color:var(--text2);font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.course-detail-close:hover{background:var(--red);color:#fff}
+.course-detail-body{flex:1;overflow-y:auto;padding:28px}
+.course-detail-body::-webkit-scrollbar{width:4px}
+.course-detail-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 
 /* MARKDOWN */
 .md{color:var(--text2);font-size:0.92rem;line-height:1.85}
-.md h1{font-family:var(--serif);font-size:1.6rem;color:var(--text);margin:28px 0 14px;font-weight:700}
-.md h2{font-size:1.2rem;color:var(--text);margin:24px 0 10px;font-weight:700;border-bottom:1px solid var(--border);padding-bottom:6px}
-.md h3{font-size:1.02rem;color:var(--gold);margin:18px 0 6px;font-weight:600}
-.md h4{font-size:0.95rem;color:var(--text);margin:14px 0 6px;font-weight:600}
+.md h1{font-family:var(--serif);font-size:1.5rem;color:var(--text);margin:24px 0 12px;font-weight:700}
+.md h2{font-size:1.15rem;color:var(--text);margin:20px 0 10px;font-weight:700;border-bottom:1px solid var(--border);padding-bottom:6px}
+.md h3{font-size:1rem;color:var(--gold);margin:16px 0 6px;font-weight:600}
+.md h4{font-size:0.92rem;color:var(--text);margin:12px 0 6px;font-weight:600}
 .md p{margin:8px 0}
 .md strong{color:var(--text)}
 .md em{color:var(--gold);font-style:italic}
@@ -91,6 +156,10 @@ a{color:inherit;text-decoration:none}
 .md ul,.md ol{padding-left:22px;margin:8px 0}
 .md li{margin:4px 0}
 .md code{background:var(--card3);padding:1px 5px;border-radius:3px;font-size:0.84rem;color:var(--gold)}
+.md hr{border:none;border-top:1px solid var(--border);margin:24px 0}
+.md table{width:100%;border-collapse:collapse;margin:12px 0;font-size:0.85rem}
+.md th{background:var(--card3);padding:8px 12px;text-align:left;font-weight:600;color:var(--text);border:1px solid var(--border)}
+.md td{padding:8px 12px;border:1px solid var(--border)}
 
 /* AUDIO PLAYER */
 .audio-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--card3);border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;font-size:0.8rem;transition:all .2s;margin-bottom:20px}
@@ -100,17 +169,17 @@ a{color:inherit;text-decoration:none}
 @keyframes pulse-audio{0%,100%{box-shadow:0 0 0 0 rgba(226,182,79,0.4)}50%{box-shadow:0 0 0 8px rgba(226,182,79,0)}}
 
 /* QUIZ */
-.quiz-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-top:24px}
-.quiz-title{display:flex;align-items:center;gap:10px;margin-bottom:20px}
-.quiz-title h3{font-size:1.1rem;color:var(--gold)}
-.quiz-title .badge{font-size:0.7rem;background:var(--gold);color:#000;padding:2px 10px;border-radius:100px;font-weight:700}
-.quiz-q{margin-bottom:24px;padding:20px;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border)}
+.quiz-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:24px}
+.quiz-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.quiz-header h3{font-size:1.05rem;color:var(--gold)}
+.quiz-header .badge{font-size:0.7rem;background:var(--gold);color:#000;padding:2px 10px;border-radius:100px;font-weight:700}
+.quiz-q{margin-bottom:20px;padding:16px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border)}
 .quiz-q.answered-correct{border-color:var(--green);background:rgba(34,197,94,0.03)}
 .quiz-q.answered-wrong{border-color:var(--red);background:rgba(239,68,68,0.03)}
 .quiz-q-num{font-size:0.75rem;color:var(--text3);font-weight:600;margin-bottom:8px}
-.quiz-q-text{font-size:0.95rem;color:var(--text);margin-bottom:14px;font-weight:500}
-.quiz-opts{display:flex;flex-direction:column;gap:8px}
-.quiz-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s;font-size:0.88rem;color:var(--text2);user-select:none}
+.quiz-q-text{font-size:0.92rem;color:var(--text);margin-bottom:12px;font-weight:500}
+.quiz-opts{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s;font-size:0.86rem;color:var(--text2);user-select:none}
 .quiz-opt:hover{border-color:var(--border2);color:var(--text);background:var(--card2)}
 .quiz-opt.selected{border-color:var(--blue);color:var(--text);background:rgba(59,130,246,0.06)}
 .quiz-opt.correct{border-color:var(--green)!important;color:var(--green)!important;background:rgba(34,197,94,0.08)!important}
@@ -120,16 +189,13 @@ a{color:inherit;text-decoration:none}
 .quiz-opt.selected .quiz-opt-letter{border-color:var(--blue);color:var(--blue)}
 .quiz-opt.correct .quiz-opt-letter{border-color:var(--green);color:#000;background:var(--green)}
 .quiz-opt.wrong .quiz-opt-letter{border-color:var(--red);color:#000;background:var(--red)}
-.quiz-explain{display:none;margin-top:12px;padding:12px 16px;border-radius:8px;font-size:0.85rem;line-height:1.7}
+.quiz-explain{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-size:0.83rem;line-height:1.7}
 .quiz-explain.show{display:block}
 .quiz-explain.correct-explain{background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);color:var(--green)}
 .quiz-explain.wrong-explain{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
-
-/* QUIZ FOOTER */
 .quiz-footer{display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
 .quiz-score{font-size:0.9rem;color:var(--text2)}
-.quiz-score .num{color:var(--gold);font-weight:700;font-size:1.2rem}
-.quiz-actions{display:flex;gap:10px}
+.quiz-score .num{color:var(--gold);font-weight:700;font-size:1.1rem}
 
 /* BUTTONS */
 .btn{padding:10px 22px;border-radius:8px;font-weight:600;font-size:0.88rem;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
@@ -141,41 +207,34 @@ a{color:inherit;text-decoration:none}
 .btn-green{background:var(--green);color:#000}
 .btn-green:hover{background:#16a34a}
 
-/* NEXT BANNER */
-.next-banner{display:none;margin-top:24px;padding:24px;background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(59,130,246,0.05));border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius);text-align:center}
-.next-banner.show{display:block}
-.next-banner h4{color:var(--green);margin-bottom:8px}
-.next-banner p{color:var(--text2);font-size:0.9rem;margin-bottom:16px}
-.next-banner .next-title{color:var(--gold);font-weight:700}
-
-/* STATS BAR */
-.stats-bar{display:flex;gap:16px;margin:24px 0;flex-wrap:wrap}
-.stat-item{flex:1;min-width:120px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;text-align:center}
-.stat-item .stat-num{font-size:1.6rem;font-weight:800;color:var(--gold)}
-.stat-item .stat-label{font-size:0.75rem;color:var(--text3);margin-top:4px}
-.stat-item:nth-child(2) .stat-num{color:var(--red)}
-
 /* CONFETTI */
-.confetti-container{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:200;overflow:hidden}
+.confetti-container{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:300;overflow:hidden}
 .confetti{position:absolute;width:8px;height:8px;top:-10px;animation:confetti-fall 3s ease-in forwards}
-@keyframes confetti-fall{
-  0%{transform:translateY(0) rotate(0deg);opacity:1}
-  100%{transform:translateY(100vh) rotate(720deg);opacity:0}
-}
+@keyframes confetti-fall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
 
-/* FOOTER */
-.footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;margin-top:40px}
-.footer p{font-size:0.8rem;color:var(--text3)}
+/* SUCCESS BANNER */
+.success-banner{display:none;margin-top:24px;padding:24px;background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(59,130,246,0.05));border:1px solid rgba(34,197,94,0.15);border-radius:var(--radius);text-align:center}
+.success-banner.show{display:block}
+.success-banner h4{color:var(--green);margin-bottom:8px}
+.success-banner p{color:var(--text2);font-size:0.9rem;margin-bottom:16px}
+.success-banner .next-title{color:var(--gold);font-weight:700}
 
-@media(max-width:768px){
-  .main{padding:84px 16px 60px}
-  .c-node-header{padding:16px;gap:12px}
-  .c-num{width:40px;height:40px;font-size:1.1rem}
-  .c-content{padding:20px 16px}
-  .quiz-section{padding:20px 16px}
-  .quiz-footer{flex-direction:column;gap:12px}
-  .stats-bar{gap:8px}
-}
+/* LOADING */
+.loading{text-align:center;padding:60px 20px;color:var(--text3)}
+.loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:80px 20px;color:var(--text3)}
+.empty-state .icon{font-size:3rem;margin-bottom:16px;opacity:0.5}
+
+/* FOOTER (Kangbo Style) */
+.footer{border-top:1px solid var(--border);padding:48px 0;text-align:center}
+.footer-links{display:flex;justify-content:center;gap:32px;margin-bottom:20px;flex-wrap:wrap}
+.footer-links a{font-size:0.85rem;color:var(--text3);transition:color .2s}
+.footer-links a:hover{color:var(--gold)}
+.footer-copy{font-size:0.8rem;color:var(--text3)}
+.footer-disclaimer{font-size:0.75rem;color:var(--text3);max-width:600px;margin:8px auto 0;line-height:1.6}
 </style>
 </head>
 <body>
@@ -190,7 +249,6 @@ a{color:inherit;text-decoration:none}
       <a href="index.html">首页</a>
       <a href="index.html#emperors">帝王录</a>
       <a href="courses.html" class="active">课程</a>
-      <a href="index.html#avatars">数字分身</a>
       <a href="index.html#pricing">定价</a>
     </div>
   </div>
@@ -198,888 +256,447 @@ a{color:inherit;text-decoration:none}
 
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 
-<div class="main">
-  <div class="learn-hero">
-    <div class="label">交互式学习系统</div>
-    <h1>逐课解锁，<span class="gold">测验通过</span>才能继续</h1>
-    <p>完成每课测验后解锁下一课。答对60%即通过，可反复作答。全部通过获得「帝王学分析师」认证。</p>
-  </div>
-
-  <!-- STATS -->
-  <div class="stats-bar" id="statsBar">
-    <div class="stat-item"><div class="stat-num" id="statCompleted">0</div><div class="stat-label">已完成课程</div></div>
-    <div class="stat-item"><div class="stat-num" id="statScore">0</div><div class="stat-label">总答对题数</div></div>
+<!-- HERO (Kangbo Style) -->
+<div class="hero">
+  <div class="hero-badge"><span class="dot"></span> 交互式学习系统</div>
+  <h1>逐课解锁，<span class="gold">测验通过</span>才能继续</h1>
+  <p>完成每课测验后解锁下一课。答对60%即通过，可反复作答。全部通过获得「帝王学分析师」认证。</p>
+  
+  <div class="stats-bar">
+    <div class="stat-item"><div class="stat-num" id="statCompleted">0</div><div class="stat-label">已完成</div></div>
+    <div class="stat-item"><div class="stat-num" id="statTotal">94</div><div class="stat-label">总课程</div></div>
+    <div class="stat-item"><div class="stat-num" id="statScore">0</div><div class="stat-label">答对题数</div></div>
     <div class="stat-item"><div class="stat-num" id="statStreak">0</div><div class="stat-label">连续通过</div></div>
   </div>
+</div>
 
-  <!-- COURSE MAP -->
-  <div class="course-map" id="courseMap"></div>
+<!-- MODULE TABS -->
+<div class="container" style="margin-top:16px">
+  <div class="module-tabs" id="moduleTabs">
+    <button class="module-tab active" data-module="all">全部课程</button>
+  </div>
+</div>
+
+<!-- COURSE GRID (Kangbo Style) -->
+<div class="container">
+  <div class="course-grid" id="courseGrid">
+    <div class="loading"><div class="loading-spinner"></div><p>加载课程数据...</p></div>
+  </div>
+</div>
+
+<!-- COURSE DETAIL OVERLAY -->
+<div class="course-detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="course-detail" id="detailPanel"></div>
 </div>
 
 <div class="confetti-container" id="confettiBox"></div>
 
+<!-- FOOTER (Kangbo Style) -->
 <footer class="footer">
-  <p>Mandate © 2026 · MoKangMedical · 完成全部100门课获得「帝王学分析师」认证</p>
+  <div class="footer-links">
+    <a href="index.html">首页</a>
+    <a href="courses.html">全部课程</a>
+    <a href="index.html#emperors">帝王录</a>
+    <a href="index.html#pricing">定价</a>
+  </div>
+  <p class="footer-copy">Mandate © 2026 · MoKangMedical</p>
+  <p class="footer-disclaimer">课程内容仅供学习参考。完成全部课程获得「帝王学分析师」认证。历史数据来源于正史、学术研究及多方考证。</p>
 </footer>
 
 <script src="js/courses-data.js"></script>
 
 <script>
-// ═══════════════ COURSE DATA ═══════════════
-const COURSES = [
-  {
-    id:1,
-    title:"帝制起源 — 从禅让到家天下",
-    desc:"夏商周三代：天命观的形成、禅让制到家天下的转变、分封制的逻辑与弊端",
-    tags:["入门","3课时","约2.5小时"],
-    content:`## 帝制起源：从禅让到家天下
-
-### 一、远古的传说：禅让制的黄金时代
-
-在夏朝建立之前，中国处于传说中的「三皇五帝」时代。那个时代的权力转移采取的是**禅让制**——最高领袖选择最有德行和才能的人来继承帝位，而非传给自己的子孙。
-
-> 尧传舜，舜传禹。不以天下为私产，而以天下付贤者。
-
-尧帝晚年，四方部落推举舜为继承人。尧考察了舜三年——把自己的两个女儿嫁给他，看他如何处理家庭关系；让他到山林中，看他在暴风雨中是否能不迷路。舜通过了所有考验，成为新一代领袖。
-
-舜晚年又用同样的方式考察禹。禹的父亲鲧因治水失败被处死，禹继承父业，用「**疏导**」代替「堵截」的方法，花了整整十三年时间，终于治平了天下洪水。
-
-> 禹三过家门而不入，连妻子生下儿子启，他都没有回去看一眼。
-
-**禅让制的核心逻辑**：天下不是君主的私有财产，而是委托给贤者管理的公共事务。谁最有治理能力，谁就应该掌握权力。
-
-但这里有一个关键问题：大禹之后，为什么变成了**家天下**？
-
-### 二、大禹的转折：从公天下到家天下
-
-大禹治水成功，威望达到顶峰。他受舜禅让后，效仿先例指定了继承人——**伯益**。
-
-但这里出现了中国历史上最重要的一次制度断裂：大禹的儿子**启**，在大禹去世后夺取了权力，杀死了伯益，建立了中国第一个世袭王朝——**夏朝**（约前2070年）。
-
-这是一个悬而未决的历史公案：
-
-- **正统史观**：启是「篡位者」，破坏了禅让的优良传统
-- **另一种解读**：大禹在世时已经默许了启的接班。伯益资历太浅，而启多年积累了自己的政治势力
-
-> 《史记》记载：禹荐益於天，而天下诸侯皆去益而朝启——「吾君之子也。」
-
-无论真相如何，从启开始，「**公天下**」变成了「**家天下**」。这一转变影响深远——此后四千年，中国的最高权力几乎都在家族内部传递。
-
-**启之后**：夏朝传了十四代、十七王，延续约四百七十年。**少康中兴**——夏朝第四代君主太康失国后，其曾孙少康联合旧臣成功复国，这是中国历史上第一次王朝复兴。
-
-### 三、夏桀的覆灭与商汤革命
-
-夏朝最后一位君主**桀**，被史书记载为暴君。他宠爱妃子妺喜，据说为了取悦她，撕毁丝绸、建造酒池肉林。
-
-商部落首领**汤**在贤臣伊尹的辅佐下，起兵讨伐夏桀。在鸣条之战中大败夏军，夏桀被流放，夏朝灭亡。
-
-> 《尚书·汤誓》中记载了夏朝百姓的诅咒：「时日曷丧？予及汝皆亡！」——百姓恨桀入骨，宁可与他同归于尽。
-
-**商朝的贡献**：商朝（约前1600年—前1046年）是中国第一个有直接文字记载的王朝。**甲骨文**的发现，让我们第一次能直接「听到」三千多年前中国人的声音——商朝人事无大小都要占卜，把结果刻在龟甲兽骨上。
-
-**天命观的形成**：商朝人相信他们能统治天下是因为获得了「天」的授权。周武王伐纣时，打出「**天命转移**」的旗号——「天命靡常，惟德是依」。天命不是固定给某一个家族的，只会眷顾有德行的君主。这一观念成为此后中国政治哲学的核心支柱。
-
-### 四、周朝的分封制：制度设计的两面性
-
-周武王灭商后，面对一个巨大的治理难题：如何管理如此广阔的疆域？
-
-他设计了**分封制**：
-
-- **天子**：天下共主，拥有最高的祭祀权和军事指挥权
-- **诸侯**：受封土地和人民，在封国内享有独立的军政大权。向天子纳贡、派兵
-- **卿大夫**：诸侯国内再次分封，形成金字塔式的贵族体系
-
-**短期优势**：
-- 快速扩张——周朝仅用数十年就将势力推进到长江流域
-- 因地制宜——各地诸侯根据本地情况灵活治理
-
-**长期弊端**：
-- 诸侯坐大，天子架空——平王东迁后，周天子沦为名义上的共主
-- 春秋战国五百年分裂——诸侯国之间无休止的兼并战争
-- 制度性矛盾——分封制给予诸侯独立性，却又要求他们忠诚于天子
-
-### 五、暴君叙事：一个贯穿帝制史的模式
-
-夏桀被中国正史列为第一个暴君，商纣紧随其后——「桀纣」并称，成为暴君的代名词。
-
-但近年有学者提出：**「桀纣」的形象可能被周朝刻意妖魔化，以论证自己革命（以周代商）的合法性。**
-
-> 周朝需要回答一个问题：臣子讨伐君主，在道德上如何正当？答案就是——把前朝末代君主描述得十恶不赦，让革命变成「替天行道」。
-
-这一模式——「前朝末代君主一定是昏君暴君」——几乎贯穿了整个中国帝制史。秦二世、隋炀帝、崇祯……几乎每个朝代的末代皇帝在史书中都被描写得特别糟糕。**这真的是巧合吗？还是胜利者书写历史时的必然选择？**
-
-> 秦始皇废除分封、推行郡县制，正是吸取了周朝分封的深刻教训。从禅让到家天下，从天下一统到诸侯割据——三代的制度实验，为中国后世两千年帝制奠定了所有基本命题。`,
-    quiz:[
-      {q:"中国最早的权力转移方式是什么？",opts:["世袭制","禅让制","选举制","分封制"],answer:1,explain:"禅让制是尧舜禹时代的权力转移方式——选贤与能，传位给最有德才的人。尧考察舜三年才传位，舜考察禹十三年才传位。禅让制的核心逻辑是：天下不是君主的私有财产，而是委托给贤者管理的公共事务。"},
-      {q:"大禹的儿子是谁？",opts:["伯益","商汤","启","契"],answer:2,explain:"启是大禹的儿子。大禹受舜禅让后，指定伯益为继承人。但禹去世后，启夺取了权力，杀死了伯益，建立了中国第一个世袭王朝——夏朝，从此'公天下'变成'家天下'。不过《史记》记载诸侯皆去益而朝启，称其为'吾君之子也'，暗示大禹可能默许了儿子的接班。"},
-      {q:"周朝的分封制中，被封的最高一级贵族是？",opts:["天子","诸侯","卿大夫","士"],answer:1,explain:"分封制的等级是：天子（天下共主）> 诸侯（受封土地和人民，有独立军政大权）> 卿大夫（诸侯国内的再分封贵族）> 士。诸侯在封国内是绝对君主，只需向天子纳贡和派兵。这一制度短期利于扩张，长期导致诸侯坐大、春秋战国五百年分裂。"},
-      {q:"第一个被称为'暴君'的中国帝王是？",opts:["商纣王","夏桀","周幽王","秦始皇"],answer:1,explain:"夏桀是夏朝最后一位君主，中国历史上第一个被钉在耻辱柱上的帝王。正史将他和商纣并列为'桀纣'——暴君的代名词。据记载他宠爱妺喜，建造酒池肉林。但近年有学者认为夏桀和商纣的形象可能被周朝刻意妖魔化，以论证'以周代商'的合法性。"},
-      {q:"有学者认为夏桀和商纣的形象可能被谁妖魔化？",opts:["汉朝","秦朝","周朝","清朝"],answer:2,explain:"有观点认为周朝为了论证自己革命（以周代商）的合法性，刻意妖魔化了夏桀和商纣的形象。周朝需要回答：臣子讨伐君主如何在道德上正当？答案就是把前朝末代君主描绘得十恶不赦，让革命变成'替天行道'。这一'前朝末代必昏君'的叙事模式贯穿了整个中国帝制史。"}
-    ]
-  },
-  {
-    id:2,
-    title:"大一统奠基 — 秦汉帝王",
-    desc:"秦始皇统一六国、汉武帝北逐匈奴——中国帝制基本框架的确立",
-    tags:["核心","5课时","约4小时"],
-    content:`## 大一统奠基：秦汉帝王
-
-### 一、秦始皇：千古一帝的功与过
-
-公元前221年，秦王嬴政用了十年时间，逐一灭掉韩、赵、魏、楚、燕、齐六国，完成了中国历史上的**第一次大一统**。
-
-这不是简单的军事征服。秦始皇要解决的核心问题是：六国已经习惯了各自独立的文化和制度，如何让它们成为一个统一的国家？
-
-**制度创新——郡县制**：
-秦始皇做了一个划时代的决定：废除分封制，全面推行**郡县制**。全国分为三十六郡，郡下设县，所有官员由中央直接任免，不得世袭。
-
-> 这意味着地方官员不再是「领主」，而是中央的「雇员」。权力牢牢掌握在皇帝一人手中。这是中国政治史上前所未有的集权实验。
-
-**文化统一——书同文、车同轨**：
-- 废除六国各自的文字，以秦国的小篆为全国通用文字
-- 统一车轮间距，修建驰道——古代的高速公路网络
-- 统一度量衡——全国的斗、秤、尺全部标准化
-- 统一货币——圆形方孔的秦半两通行全国
-
-**北筑长城**：
-将燕、赵、秦三国的旧长城连接起来，西起临洮、东至辽东，绵延万里。动用民夫数十万。
-
-**功与过的矛盾**：
-
-| 功绩 | 过失 |
-|------|------|
-| 废分封，行郡县——中央直管 | 焚书坑儒——思想专制 |
-| 统一文字、度量衡、货币 | 严刑峻法——「赭衣塞路，囹圄成市」 |
-| 修驰道、凿灵渠 | 过度役使——长城、阿房宫、骊山陵 |
-
-> 秦始皇的核心矛盾：他创造了中国历史上最伟大的制度创新，却也用最残酷的手段推行它。**功在千秋，罪在当代。**
-
-**秦二世而亡**：
-秦始皇死后，赵高和李斯篡改遗诏，扶持昏庸的胡亥（秦二世）继位。在赵高的操纵下，秦二世屠戮兄弟姐妹、诛杀功臣，朝政混乱。仅仅三年后——公元前209年——陈胜吴广在大泽乡揭竿而起。
-
-> 「王侯将相，宁有种乎？」——这句话成为中国历史上所有底层反抗者的精神旗帜。
-
-秦朝仅十五年便土崩瓦解。它的教训是：**再伟大的制度，如果失去民心，也无法持久。**
-
-### 二、刘邦：布衣天子的用人之道
-
-刘邦出身低微，做过泗水亭长——大约相当于今天的乡镇派出所所长。他是中国历史上第一个**平民皇帝**。
-
-**楚汉争霸**：
-刘邦与项羽争夺天下的四年，是中国历史上最戏剧性的一段。项羽勇冠三军，力能扛鼎，却刚愎自用；刘邦看似无能，但知人善任。垓下之战，韩信以「四面楚歌」瓦解楚军士气，项羽在乌江自刎。
-
-> 「力拔山兮气盖世，时不利兮骓不逝。骓不逝兮可奈何，虞兮虞兮奈若何！」——项羽的绝唱，千古悲歌。
-
-**刘邦的用人之道——自我总结**：
-他在一次宴会上总结自己成功的原因：
-
-- 「运筹帷幄之中，决胜千里之外，吾不如**子房**（张良）」
-- 「镇国家，抚百姓，给馈饷，不绝粮道，吾不如**萧何**」
-- 「连百万之军，战必胜，攻必取，吾不如**韩信**」
-- 「此三者皆人杰也，**吾能用之**，此吾所以取天下也」
-
-> **领导力的核心**：不是自己最强，而是能用最强的人。项羽手下只有一个范增却不能用，刘邦手下人才济济皆尽其用——胜负早已注定。
-
-**白登山之围与黄老之治**：
-刘邦称帝后曾在白登山被匈奴围困七天七夜，几乎全军覆没。此后的**汉文帝和汉景帝**采取「**黄老之学**」——无为而治、休养生息、不轻易对外用兵。这就是著名的**文景之治**。
-
-> 《史记》记载：「京师之钱累巨万，贯朽而不可校。太仓之粟陈陈相因，充溢露积於外，至腐败不可食。」——轻徭薄赋四十年，国家财富迅速积累。
-
-### 三、汉武帝：塑造「汉」民族的帝王
-
-汉武帝刘彻十六岁即位，在位五十四年。他的决策，至今影响着我们的生活。
-
-**北逐匈奴——确立生存空间**：
-汉武帝一改前代的防御姿态，主动出击匈奴。卫青、霍去病率领汉军深入漠北，封狼居胥山——这是汉人军事辉煌的顶点。
-
-> 霍去病说：「**匈奴未灭，何以家为？**」
-
-从匈奴的威胁中突围，汉民族确立了自己的生存疆域。直到今天，「汉」仍然是我们民族的名称。
-
-**张骞通西域——开辟丝绸之路**：
-张骞出使西域最初是军事目的——联合大月氏夹击匈奴。但他在西域的见闻打开了中国人的世界视野。此后，丝绸、瓷器、茶叶通过这条商路运往西方，葡萄、石榴、胡桃、胡麻传入中国。
-
-**独尊儒术——确立意识形态**：
-武帝采纳董仲舒的建议——「罢黜百家，**独尊儒术**」。从此儒学成为中国的官方意识形态，影响了此后两千年的政治、教育和伦理体系。科举考试以儒家经典为核心内容，直到1905年才废止。
-
-**推恩令——不动声色的削藩**：
-汉武帝面对诸侯王势力过大的问题，发布了「推恩令」：诸侯王的封地不再由嫡长子一人继承，而是由**所有儿子均分**。这一政策的精妙之处在于——诸侯王没有任何理由反对（让所有儿子受益），但几代之后封地越分越小，诸侯势力自然瓦解。
-
-**晚年的悲剧——巫蛊之祸**：
-汉武帝晚年多疑，宠臣江充诬告太子刘据用巫蛊诅咒皇帝。太子被迫起兵自卫，兵败被杀，牵连数万人。事后武帝追悔莫及，在轮台发布《**轮台罪己诏**》，公开承认自己穷兵黩武、劳民伤财的过失。
-
-> 这是中国历史上第一个皇帝公开进行自我批评。帝王认错，何其罕见。但这份觉悟来得太晚了。
-
-从秦始皇到汉武帝，中国帝制的基本框架——中央集权、郡县制、儒家意识形态——全部确立。此后两千年，不论王朝如何更替，这一框架从未改变。`,
-    quiz:[
-      {q:"秦始皇在哪一年完成统一六国？",opts:["前230年","前221年","前210年","前206年"],answer:1,explain:"公元前221年，秦王嬴政灭掉最后一个诸侯国齐国，完成了中国历史上第一次大一统。从公元前230年灭韩开始，嬴政用了整整十年逐一消灭六国。统一后他推行郡县制、书同文、车同轨、统一度量衡和货币，奠定了此后两千年的帝制框架。"},
-      {q:"刘邦总结自己成功的三杰不包括谁？",opts:["张良（子房）","萧何","韩信","项羽"],answer:3,explain:"刘邦认为成功在于用了张良（运筹帷幄）、萧何（后勤保障）、韩信（军事指挥）三杰。项羽是他的对手而非部下。刘邦的领导力核心是'吾能用之'——不是自己最强，而是能用最强的人。项羽手下只有一个范增却不能用，胜负早已注定。"},
-      {q:"汉武帝独尊儒术前的官方意识形态是什么？",opts:["法家","道家（黄老）","墨家","阴阳家"],answer:1,explain:"汉初实行黄老之学（道家思想），核心是'无为而治'——政府少干预、轻徭薄赋、与民休息。文景之治就是黄老之治的典范。武帝时董仲舒建议'罢黜百家，独尊儒术'，儒学从此成为官方意识形态，影响了此后两千年的中国政治和教育体系。"},
-      {q:"张骞通西域的主要目的是什么？",opts:["贸易","旅游","联合大月氏抗击匈奴","传播佛教"],answer:2,explain:"张骞出使西域最初是军事目的——联合大月氏夹击匈奴。他被匈奴扣押十年仍持汉节不屈。虽然军事目的没有达成，但他在西域的见闻打开了中国人的世界视野。此后丝绸、瓷器经此运往西方，葡萄、石榴、胡桃传入中国——丝绸之路由此开辟。"},
-      {q:"汉武帝晚年发布的自我批评文件叫什么？",opts:["罪己诏","轮台罪己诏","求贤诏","推恩令"],answer:1,explain:"《轮台罪己诏》是中国历史上第一个皇帝公开检讨。汉武帝在巫蛊之祸导致太子被杀后追悔莫及，公开承认自己穷兵黩武、劳民伤财的过失，宣布停止对外征伐、恢复休养生息。帝王认错，何其罕见。但这份觉悟来得太晚了。"}
-    ]
-  },
-  {
-    id:3,
-    title:"帝国巅峰 — 隋唐帝王",
-    desc:"贞观之治到开元盛世：盛世治理的核心密码与崩塌教训",
-    tags:["深度","6课时","约5小时"],
-    content:`## 帝国巅峰：隋唐帝王
-
-### 一、隋文帝：结束三百年分裂的制度设计师
-
-公元581年，杨坚逼迫北周静帝禅让，建立隋朝。八年后的589年，隋军渡过长江，灭掉陈朝，**结束了自西晋灭亡以来近三百年的分裂**。
-
-杨坚最伟大的贡献不在军事，而在制度设计。
-
-**三省六部制**——中国古代政治制度的巅峰设计：
-- **中书省**——负责起草政令（决策）
-- **门下省**——负责审核政令（监督）
-- **尚书省**——负责执行政令（行政）
-- 尚书省下设**六部**：吏、户、礼、兵、刑、工
-
-> 权力分立、相互制衡——这套体系一直沿用到清朝末年。在西方孟德斯鸠提出「三权分立」的一千年前，中国已经建立了一套精密的权力制衡机制。
-
-**科举制——一场无声的革命**：
-隋文帝创立的科举制，打破了自魏晋以来**门阀士族**对政治权力的垄断。
-
-此前，做官靠的是出身。九品中正制下，「上品无寒门，下品无士族」——出身决定命运。科举制让平民通过考试进入官场，「朝为田舍郎，暮登天子堂」不再只是梦想。
-
-> 此后一千三百年间，无数寒门子弟通过科举改变命运。这是中国历史上最持久、最深刻的社会流动机制。
-
-**开皇之治**：杨坚在位期间轻徭薄赋、整顿户籍，国家财富急剧增长。据《资治通鉴》记载，到隋朝灭亡时仓库里的粮食和布帛堆积如山，唐朝建立后的二三十年里还在使用隋朝留下的储备。
-
-### 二、隋炀帝：被妖魔化的理想主义者
-
-杨广是隋文帝的次子，通过阴谋手段取代兄长杨勇成为太子。他的统治，堪称中国历史上最戏剧性的悲剧。
-
-**三大壮举**：
-
-1. **大运河**——连接南北五大水系，全长约两千七百公里。直到今天，京杭大运河仍在发挥航运作用
-2. **东征高句丽**——三次大规模远征，动用兵力超过百万
-3. **营建东都洛阳**——建设了一座宏伟的新都城
-
-每一项都是宏大构想。但杨广的问题是——**他同时做了所有事情**。
-
-> 大运河连接南北，造福此后千年。但他在极短时间内强征百万民夫，死者枕藉。他完成的伟大工程，却用了最残酷的手段。
-
-**最后的画面**：
-618年，禁军将领宇文化及发动政变，缢杀杨广。据说杨广死前对镜感叹：「好头颅，谁当斫之？」——自负与悲凉交织。
-
-> 历史评价长期两极分化：有人说他是「暴君」，有人说他是「被误解的改革家」。他的大运河、科举完善、西域经略，都为唐朝盛世奠定了基础。但如果他没有透支民力，隋朝会不会延续更久？这是一个永远没有答案的历史假设。
-
-### 三、唐太宗：贞观之治的密码
-
-李世民是中国历史上最受推崇的皇帝之一，但他的皇位来路不正——他是通过**玄武门之变**杀兄逼父上位的。
-
-**玄武门之变**（公元626年）：
-李世民在玄武门设伏，杀死兄长李建成和弟弟李元吉，随即派兵进入宫中，迫使父亲李渊退位。这成为他一生的阴影。
-
-> 他用此后二十三年的治世来弥补这一天的罪孽。贞观之治，某种程度上是李世民对自己罪行的救赎。
-
-**治理哲学——四句话**：
-
-1. **以铜为镜，可以正衣冠**
-2. **以史为镜，可以知兴替**
-3. **以人为镜，可以明得失**
-4. **水能载舟，亦能覆舟**
-
-**史上最强管理团队**：
-- **房玄龄**——善於谋划，被称为「房谋」
-- **杜如晦**——善於决断，「房谋杜断」成为中国成语
-- **魏征**——以直谏闻名，当面让皇帝难堪
-
-> 魏征死后，李世民痛哭：「以铜为镜……以人为镜，可以明得失。魏征没，朕亡一镜矣！」
-
-**天可汗**：
-贞观四年（630年），唐军击败东突厥，北方各族尊称李世民为「**天可汗**」——既是汉人的皇帝，也是草原民族的大汗。这是中国历史上少有的双重合法性。
-
-**纳谏——权力自觉的边界**：
-李世民最难得的是——他手握绝对权力，却刻意对自己的权力设限。他主动征求谏言，甚至在魏征当众顶撞他时压下怒火。因为他知道：**一个人做决策，一定会出错。**
-
-> 权力的自觉——这可能是帝王学中最高深、最稀缺的品质。
-
-### 四、武则天：唯一的例外
-
-公元690年，六十七岁的武则天正式称帝，改国号为「**周**」。她是中国历史上**唯一的女性皇帝**。
-
-**非常规的上位之路**：
-武则天十四岁入宫，成为唐太宗（李世民）的才人。太宗死后，她按惯例出家为尼，却被太宗的儿子唐高宗李治接回宫中。此后她一步步清除所有障碍——王皇后、萧淑妃、长孙无忌——所有挡在她面前的人都被她清除。
-
-**统治术的精妙**：
-- **扩大科举，提拔寒门**——狄仁杰、姚崇、张说都是从她的时代崛起的
-- **设立铜匦（告密系统）**——鼓励百姓举报，以恐怖手段打击政敌
-- **任用酷吏如来俊臣，但用完即杀**——用完的工具不会留下把柄
-
-**无字碑**：
-武则天死后，与唐高宗合葬於乾陵。她立了一块巨大的石碑，上面**空无一字**。
-
-> 「功过是非，任后人评说。」——不自己写，也不让别人替她写。这是中国历史上前所未有的自信。
-
-武则天的统治充满争议。但史学界逐渐形成共识：她延续并发展了贞观之治，为开元盛世奠定了基础。她提拔的寒门人才，正是后来开元盛世的核心班底。
-
-### 五、唐玄宗：同一个人的两张面孔
-
-中国历史上很难找到另一个皇帝，像唐玄宗李隆基这样——同一个人的前后半生，呈现出如此极端的两张面孔。
-
-**前半生：开元盛世（713—741）**
-李隆基在武则天去世后的政变乱局中崛起，先后铲除了**韦后集团**（他的伯母）和**太平公主集团**（他的姑母），夺取政权。
-
-开元年间，他励精图治：
-- 任用姚崇、宋璟、张九龄等贤相
-- 整顿吏治，精简机构
-- 长安成为当时世界上最繁荣的城市，人口超过一百万
-
-> 杜甫《忆昔》：「忆昔开元全盛日，小邑犹藏万家室。稻米流脂粟米白，公私仓廪俱丰实。」
-
-**后半生：安史之乱（755—763）**
-一切在天宝年间急转直下：
-- 沉迷杨贵妃，不理朝政——「春宵苦短日高起，从此君王不早朝」
-- 信任安禄山——一个肥胖的胡人将领，甚至收为义子
-- 重用李林甫、杨国忠——堵塞言路，奸臣当道
-
-公元755年，安禄山在范阳起兵叛乱。**安史之乱**持续八年，死亡人数超过三千万——按当时人口比例来算，是人类历史上最惨烈的战争之一。唐朝从此由盛转衰。
-
-> 同一个皇帝，同一个国家，同一套制度。转变的不是制度，是**人**。当掌握绝对权力的人失去了自我约束，再好的制度也无能为力。
-
-开元盛世到安史之乱的剧变，给后世留下了一个永恒的命题：**盛世如何避免衰退？帝国的巅峰，为什么总是蕴藏着衰落的种子？**`,
-    quiz:[
-      {q:"隋文帝创立的哪项制度打破了门阀对官场的垄断？",opts:["九品中正制","科举制","察举制","世袭制"],answer:1,explain:"科举制让平民通过考试进入官场，打破了门阀士族对政治权力的垄断。"},
-      {q:"李世民是通过什么事件取得皇位的？",opts:["正常继位","禅让","玄武门之变","陈桥兵变"],answer:2,explain:"玄武门之变中，李世民杀死兄长李建成和弟弟李元吉，迫使父亲李渊退位。"},
-      {q:"贞观之治最著名的谏臣是谁？",opts:["房玄龄","杜如晦","长孙无忌","魏征"],answer:3,explain:"魏征以敢于直谏闻名，他死后李世民说'以人为镜，可以明得失。魏征没，朕亡一镜矣。'"},
-      {q:"武则天立了什么碑来让后人评价自己？",opts:["功德碑","无字碑","神道碑","纪功碑"],answer:1,explain:"武则天的无字碑是一块空白的石碑，意味着'功过是非，任后人评说'——不自己写，也不让别人替她写。"},
-      {q:"唐玄宗统治的两个极端时期分别是什么？",opts:["贞观和开元","开元盛世和安史之乱","永徽之治和甘露之变","大中之治和黄巢起义"],answer:1,explain:"唐玄宗前半生开创开元盛世，后半生酿成安史之乱，是同一个皇帝的两个极端。"}
-    ]
-  },
-  {
-    id:4,
-    title:"文治的博弈 — 宋元帝王",
-    desc:"杯酒释兵权的智慧与代价、宋仁宗的文治盛世、忽必烈的统治实验",
-    tags:["进阶","5课时","约4小时"],
-    content:`## 文治的博弈：宋元帝王
-
-### 一、赵匡胤：最温柔的夺权者
-
-公元960年正月初一，边关急报：辽国联合北汉大举南侵。后周朝廷仓促之下派殿前都点检赵匡胤率军北上御敌。
-
-大军走到开封城东北二十里的陈桥驿时天降大雪。当晚赵匡胤的部下开始议论：当今皇帝只有七岁，我们在前线拼命他知道吗？不如立点检做天子。
-
-第二天一早，赵匡胤醒来时，一件黄袍已经披在他身上。将士们跪地山呼万岁。赵匡胤推辞再三之后说：你们贪图富贵立我为天子。但必须答应我三件事：回开封后不得惊犯太后和幼主，不得欺凌公卿大臣，不得抢掠府库。从命者有赏，违者灭族。
-
-大军回到开封时秋毫无犯。赵匡胤和平接管了政权。七岁的小皇帝柴宗训禅位。赵匡胤在《即位赦文》中特别强调：柴氏子孙有罪不得加刑，即使谋反也只许在狱中赐尽——这在历朝历代是独一无二的仁慈。
-
-**但夺取政权容易，守住政权需要解决一个根本问题：如何防止别人也披上黄袍？**
-
-### 二、杯酒释兵权：历史性的和平削权
-
-建隆二年七月的某个夜晚，赵匡胤把石守信、高怀德等禁军高级将领请来喝酒。
-
-酒过三巡，赵匡胤突然叹气：没有你们就没有我的今天。但做天子太难了——整夜睡不着觉。
-
-将领们忙问为什么。赵匡胤说：这还不明白吗？这个位子谁不想坐？
-
-众将大惊跪地：天下已定谁敢有二心？
-
-赵匡胤说了一段掏心窝子的话：「卿等固然忠心。但你们的部下如果把黄袍披在你们身上，你们虽然不想干，还由得了你们吗？」
-
-将领们吓出一身冷汗，请求指示生路。
-
-赵匡胤说出了他的方案：「人生如白驹过隙。你们不如交出兵权，到地方上去做节度使，多买良田美宅留给子孙，养些歌儿舞女安度晚年。我再与你们结为儿女亲家。这样君臣之间上下相安，不是很好吗？」
-
-第二天，禁军将领们纷纷称病请求辞职。赵匡胤一一批准，赏赐优厚。石守信去当天平军节度使，高怀德去当归德军节度使——有职无权，富贵终身。
-
-没有流血，没有杀戮。一场历史上最温和的权力交接完成了。
-
-**但杯酒释兵权有代价**。从此宋朝形成了重文轻武的国策。赵匡胤亲口说过：「朕今选儒臣干事者百余，分治大藩。纵使皆贪浊，亦未及武臣一人也。」——就算一百个文官贪污，危害也比不上一个武将造反。
-
-这个政策导致军队战斗力严重下降。宋朝军费占财政总支出的80%以上，养兵百万，但在对辽、西夏、金的战争中屡战屡败。这是「杯酒释兵权」的另一面——它防止了内部叛乱，但也削弱了抵御外敌的能力。
-
-### 三、宋仁宗：最仁慈的皇帝
-
-赵祯是宋朝第四位皇帝，在位四十二年。他在中国民间知名度可能不高，但他治下的朝代是中国文化史上最辉煌的时期之一。
-
-他去世时，消息传到辽国后，辽道宗耶律洪基握着使者的手痛哭：「四十二年不识兵革矣！」
-
-仁宗朝诞生了中国文化史上最集中的一批巨星：
-
-- 包拯：铁面无私的「包青天」，传说他弹劾过仁宗的岳父
-- 范仲淹：「先天下之忧而忧，后天下之乐而乐」
-- 欧阳修：文坛领袖，唐宋八大家之一
-- 苏轼苏辙兄弟
-- 王安石和司马光——这两个后来的政敌当时都是仁宗朝的年轻官员
-- 沈括：写出《梦溪笔谈》的全才科学家
-
-**唐宋八大家中，有六位活跃在仁宗朝。**
-
-仁宗以节俭和仁慈著称。有一天夜里他想吃烤羊肉，但想到御厨会因此杀羊劳费，硬是忍住了。大臣包拯在朝堂上慷慨陈词唾沫星子飞到他脸上，他一边擦脸一边接受建议。谏官王素批评他收了地方官进献的美女——他立即把美女全部遣送回家。
-
-### 四、王安石变法与司马光：理想与保守的碰撞
-
-神宗即位后重用王安石，开始了宋朝最大规模的改革——熙宁变法。
-
-王安石变法的核心逻辑完全正确：当时宋朝财政困难军队庞大而战斗力低下。解决问题的方案是富国强兵：
-
-- 青苗法：官府在青黄不接时贷款给农民收低利息——替代高利贷
-- 免役法：百姓可以交钱代替劳役——解放劳动力
-- 保甲法：农村组织民兵——节省军费
-
-这些政策在理论上无懈可击。但执行中完全走样：青苗法变成了强制贷款，为了完成指标官员逼迫不需要贷款的富户借贷，到期还不上就进监狱。免役法变成了变相加税。
-
-**核心教训：好政策，坏执行。政策设计者的智商不能替代基层执行者的素质。**
-
-司马光强烈反对变法。他的理由是：天下财富是固定的，政府多收老百姓就少得。与其折腾不如保持稳定。
-
-两人的争论是真诚的——他们都是为国家好。王安石回朝后没有杀司马光（不像某些朝代异见者就被清洗），司马光也只是在洛阳安心写他的《资治通鉴》。神宗死后司马光执政废除了全部新法——矫枉过正，把新法中有用的部分也废掉了。
-
-### 五、忽必烈与元朝：草原帝国如何统治农耕文明
-
-1271年，忽必烈建立元朝定都大都（今北京）。他是成吉思汗的孙子，统一中国的蒙古大汗。
-
-忽必烈面临一个前所未有的管理难题：如何用草原游牧民族的治理方式管理一个农业文明社会？
-
-他尝试做了一个折中：在军事上保持蒙古传统——蒙古军队不汉化保持骑兵优势；在行政上采用汉制——设立中书省、推行科举（虽然录取很少的汉人）；在文化上多元包容——忽必烈本人信奉藏传佛教但对儒生道士也都礼遇。
-
-马可·波罗在忽必烈时期来到中国。他的游记让欧洲人第一次知道在遥远的东方有一个叫「契丹」（Cathay）的富庶帝国。他描写大都的宏伟繁华——每天有一千辆运丝车进城——这在西方引起了巨大的震撼。
-
-但元朝的根本矛盾没有解决。蒙古贵族不愿汉化，坚持着游牧生活方式。汉人士大夫阶层被排除在核心权力之外心怀不满。加上中后期的皇位继承混乱——忽必烈死后四十年间换了八个皇帝——元朝始终没有建立起稳定的治理体系。
-
-**元朝的启示**：征服一个国家容易，治理一个国家需要制度。蒙古人用不到一百年就退回草原——制度比武力更持久。`,
-    quiz:[
-      {q:"赵匡胤用什么方式解除武将的兵权？",opts:["诛杀功臣","杯酒释兵权","削藩","推恩令"],answer:1,explain:"赵匡胤用一场酒宴和平解除了石守信等将领的兵权——没有流血，是中国历史上最温和的集权方式。"},
-      {q:"唐宋八大家中有几位活跃在宋仁宗朝？",opts:["3位","4位","6位","8位"],answer:2,explain:"六位活跃在仁宗朝——欧阳修、苏洵、苏轼、苏辙、王安石、曾巩。"},
-      {q:"王安石变法的核心失败原因是什么？",opts:["理论错了","执行走样","皇帝不支持","敌人太强"],answer:1,explain:"王安石的理论和逻辑都是对的（富国强兵），但政策在地方执行中严重走样——好政策，坏执行。"},
-      {q:"忽必烈的都城在哪里？",opts:["长安","洛阳","大都（北京）","南京"],answer:2,explain:"忽必烈定都大都（今北京），这是北京第一次成为统一王朝的首都。"},
-      {q:"马可·波罗在哪位皇帝在位时来到中国？",opts:["成吉思汗","窝阔台","忽必烈","朱元璋"],answer:2,explain:"马可·波罗在忽必烈在位期间来到中国，他的游记让西方第一次全面了解中国。"}
-    ]
-  },
-  {
-    id:5,
-    title:"专制巅峰 — 明清帝王",
-    desc:"朱元璋的集权实验、康熙的千古一帝之路、乾隆盛世背后的阴影",
-    tags:["深度","7课时","约6小时"],
-    content:`## 专制巅峰：明清帝王
-
-### 一、朱元璋：从乞丐到皇帝的集权实验
-
-朱元璋是中国历史上起点最低的皇帝。他出生在濠州钟离一个赤贫农家，排行老八，父母和三个兄长都在一场瘟疫中饿死。十七岁的朱元璋无家可归，到皇觉寺当了和尚。但寺庙也养不起他，他外出云游化缘三年——实际上就是乞讨。
-
-二十五岁那年他投奔了红巾军。仅仅十五年后的1368年，四十岁的朱元璋在应天（南京）称帝建立了明朝。
-
-他是天才的军事家。他采取高筑墙广积粮缓称王的稳健策略，先取陈友谅再灭张士诚最后北伐元朝——战略顺序精妙绝伦。
-
-但建国后朱元璋做了一件影响中国此后五百年的事：废除了丞相制度。
-
-洪武十三年，朱元璋以宰相胡惟庸谋反为由将其处死。他宣布：从此永远废除丞相之职，六部直接向皇帝汇报。
-
-背后的逻辑简单而可怕：他不信任任何人。他要亲自掌控一切。此后朱元璋每天批阅数百份奏折。据记载他平均每天处理400多件政务，每件都要亲自批示。
-
-**废除丞相的长期后果**：权力完全集中在皇帝一人之手。此后的明朝皇帝要么像朱元璋朱棣一样累死累活，要么像万历一样躲在后宫几十年不上朝——因为没有丞相系统可以分担和制衡。清朝虽然名义上有内阁和军机处，但决策权从未离开皇帝。
-
-### 二、永乐大帝朱棣与郑和下西洋
-
-朱棣是朱元璋第四子。侄儿建文帝削藩逼反了他。他发动靖难之役从北平起兵三年后攻入南京。
-
-朱棣做了几件影响深远的事：
-- 迁都北京：把大本营从南京搬到北方前线，奠定了北京此后作为首都的地位
-- 五次亲征漠北打击蒙古残余势力
-- 派郑和七下西洋
-
-郑和七下西洋是中国古代航海技术登峰造极的体现。最大的一次船队有200多艘船、27000多人。最大的宝船长约150米——当时世界上最大的木船。郑和到达了东南亚、印度、阿拉伯半岛、非洲东海岸。
-
-但朱棣一死，航海立即停止。此后的明朝皇帝不仅不发展了——连郑和的航海档案都被兵部侍郎刘大夏销毁了。他说：三宝太监下西洋耗资巨大对国家无益。从此中国从世界海洋上退出。
-
-**郑和下西洋是明朝最辉煌的时刻之一，也是最令人扼腕的错失——如果持续海外探索，世界近代史的格局可能完全不同。**
-
-### 三、康熙：千古一帝的光与影
-
-康熙八岁即位十四岁智擒鳌拜亲政。他是中国历史上知识最渊博的皇帝之一：
-
-- 精通满语汉语蒙古语，还能阅读拉丁文数学著作
-- 师从比利时传教士南怀仁学习几何天文学和弹道学
-- 亲自用几何方法测量永定河堤坝的长度
-
-他的功业也是一流的：
-- 十六岁铲除权臣鳌拜
-- 平定三藩之乱（八年）
-- 派施琅收复台湾
-- 三次亲征噶尔丹
-- 签订《尼布楚条约》划定中俄边界
-
-但康熙晚年犯了一个致命的错误：没有解决好继承人问题。
-
-康熙废黜太子胤礽两次。九个皇子各自结党争储——九子夺嫡。皇子们明争暗斗互相倾轧。康熙对此心知肚明却无力制止。晚年他在诏书中流露出深深的疲惫和无奈。
-
-**康熙的悲剧**：一个才华横溢的皇帝到了晚年却在儿子们的争斗中束手无策。他建立了强大的帝国但无法保证权力的平稳交接。
-
-### 四、雍正：最孤独的勤政者
-
-雍正在九子夺嫡的腥风血雨中胜出。但关于他的继位一直有争议——是康熙遗诏真传还是他篡改遗诏？
-
-不管继位方式如何，雍正的执政表现是出色的。他在位仅十三年批阅奏折数以万计。他留下的朱批字数超过很多皇帝一生的阅读量。
-
-他铁腕反腐。查抄大贪官年羹尧和隆科多。整顿财政实行耗羡归公——地方官的灰色收入被制度化收归国库。他还废除了贱籍制度——改变了数百年来的社会等级。
-
-雍正最人性化的时刻是被记载在奏折里的一段话。他在批复河南巡抚田文镜的奏折时写道：「**朕就是这样汉子。就是这样秉性。就是这样皇帝。**」——这三句话透露着极度的自信与极深的孤独。
-
-他为儿子乾隆留下了一个国库充盈吏治清明的帝国。但他自己却很少有真正快乐的日子。
-
-### 五、乾隆：盛世的顶峰与黄昏
-
-乾隆在位六十年（还当了四年太上皇），是中国历史上实际掌权最久的皇帝。
-
-他自诩「十全武功」——十场大规模军事行动的胜利。他编了《四库全书》——中国古代最大的一部丛书。他六下江南留下了无数诗词碑刻。
-
-但乾隆统治的后期是清朝由盛转衰的转折点。
-
-1793年英国使臣马戛尔尼来华请求通商。他带来了当时最先进的科技产品——蒸汽机模型天体运行仪地球仪。乾隆却说：天朝物产丰盈无所不有原不藉外夷货物以通有无。他把马戛尔尼当成朝贡的蛮夷打发走了。
-
-就在乾隆拒绝英国通商的同一年英国工业革命正在重塑世界。蒸汽机工厂铁路改变了生产和生活方式——而中国对此一无所知。
-
-更严重的是乾隆晚年的腐败。宠臣和珅贪污的财产相当于当时清政府十五年的财政收入。和珅跌倒嘉庆吃饱——但整个官僚系统的腐败已经病入膏肓。
-
-**乾隆是中国帝制时代最后一个可以称得上伟大的皇帝——但他也是中国错过世界的关键人物。**`,
-    quiz:[
-      {q:"朱元璋废除了什么制度？",opts:["科举制","丞相制","行省制","分封制"],answer:1,explain:"朱元璋在胡惟庸案后宣布永远废除丞相制度，从此所有权力集中到皇帝一人手中——影响了此后五百多年的中国政治。"},
-      {q:"康熙晚年最大的失败是什么？",opts:["军事失败","经济崩溃","继承人问题（九子夺嫡）","文化政策"],answer:2,explain:"康熙没能处理好继承人问题，导致九个皇子明争暗斗——九子夺嫡，各自结党，互相残杀。"},
-      {q:"雍正以什么闻名？",opts:["开疆拓土","下江南","勤政和反腐","文化繁荣"],answer:2,explain:"雍正以极度的勤政和铁腕反腐闻名。他在位仅13年，批阅奏折字数远超许多皇帝一生。"},
-      {q:"乾隆拒绝了哪国使团的通商请求？",opts:["日本","葡萄牙","英国（马戛尔尼）","法国"],answer:2,explain:"1793年，乾隆拒绝了英国马戛尔尼使团的通商请求。这是中国与工业革命擦肩而过的历史性时刻。"},
-      {q:"乾隆编纂的中国古代最大丛书是什么？",opts:["永乐大典","古今图书集成","四库全书","皇朝经世文编"],answer:2,explain:"《四库全书》是中国古代最大的丛书，共收录3461种图书，79309卷。由纪晓岚主持编纂。"}
-    ]
-  },
-  {
-    id:6,
-    title:"帝王领导力 — 以史为鉴",
-    desc:"从帝王用人、决策、危机管理中提炼现代领导力智慧",
-    tags:["应用","4课时","约3小时"],
-    content:`## 帝王领导力：以史为鉴
-
-### 一、用人之道：刘邦的终极智慧
-
-领导者不需要在每件事上比别人强。你需要的是找到在每件事上比你强的人并让他们愿意为你工作。
-
-刘邦的经典总结：「运筹帷幄之中决胜千里之外吾不如子房。镇国家抚百姓给馈饷不绝粮道吾不如萧何。连百万之军战必胜攻必取吾不如韩信。此三者皆人杰也吾能用之此吾所以取天下也。」
-
-对比同时代的项羽：力能扛鼎才气过人。但他的团队只有一个范增——还被猜忌而气走了。项羽自己太强导致他看不起别人的才能。
-
-**现代启示**：优秀组织不是由一个全能的CEO驱动的，而是由在各自领域都比CEO强的人组成的。CEO的核心能力是识别人才搭建平台并让他们发挥。
-
-李世民用人的特点是「找能说不的人」。魏征一生向李世民进谏二百多次——大多数李世民都接受了。李世民说：「以铜为镜可以正衣冠。以史为镜可以知兴替。以人为镜可以明得失。」魏征就是他的人镜。
-
-反面教材是崇祯。在明朝最危险的时刻他杀了自己的最强将领袁崇焕。不管袁崇焕是否真的有罪——在关键处决自己的最强执行者永远是一个灾难性的决定。
-
-### 二、战略决策：等待的智慧
-
-曹操在赤壁之战犯的最大错误是赌一把。他没有水军优势就南下在完全不了解长江水文的情况下打了一场必输的仗。赤壁之战后曹操再也没有统一天下的机会。
-
-曹操的失败源于急躁。他刚平定北方就想一举南下完成统一。如果他能先花几年时间训练水军建立水上优势——历史可能完全不同。
-
-对比康熙。康熙十四岁就开始谋划除鳌拜。但他等到十六岁——等了整整两年——等到那个最合适的时机。一个十几岁的少年能表现出这样的战略耐心是极其罕见的。
-
-**战略的核心不是做正确的决定——是在正确的时间做正确的决定。时机错了正确的决定也会失败。**
-
-唐玄宗在安史之乱中的决策则是一个混合教训。他的第一反应是正确的——逃跑入蜀保存实力。但在逃跑途中他错误地命令哥舒翰出潼关与叛军进行野战——导致了长安失守和整个战局的逆转。
-
-好的决策需要区分：什么事情必须立即响应什么事情需要等待。逃跑是立即响应——必须马上行动。反击是战略行动——可以等待时机。
-
-### 三、危机管理：于谦的决断
-
-1449年土木堡之变——明英宗亲征被瓦剌俘虏。皇帝被俘全国震动。很多大臣主张迁都南京。
-
-于谦站出来说了震铄古今的一段话：「言南迁者可斩也。京师天下根本一动则大事去矣。独不见宋南渡事乎？」
-
-他做了三个关键决策：
-1. 另立新君（景泰帝）——拒绝用国家利益交换皇帝
-2. 集结北京周边所有军队——绝不分散兵力
-3. 自己披甲上城亲自督战——用个人勇气稳住军心
-
-北京保卫战大获全胜。于谦用一个正确的危机决策挽救了大明。
-
-**危机关头最需要的是有勇气做决断的人。于谦的决策不是所有人都同意——但他做了然后就承担后果。**
-
-反面案例是戊戌变法。光绪皇帝和康有为梁启超在103天内发布了180多道改革诏令——平均每天近两道。他们想在一夜之间改变整个帝国。结果所有既得利益集团联合反扑——变法失败六君子被杀。
-
-**危机中的改革需要勇气但也需要时机和节奏。没有节奏的勇气就是鲁莽。**
-
-### 四、接班人问题：中国帝王最大的治理难题
-
-中国历史反复证明：接班人问题是帝制最大的结构性缺陷。
-
-汉武帝晚年巫蛊之祸杀太子——他深爱的儿子因为猜疑而死。康熙九子夺嫡——九个儿子互相残杀老皇帝心力交瘁。万历国本之争——因为不想立长子为太子和大臣僵持了十五年几乎废了朝政。
-
-根本问题：当权力完全集中于一人之手时连权力者自己也无法控制权力的继承。这是君主制的天然缺陷——没有任何制度设计能保证每一代君主都英明。
-
-唯一的例外或许是刘秀。他退功臣进文吏让二十八将被画像荣誉但不掌实权——用柔道完成权力过渡。但东汉后来也陷入了外戚和宦官交替专权的恶性循环。
-
-**现代启示**：任何组织的长期成功不能依赖找到完美的接班人。必须建立让平庸之人也能正常运转的制度。科举制比任何皇帝都长寿——因为制度不靠天才也能运行。`,
-    quiz:[
-      {q:"刘邦用人之道的核心是什么？",opts:["自己最强","用比自己强的人","只用亲戚","只用功臣"],answer:1,explain:"刘邦的核心智慧：不是自己最强，而是能用最强的人。张良、萧何、韩信各方面都比他强。"},
-      {q:"康熙什么时候开始谋划除鳌拜？",opts:["亲政当天","14岁开始，等了两年","鳌拜谋反后","大臣建议后"],answer:1,explain:"康熙14岁就开始谋划，但等到最合适的时机才动手——耐心等待是战略决策的核心素养。"},
-      {q:"唐玄宗在安史之乱中的第一反应是什么？",opts:["死守长安","逃跑入蜀","投降","御驾亲征"],answer:1,explain:"唐玄宗选择逃跑入蜀——这在策略上是正确的（保存实力），但他错误地命令哥舒翰出潼关决战，造成了长安失守。"},
-      {q:"崇祯杀袁崇焕说明了什么？",opts:["袁崇焕确实有罪","崇祯用人果断","关键时刻杀了最强将领","用间计成功"],answer:2,explain:"崇祯在关键时刻处决了自己最强的将领袁崇焕，加速了明朝的灭亡——这是用人决策的反面教材。"},
-      {q:"本课程认为中国历史上最大的治理难题是什么？",opts:["军事","经济","接班人","文化"],answer:2,explain:"接班人问题是中国帝制史上最大的治理难题——当权力绝对集中时，连皇帝自己也无法控制权力的继承。"}
-    ]
+/* ═══════════════ STATE ═══════════════ */
+const STORAGE_KEY = 'mandate_course_state';
+let state = loadState();
+let quizAnswers = {};
+let allCourses = [];
+let activeDetail = null;
+
+function defaultState() {
+  return { completed:[], current:0, scores:{}, totalCorrect:0, streak:0 };
+}
+function loadState() {
+  try { const s = JSON.parse(localStorage.getItem(STORAGE_KEY)); return s && typeof s.current === 'number' ? s : defaultState(); }
+  catch(e) { return defaultState(); }
+}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+/* ═══════════════ LOAD COURSES ═══════════════ */
+function loadAllCourses() {
+  // Merge in-page courses with COURSES_EXTENDED from courses-data.js
+  const merged = [];
+  
+  // Inline courses 1-6 (defined below) 
+  if (typeof COURSES !== 'undefined') merged.push(...COURSES);
+  
+  // External courses 7-100 from courses-data.js
+  if (typeof COURSES_EXTENDED !== 'undefined') {
+    COURSES_EXTENDED.forEach(c => {
+      // Parse tags from array or string format
+      let tags = [];
+      if (Array.isArray(c.tags)) {
+        tags = c.tags;
+      } else if (typeof c.tags === 'string') {
+        tags = c.tags.split('|');
+      }
+      merged.push({
+        id: c.id,
+        title: c.title,
+        desc: c.desc,
+        tags: tags,
+        content: c.content || '',
+        quiz: c.quiz || []
+      });
+    });
   }
-];
-
-// ═══════════════ MERGE EXTENDED COURSES ═══════════════
-if (typeof COURSES_EXTENDED !== 'undefined') {
-  COURSES.push(...COURSES_EXTENDED);
+  
+  allCourses = merged.sort((a,b) => a.id - b.id);
+  
+  // Collect modules
+  const modules = new Set();
+  allCourses.forEach(c => {
+    (c.tags||[]).forEach(t => {
+      if (t && !t.includes('分钟') && !t.includes('课时')) modules.add(t);
+    });
+  });
+  
+  // Build module tabs
+  const tabContainer = document.getElementById('moduleTabs');
+  modules.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'module-tab';
+    btn.textContent = m;
+    btn.dataset.module = m;
+    btn.onclick = () => filterByModule(m, btn);
+    tabContainer.appendChild(btn);
+  });
+  
+  renderGrid();
+  updateStats();
 }
 
-// ═══════════════ STATE ═══════════════
-const KEY='mandate_learn_v1';
-let state=loadState();
-
-function loadState(){
-  try{
-    const s=localStorage.getItem(KEY);
-    if(s) return JSON.parse(s);
-  }catch(e){}
-  return {completed:[],scores:{},current:1,totalCorrect:0,streak:0};
+/* ═══════════════ FILTER ═══════════════ */
+function filterByModule(module, btn) {
+  document.querySelectorAll('.module-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid(module === 'all' ? null : module);
 }
-function saveState(){localStorage.setItem(KEY,JSON.stringify(state));}
 
-// ═══════════════ RENDER ═══════════════
-function render(){
-  const map=document.getElementById('courseMap');
-  map.innerHTML='';
-
-  COURSES.forEach((c)=>{
-    const isCompleted=state.completed.includes(c.id);
-    const isCurrent=c.id===state.current;
-    const isLocked=!isCompleted && !isCurrent;
-    const score=state.scores[c.id];
-    const hasScore=score!==undefined;
-
-    const node=document.createElement('div');
-    node.className='c-node'+(isCompleted?' completed':'')+(isCurrent?' current':'')+(isLocked?' locked':'');
-    node.id='course-'+c.id;
-
-    const statusText=isCompleted?'✓ 已通过':isLocked?'🔒 未解锁':'▶ 学习中';
-    node.innerHTML=`
-      <div class="c-node-header" onclick="toggleCourse(${c.id})">
-        <div class="c-num">${isCompleted?'✓':c.id}</div>
-        <div class="c-info">
-          <h3>${c.title}</h3>
-          <p>${c.desc}</p>
-          <div class="c-tags">${c.tags.map(t=>`<span class="c-tag">${t}</span>`).join('')}${hasScore?`<span class="c-tag" style="color:var(--green)">得分 ${score}/${c.quiz.length}</span>`:''}</div>
+/* ═══════════════ RENDER GRID ═══════════════ */
+function renderGrid(moduleFilter) {
+  const grid = document.getElementById('courseGrid');
+  let courses = allCourses;
+  if (moduleFilter) {
+    courses = courses.filter(c => (c.tags||[]).some(t => t === moduleFilter));
+  }
+  
+  if (!courses.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">📚</div><p>该模块暂无课程</p></div>';
+    return;
+  }
+  
+  grid.innerHTML = courses.map((c,i) => {
+    const completed = state.completed.includes(c.id);
+    const isCurrent = state.current === i && !completed;
+    const locked = i > 0 && !state.completed.includes(courses[i-1].id) && !completed;
+    let cardClass = 'course-card';
+    if (locked) cardClass += ' locked';
+    else if (isCurrent) cardClass += ' current';
+    else if (completed) cardClass += ' completed';
+    
+    let statusText = '';
+    if (locked) statusText = '🔒 待解锁';
+    else if (completed) statusText = '✓ 已完成';
+    else if (isCurrent) statusText = '进行中';
+    
+    const tags = (c.tags||[]).map(t => {
+      let cls = 'course-tag';
+      if (t.includes('核心') || t.includes('入门') || t.includes('进阶') || t.includes('深度') || t.includes('高级')) cls += ' core';
+      if (t.includes('分钟') || t.includes('课时')) cls += ' time';
+      return `<span class="${cls}">${t}</span>`;
+    }).join('');
+    
+    return `
+      <div class="${cardClass}" id="card-${c.id}" onclick="openDetail(${c.id})">
+        <div class="course-card-header">
+          <div class="course-num">${c.id}</div>
+          <div class="course-card-info">
+            <h3>${c.title}</h3>
+            <div class="desc">${c.desc}</div>
+          </div>
         </div>
-        <div class="c-status">${statusText}</div>
-      </div>
-      <div class="c-body">
-        <div class="c-content">
-          <button class="audio-btn" id="audioBtn-${c.id}" onclick="toggleAudio(${c.id})" title="朗读课程内容">🔊 朗读</button>
-          <div class="md">${parseMd(c.content)}</div>
-          ${renderQuiz(c,isCompleted,hasScore)}
+        <div class="course-card-body">
+          ${tags}
+          ${statusText ? `<span class="course-status">${statusText}</span>` : ''}
         </div>
       </div>
     `;
-    map.appendChild(node);
-  });
+  }).join('');
+}
 
+/* ═══════════════ OPEN DETAIL ═══════════════ */
+function openDetail(cid) {
+  const course = allCourses.find(c => c.id === cid);
+  if (!course) return;
+  
+  // Check if locked
+  const idx = allCourses.findIndex(c => c.id === cid);
+  if (idx > 0 && !state.completed.includes(allCourses[idx-1].id) && !state.completed.includes(cid)) return;
+  
+  activeDetail = cid;
+  quizAnswers[cid] = quizAnswers[cid] || {};
+  
+  const panel = document.getElementById('detailPanel');
+  const content = course.content ? renderMarkdown(course.content) : '<p style="color:var(--text3)">课程内容加载中...</p>';
+  
+  panel.innerHTML = `
+    <div class="course-detail-header">
+      <div class="course-num" style="background:linear-gradient(135deg,var(--gold),#b8860b);color:#000">${course.id}</div>
+      <div class="course-detail-info">
+        <h2>${course.title}</h2>
+        <div class="desc">${course.desc}</div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+          ${(course.tags||[]).map(t => `<span class="course-tag ${t.includes('核心')||t.includes('入门')?'core':t.includes('分钟')?'time':''}">${t}</span>`).join('')}
+        </div>
+      </div>
+      <button class="course-detail-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="course-detail-body">
+      ${course.content ? `<button class="audio-btn" id="audioBtn-${course.id}" onclick="toggleAudio(${course.id})">🔊 朗读</button>` : ''}
+      <div class="md">${content}</div>
+      ${renderQuiz(course)}
+    </div>
+  `;
+  
+  document.getElementById('detailOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDetail() {
+  document.getElementById('detailOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  activeDetail = null;
+  renderGrid();
   updateStats();
 }
 
-function renderQuiz(c,isCompleted,hasScore){
-  if(isCompleted && hasScore){
-    return `
-      <div class="quiz-section">
-        <div class="quiz-title"><h3>随堂测验</h3><span class="badge">得分 ${state.scores[c.id]}/${c.quiz.length}</span></div>
-        <p style="color:var(--green);text-align:center;padding:20px">✓ 本课测验已通过</p>
-        <div class="quiz-actions" style="justify-content:center;margin-top:12px">
-          <button class="btn btn-secondary" onclick="retakeQuiz(${c.id})">重新测验</button>
-        </div>
-      </div>`;
-  }
-
-  const letters=['A','B','C','D'];
-  let html=`<div class="quiz-section" id="quiz-${c.id}">
-    <div class="quiz-title"><h3>随堂测验</h3><span class="badge">答对${Math.ceil(c.quiz.length*0.6)}/${c.quiz.length}通过</span></div>`;
-
-  c.quiz.forEach((q,qi)=>{
-    html+=`<div class="quiz-q" id="q-${c.id}-${qi}">
-      <div class="quiz-q-num">第${qi+1}题 / 共${c.quiz.length}题</div>
-      <div class="quiz-q-text">${q.q}</div>
-      <div class="quiz-opts">
-        ${q.opts.map((o,oi)=>`
-          <div class="quiz-opt" id="opt-${c.id}-${qi}-${oi}" onclick="selectOpt(${c.id},${qi},${oi})">
-            <div class="quiz-opt-letter">${letters[oi]}</div>
-            <div>${o}</div>
-          </div>
-        `).join('')}
-      </div>
-      <div class="quiz-explain" id="exp-${c.id}-${qi}"></div>
-    </div>`;
-  });
-
-  html+=`<div class="quiz-footer">
-      <div class="quiz-score">已答：<span class="num" id="answered-${c.id}">0</span>/${c.quiz.length}</div>
-      <div class="quiz-actions">
-        <button class="btn btn-primary" id="submitBtn-${c.id}" onclick="submitQuiz(${c.id})" disabled>提交答卷</button>
-      </div>
-    </div></div>`;
-  return html;
-}
-
-// ═══════════════ MARKDOWN PARSER ═══════════════
-function parseMd(md){
+/* ═══════════════ MARKDOWN RENDER ═══════════════ */
+function renderMarkdown(md) {
+  if (!md) return '';
   return md
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^#### (.+)$/gm,'<h4>$1</h4>')
     .replace(/^### (.+)$/gm,'<h3>$1</h3>')
     .replace(/^## (.+)$/gm,'<h2>$1</h2>')
-    .replace(/^#### (.+)$/gm,'<h4>$1</h4>')
-    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/\*(.+?)\*/g,'<em>$1</em>')
     .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
     .replace(/^- (.+)$/gm,'<li>$1</li>')
-    .replace(/\n\n/g,'</p><p>')
+    .replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>')
+    .replace(/^(\d+)\. (.+)$/gm,'<li>$2</li>')
+    .replace(/\n{2,}/g,'</p><p>')
+    .replace(/^(?!<[hublocqtu])(.+)$/gm,'<p>$1</p>')
     .replace(/<p><\/p>/g,'')
-    .replace(/<p>(<h[234]>)/g,'$1').replace(/(<\/h[234]>)<\/p>/g,'$1')
-    .replace(/<p>(<blockquote>)/g,'$1').replace(/(<\/blockquote>)<\/p>/g,'$1')
-    .replace(/<p><li>/g,'<ul><li>').replace(/<\/li><\/p>/g,'</li></ul>')
-    .replace(/<\/ul><ul>/g,'');
+    .replace(/<\/ul>\s*<p>/g,'</ul>')
+    .replace(/<p>\s*<ul>/g,'<ul>')
+    .replace(/---/g,'<hr>')
+    .replace(/\\n/g,'\n');
 }
 
-// ═══════════════ QUIZ LOGIC ═══════════════
-let quizAnswers={};
-
-function selectOpt(ci,qi,oi){
-  const qEl=document.getElementById(`q-${ci}-${qi}`);
-  if(qEl.classList.contains('answered-correct')||qEl.classList.contains('answered-wrong')) return;
-
-  if(!quizAnswers[ci]) quizAnswers[ci]={};
-  quizAnswers[ci][qi]=oi;
-
-  const opts=qEl.querySelectorAll('.quiz-opt');
-  opts.forEach((o,i)=>o.classList.toggle('selected',i===oi));
-
-  const answered=Object.keys(quizAnswers[ci]).length;
-  const el=document.getElementById('answered-'+ci);
-  if(el) el.textContent=answered;
-
-  const c=COURSES.find(x=>x.id===ci);
-  const btn=document.getElementById('submitBtn-'+ci);
-  if(btn) btn.disabled=answered<c.quiz.length;
-}
-
-function submitQuiz(ci){
-  const c=COURSES.find(x=>x.id===ci);
-  const answers=quizAnswers[ci]||{};
-  let correct=0;
-
-  c.quiz.forEach((q,qi)=>{
-    const userAns=answers[qi];
-    const qEl=document.getElementById(`q-${ci}-${qi}`);
-    const expEl=document.getElementById(`exp-${ci}-${qi}`);
-    const opts=qEl.querySelectorAll('.quiz-opt');
-
-    opts.forEach(o=>o.classList.add('disabled'));
-
-    if(userAns===q.answer){
-      correct++;
-      qEl.classList.add('answered-correct');
-      opts[userAns].classList.add('correct');
-      expEl.className='quiz-explain show correct-explain';
-      expEl.innerHTML='✓ 正确 — '+q.explain;
-    }else{
-      qEl.classList.add('answered-wrong');
-      if(userAns!==undefined) opts[userAns].classList.add('wrong');
-      opts[q.answer].classList.add('correct');
-      expEl.className='quiz-explain show wrong-explain';
-      expEl.innerHTML='✗ 正确答案是 '+['A','B','C','D'][q.answer]+' — '+q.explain;
+/* ═══════════════ QUIZ ═══════════════ */
+function renderQuiz(course) {
+  if (!course.quiz || !course.quiz.length) {
+    // Show pass button for courses without quiz
+    if (!state.completed.includes(course.id)) {
+      return `<div class="quiz-section" style="text-align:center">
+        <p style="color:var(--text2);margin-bottom:16px">本课程为阅读材料，无测验。</p>
+        <button class="btn btn-primary" onclick="markComplete(${course.id})">✓ 标记为已完成</button>
+      </div>`;
     }
+    return '<div class="quiz-section" style="text-align:center"><p style="color:var(--green)">✓ 已完成</p></div>';
+  }
+  
+  const answers = quizAnswers[course.id] || {};
+  const score = state.scores[course.id];
+  const passed = state.completed.includes(course.id);
+  
+  let html = '<div class="quiz-section">';
+  html += '<div class="quiz-header"><h3>📝 随堂测验</h3><span class="badge">' + course.quiz.length + '题</span></div>';
+  
+  course.quiz.forEach((q, qi) => {
+    const answered = answers[qi] !== undefined;
+    const correct = answered && answers[qi] === q.answer;
+    const wrong = answered && answers[qi] !== q.answer;
+    let qClass = '';
+    if (correct) qClass = ' answered-correct';
+    else if (wrong) qClass = ' answered-wrong';
+    
+    html += `<div class="quiz-q${qClass}" id="quizQ-${course.id}-${qi}">
+      <div class="quiz-q-num">第 ${qi+1}/${course.quiz.length} 题</div>
+      <div class="quiz-q-text">${q.q}</div>
+      <div class="quiz-opts">`;
+    
+    q.opts.forEach((opt, oi) => {
+      let oClass = 'quiz-opt';
+      if (answered) oClass += ' disabled';
+      if (answered && oi === answers[qi]) oClass += ' selected';
+      if (passed && oi === q.answer) oClass += ' correct';
+      if ((passed || wrong) && oi === answers[qi] && oi !== q.answer) oClass += ' wrong';
+      
+      html += `<div class="${oClass}" onclick="${answered?'':'selectAnswer('+course.id+','+qi+','+oi+')'}">
+        <span class="quiz-opt-letter">${'ABCD'[oi]}</span>
+        <span>${opt}</span>
+      </div>`;
+    });
+    
+    html += '</div>';
+    
+    if (wrong && q.explain) {
+      html += `<div class="quiz-explain wrong-explain show">${q.explain}</div>`;
+    } else if (passed && q.explain) {
+      html += `<div class="quiz-explain correct-explain show">${q.explain}</div>`;
+    }
+    
+    html += '</div>';
   });
+  
+  if (passed) {
+    html += `<div class="quiz-footer">
+      <div class="quiz-score">得分：<span class="num">${score.correct}/${score.total}</span> (${Math.round(score.correct/score.total*100)}%)</div>
+      <button class="btn btn-secondary" onclick="retakeQuiz(${course.id})">🔄 重新作答</button>
+    </div>`;
+  } else {
+    const answeredCount = Object.keys(answers).length;
+    html += `<div class="quiz-footer">
+      <div class="quiz-score">已答：<span class="num">${answeredCount}</span>/${course.quiz.length}</div>
+      <button class="btn btn-primary" id="submitBtn-${course.id}" onclick="submitQuiz(${course.id})" ${answeredCount < course.quiz.length ? 'disabled' : ''}>提交答案</button>
+    </div>`;
+  }
+  
+  html += '</div>';
+  return html;
+}
 
-  state.scores[ci]=correct;
-  state.totalCorrect=Object.values(state.scores).reduce((a,b)=>a+b,0);
+/* ═══════════════ QUIZ ACTIONS ═══════════════ */
+function selectAnswer(cid, qi, oi) {
+  quizAnswers[cid] = quizAnswers[cid] || {};
+  quizAnswers[cid][qi] = oi;
+  
+  // Enable submit if all answered
+  const course = allCourses.find(c => c.id === cid);
+  if (course && Object.keys(quizAnswers[cid]).length >= course.quiz.length) {
+    const btn = document.getElementById('submitBtn-'+cid);
+    if (btn) btn.disabled = false;
+  }
+  
+  // Refresh the quiz section
+  refreshDetailQuiz(cid);
+}
 
-  const passed=correct>=Math.ceil(c.quiz.length*0.6);
-
-  if(passed){
-    if(!state.completed.includes(ci)){
-      state.completed.push(ci);
+function submitQuiz(cid) {
+  const course = allCourses.find(c => c.id === cid);
+  if (!course) return;
+  
+  const answers = quizAnswers[cid] || {};
+  let correct = 0;
+  course.quiz.forEach((q, qi) => {
+    if (answers[qi] === q.answer) correct++;
+  });
+  
+  const total = course.quiz.length;
+  const passed = correct / total >= 0.6;
+  
+  state.scores[cid] = { correct, total };
+  if (passed) {
+    if (!state.completed.includes(cid)) {
+      state.completed.push(cid);
+      state.totalCorrect += correct;
+      // Update streak
       state.streak++;
-      if(ci<COURSES.length) state.current=ci+1;
+      // Update current
+      const idx = allCourses.findIndex(c => c.id === cid);
+      if (idx >= 0 && idx < allCourses.length - 1) state.current = idx + 1;
     }
     showConfetti();
-
-    const nextC=COURSES.find(x=>x.id===ci+1);
-    const banner=document.createElement('div');
-    banner.className='next-banner show';
-    banner.innerHTML=nextC?
-      `<h4>🎉 恭喜通过！</h4>
-       <p>你答对了 <strong>${correct}/${c.quiz.length}</strong> 题，下一课已解锁：</p>
-       <p class="next-title">第${nextC.id}课：${nextC.title}</p>
-       <button class="btn btn-green" onclick="toggleCourse(${nextC.id});document.getElementById('course-${nextC.id}').scrollIntoView({behavior:'smooth',block:'start'})">进入下一课 →</button>`
-      :
-      `<h4>🏆 全部完成！</h4>
-       <p>你答对了 <strong>${correct}/${c.quiz.length}</strong> 题，已完成全部100门课！</p>
-       <p style="color:var(--gold);font-weight:700;font-size:1.1rem;margin-top:8px">恭喜获得「帝王学分析师」认证 👑</p>`;
-    document.getElementById('quiz-'+ci).after(banner);
+  } else {
+    state.streak = 0;
   }
-
-  const btn=document.getElementById('submitBtn-'+ci);
-  if(btn){
-    btn.outerHTML=passed?
-      `<span style="color:var(--green);font-weight:700">✓ 通过 (${correct}/${c.quiz.length})</span>`
-      :
-      `<button class="btn btn-secondary" onclick="retakeQuiz(${ci})">未通过 (${correct}/${c.quiz.length})，重试</button>`;
-  }
-
+  
   saveState();
+  refreshDetailQuiz(cid);
   updateStats();
 }
 
-function retakeQuiz(ci){
-  delete quizAnswers[ci];
-  delete state.scores[ci];
-  state.completed=state.completed.filter(x=>x!==ci);
-  if(state.current>ci) state.current=ci;
+function retakeQuiz(cid) {
+  delete quizAnswers[cid];
+  delete state.scores[cid];
+  state.completed = state.completed.filter(x => x !== cid);
   saveState();
-  render();
-  setTimeout(()=>toggleCourse(ci),100);
+  refreshDetailQuiz(cid);
+  updateStats();
 }
 
-function toggleCourse(id){
-  const node=document.getElementById('course-'+id);
-  if(!node||node.classList.contains('locked')) return;
-  const wasOpen=node.classList.contains('open');
-  document.querySelectorAll('.c-node').forEach(n=>n.classList.remove('open'));
-  if(!wasOpen){
-    node.classList.add('open');
-    setTimeout(()=>node.scrollIntoView({behavior:'smooth',block:'start'}),50);
+function markComplete(cid) {
+  if (!state.completed.includes(cid)) {
+    state.completed.push(cid);
+    const idx = allCourses.findIndex(c => c.id === cid);
+    if (idx >= 0 && idx < allCourses.length - 1) state.current = idx + 1;
+    state.streak++;
+    showConfetti();
+  }
+  saveState();
+  refreshDetailQuiz(cid);
+  updateStats();
+}
+
+function refreshDetailQuiz(cid) {
+  const course = allCourses.find(c => c.id === cid);
+  if (!course) return;
+  const body = document.querySelector('.course-detail-body');
+  if (!body) return;
+  
+  // Update only the quiz section
+  const quizSection = body.querySelector('.quiz-section');
+  const temp = document.createElement('div');
+  temp.innerHTML = renderQuiz(course);
+  const newQuiz = temp.querySelector('.quiz-section');
+  if (quizSection && newQuiz) {
+    quizSection.outerHTML = newQuiz.outerHTML;
   }
 }
 
-function updateStats(){
-  document.getElementById('statCompleted').textContent=state.completed.length;
-  document.getElementById('statScore').textContent=state.totalCorrect;
-  document.getElementById('statStreak').textContent=state.streak;
-  document.getElementById('progressFill').style.width=(state.completed.length/COURSES.length*100)+'%';
+/* ═══════════════ STATS ═══════════════ */
+function updateStats() {
+  document.getElementById('statCompleted').textContent = state.completed.length;
+  document.getElementById('statTotal').textContent = allCourses.length;
+  document.getElementById('statScore').textContent = state.totalCorrect;
+  document.getElementById('statStreak').textContent = state.streak;
+  document.getElementById('progressFill').style.width = (state.completed.length / Math.max(allCourses.length, 1) * 100) + '%';
 }
 
-// ═══════════════ CONFETTI ═══════════════
-function showConfetti(){
-  const box=document.getElementById('confettiBox');
-  const colors=['#e2b64f','#c43a31','#22c55e','#3b82f6','#a78bfa','#f59e0b'];
-  for(let i=0;i<60;i++){
-    const el=document.createElement('div');
-    el.className='confetti';
-    el.style.left=Math.random()*100+'%';
-    el.style.background=colors[Math.floor(Math.random()*colors.length)];
-    el.style.animationDelay=Math.random()*2+'s';
-    el.style.animationDuration=(2+Math.random()*2)+'s';
+/* ═══════════════ CONFETTI ═══════════════ */
+function showConfetti() {
+  const box = document.getElementById('confettiBox');
+  const colors = ['#e2b64f','#c43a31','#22c55e','#3b82f6','#a78bfa','#f59e0b'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.animationDelay = Math.random() * 2 + 's';
+    el.style.animationDuration = (2 + Math.random() * 2) + 's';
     box.appendChild(el);
   }
-  setTimeout(()=>box.innerHTML='',4000);
+  setTimeout(() => box.innerHTML = '', 4000);
 }
 
-
-// ═══════════════ TTS AUDIO ═══════════════
+/* ═══════════════ TTS AUDIO ═══════════════ */
 let audioState = { currentId: null, utterance: null, paused: false };
 function toggleAudio(cid) {
   const btn = document.getElementById('audioBtn-' + cid);
-  // If same course playing, toggle pause
   if (audioState.currentId === cid && audioState.utterance) {
     if (audioState.paused) {
       window.speechSynthesis.resume();
@@ -1092,20 +709,14 @@ function toggleAudio(cid) {
     }
     return;
   }
-  // Stop any previous audio
   window.speechSynthesis.cancel();
   if (audioState.currentId) {
     const oldBtn = document.getElementById('audioBtn-' + audioState.currentId);
     if (oldBtn) { oldBtn.className = 'audio-btn'; oldBtn.innerHTML = '🔊 朗读'; }
   }
-  // Get course content text
-  const c = COURSES.find(x => x.id === cid);
-  if (!c || !window.speechSynthesis) return;
-  // Strip markdown for clean speech
-  const text = c.content
-    .replace(/[#>*`_\-]/g, '')
-    .replace(/\n+/g, '。')
-    .replace(/[「」]/g, '');
+  const course = allCourses.find(c => c.id === cid);
+  if (!course || !course.content || !window.speechSynthesis) return;
+  const text = course.content.replace(/[#>*`_\-|\\]/g, '').replace(/\n+/g, '。').replace(/[「」]/g, '');
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'zh-CN';
   utterance.rate = 0.9;
@@ -1117,19 +728,108 @@ function toggleAudio(cid) {
     audioState = { currentId: null, utterance: null, paused: false };
     if (btn) { btn.className = 'audio-btn'; btn.innerHTML = '🔊 朗读'; }
   };
-  audioState = { currentId: cid, utterance: utterance, paused: false };
+  audioState = { currentId: cid, utterance, paused: false };
   window.speechSynthesis.speak(utterance);
   if (btn) { btn.className = 'audio-btn playing'; btn.innerHTML = '⏸ 暂停'; }
 }
 
-// ═══════════════ INIT ═══════════════
-render();
-if(state.current<=COURSES.length){
-  setTimeout(()=>{
-    const node=document.getElementById('course-'+state.current);
-    if(node) node.classList.add('open');
-  },300);
-}
+/* ═══════════════ INIT ═══════════════ */
+document.addEventListener('DOMContentLoaded', loadAllCourses);
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeDetail();
+});
+</script>
+
+<!-- INLINE COURSES 1-6 -->
+<script>
+const COURSES = [
+  {
+    id:1,
+    title:"帝制起源 — 从禅让到家天下",
+    desc:"夏商周三代：天命观的形成、禅让制到家天下的转变、分封制的逻辑与弊端",
+    tags:["入门","3课时"],
+    content:`## 帝制起源：从禅让到家天下\n\n### 一、远古的传说：禅让制的黄金时代\n\n在夏朝建立之前，中国处于传说中的「三皇五帝」时代。那个时代的权力转移采取的是**禅让制**——最高领袖选择最有德行和才能的人来继承帝位，而非传给自己的子孙。\n\n> 尧传舜，舜传禹。不以天下为私产，而以天下付贤者。\n\n尧帝晚年，四方部落推举舜为继承人。尧考察了舜三年——把自己的两个女儿嫁给他，看他如何处理家庭关系；让他到山林中，看他在暴风雨中是否能不迷路。舜通过了所有考验，成为新一代领袖。\n\n舜晚年又用同样的方式考察禹。禹的父亲鲧因治水失败被处死，禹继承父业，用「**疏导**」代替「堵截」的方法，花了整整十三年时间，终于治平了天下洪水。\n\n> 禹三过家门而不入，连妻子生下儿子启，他都没有回去看一眼。\n\n**禅让制的核心逻辑**：天下不是君主的私有财产，而是委托给贤者管理的公共事务。\n\n### 二、大禹的转折：从公天下到家天下\n\n大禹治水成功，威望达到顶峰。他受舜禅让后，效仿先例指定了继承人——**伯益**。但出现了中国历史上最重要的一次制度断裂：大禹的儿子**启**，在大禹去世后夺取了权力，杀死了伯益，建立了中国第一个世袭王朝——**夏朝**（约前2070年）。\n\n> 《史记》记载：禹荐益於天，而天下诸侯皆去益而朝启——「吾君之子也。」\n\n从启开始，「**公天下**」变成了「**家天下**」。此后四千年，中国的最高权力几乎都在家族内部传递。\n\n### 三、夏桀的覆灭与商汤革命\n\n夏朝最后一位君主**桀**被史书记载为暴君。商部落首领**汤**在贤臣伊尹的辅佐下起兵讨伐。\n\n> 《尚书·汤誓》中记载了夏朝百姓的诅咒：「时日曷丧？予及汝皆亡！」\n\n商朝（约前1600年—前1046年）是中国第一个有直接文字记载的王朝。**甲骨文**的发现让我们第一次直接「听到」三千多年前中国人的声音。\n\n### 四、周朝的分封制\n\n周武王灭商后设计了**分封制**：天子（天下共主）→ 诸侯（受封土地和人民）→ 卿大夫（再次分封），形成金字塔式贵族体系。\n\n短期优势：快速扩张、因地制宜。长期弊端：诸侯坐大、春秋战国五百年分裂。\n\n### 五、暴君叙事\n\n夏桀被列为第一个暴君，商纣紧随其后。近年有学者提出：**「桀纣」的形象可能被周朝刻意妖魔化，以论证自己革命的合法性。**这一「前朝末代君主必昏君」的叙事模式贯穿了整个中国帝制史。`,
+    quiz:[
+      {q:"中国最早的权力转移方式是什么？",opts:["世袭制","禅让制","选举制","分封制"],answer:1,explain:"禅让制是尧舜禹时代的权力转移方式——选贤与能，传位给最有德才的人。"},
+      {q:"大禹的儿子是谁？",opts:["伯益","商汤","启","契"],answer:2,explain:"启在大禹去世后夺取权力，杀死伯益，建立中国第一个世袭王朝——夏朝。"},
+      {q:"周朝分封制中，被封的最高一级贵族是？",opts:["天子","诸侯","卿大夫","士"],answer:1,explain:"分封制等级：天子>诸侯>卿大夫>士。诸侯在封国内有独立军政大权。"},
+      {q:"第一个被称为'暴君'的中国帝王是？",opts:["商纣王","夏桀","周幽王","秦始皇"],answer:1,explain:"夏桀是夏朝最后一位君主，中国历史上第一个被钉在耻辱柱上的帝王。"},
+      {q:"有学者认为夏桀和商纣的形象可能被谁妖魔化？",opts:["汉朝","秦朝","周朝","清朝"],answer:2,explain:"周朝为论证'以周代商'合法性，刻意妖魔化了前朝末代君主形象。"}
+    ]
+  },
+  {
+    id:2,
+    title:"大一统奠基 — 秦汉帝王",
+    desc:"秦始皇统一六国、汉武帝北逐匈奴——中国帝制基本框架的确立",
+    tags:["核心","5课时"],
+    content:`## 大一统奠基：秦汉帝王\n\n### 一、秦始皇：千古一帝的功与过\n\n公元前221年，秦王嬴政用了十年时间，逐一灭掉韩、赵、魏、楚、燕、齐六国，完成了中国历史上的**第一次大一统**。\n\n**制度创新——郡县制**：废除分封制，全国分为三十六郡，郡下设县，所有官员由中央直接任免，不得世袭。\n\n**文化统一**：书同文（统一文字为小篆）、车同轨（统一车轮间距）、统一度量衡、统一货币（圆形方孔秦半两）。\n\n**北筑长城**：将燕、赵、秦三国旧长城连接起来，西起临洮、东至辽东，绵延万里。\n\n### 二、汉武帝：北逐匈奴的帝国战略\n\n汉武帝刘彻十六岁即位，在位五十四年。他改变了汉初对匈奴的和亲政策，发动了长达四十四年的对匈奴战争。\n\n卫青、霍去病率大军深入漠北。霍去病封狼居胥——汉军最远打到了今天蒙古国的肯特山（狼居胥山）。\n\n> 「匈奴未灭，何以家为？」——霍去病拒绝汉武帝为他建造豪宅。\n\n**丝绸之路**：张骞出使西域，开辟了连接东西方的陆上贸易通道。\n\n**盐铁专卖**：将盐和铁的生产销售收归国有——世界上最早的国企体系之一。\n\n### 三、秦汉帝王的管理学启示\n\n秦始皇和汉武帝共同的历史遗产：**奠定了中国中央集权制度的基本框架**——郡县制、统一文字货币、对北方的战略防御、对西域的经营。此后两千年，无论王朝如何更替，这套治理框架从未被根本改变。`,
+    quiz:[
+      {q:"秦始皇用多少年灭掉六国？",opts:["5年","10年","15年","20年"],answer:1,explain:"公元前230-221年，嬴政用十年逐一灭掉韩赵魏楚燕齐六国。"},
+      {q:"秦始皇废除分封制后推行的是什么制度？",opts:["科举制","三省六部制","郡县制","内阁制"],answer:2,explain:"郡县制：全国分三十六郡，官员由中央任免，不得世袭。这是中国政治史上的划时代创举。"},
+      {q:"霍去病的名言是什么？",opts:["天下兴亡匹夫有责","匈奴未灭何以家为","先天下之忧而忧","鞠躬尽瘁死而后已"],answer:1,explain:"霍去病拒绝汉武帝为他建造豪宅时说出此名言，年仅24岁就去世了。"},
+      {q:"张骞出使西域开辟了什么？",opts:["海上丝绸之路","茶马古道","丝绸之路","蜀道"],answer:2,explain:"张骞两次出使西域，开辟了连接东西方的陆上贸易通道，促进丝绸、瓷器等贸易。"},
+      {q:"汉武帝实行的经济政策是什么？",opts:["自由市场","盐铁专卖","重农抑商","闭关锁国"],answer:1,explain:"盐铁专卖——将盐和铁的生产销售收归国有，世界上最早的国企体系之一。"}
+    ]
+  },
+  {
+    id:3,
+    title:"分裂与融合 — 魏晋南北朝",
+    desc:"三国争霸、淝水之战、北魏孝文帝改革——长达四百年的分裂与民族大融合",
+    tags:["进阶","6课时"],
+    content:`## 分裂与融合：魏晋南北朝\n\n### 一、三国争霸\n\n东汉末年，天下大乱。曹操「挟天子以令诸侯」，孙权据江东，刘备借荆州。赤壁之战（208年）一把大火烧掉了曹操统一天下的梦想，也烧出了三分天下的格局。\n\n### 二、八王之乱与五胡乱华\n\n西晋统一不到三十年就爆发了宗室自相残杀的「八王之乱」。匈奴、鲜卑、羯、氐、羌五个少数民族趁机南下，北中国陷入长达一百三十多年的战乱。\n\n### 三、淝水之战\n\n公元383年，前秦苻坚率百万大军南征东晋。东晋宰相谢安派谢玄率八万北府兵迎战。\n\n结果八万北府兵大破百万秦军。投鞭断流、草木皆兵、风声鹤唳三个成语都出于此战。\n\n### 四、北魏孝文帝改革\n\n鲜卑人建立的北魏王朝，孝文帝拓跋宏（元宏）做了一个惊世骇俗的决定：**全盘汉化**——迁都洛阳、改汉姓、穿汉服、说汉语、鼓励胡汉通婚。这是世界史上最大规模的由政府主导向先进文化靠拢的改革运动。`,
+    quiz:[
+      {q:"赤壁之战发生在哪一年？",opts:["200年","208年","220年","230年"],answer:1,explain:"208年赤壁之战，孙刘联军大败曹操，三分天下格局由此确立。"},
+      {q:"'投鞭断流'出自哪场战役？",opts:["赤壁之战","官渡之战","淝水之战","夷陵之战"],answer:2,explain:"苻坚号称百万大军'以吾之众旅，投鞭于江，足断其流'，结果八万北府兵大破百万秦军。"},
+      {q:"北魏孝文帝的改革核心是什么？",opts:["武力征服","全盘汉化","闭关自守","恢复鲜卑传统"],answer:1,explain:"迁都洛阳、改汉姓（拓跋改为元）、穿汉服、说汉语、鼓励胡汉通婚。"},
+      {q:"'挟天子以令诸侯'说的是谁？",opts:["刘备","孙权","曹操","袁绍"],answer:2,explain:"曹操迎汉献帝至许昌，以天子名义号令天下诸侯。"},
+      {q:"'风声鹤唳'出自哪场战役？",opts:["赤壁之战","官渡之战","淝水之战","长平之战"],answer:2,explain:"淝水之战秦军溃败，逃跑时听到风声鹤叫都以为是追兵。"}
+    ]
+  },
+  {
+    id:4,
+    title:"盛世巅峰 — 隋唐五代",
+    desc:"开皇之治、贞观之治、开元盛世——中国帝制时代的黄金年代",
+    tags:["核心","5课时"],
+    content:`## 盛世巅峰：隋唐五代\n\n### 一、隋文帝与科举制\n\n隋文帝杨坚结束近三百年的分裂，重新统一中国。他创立的**科举制**——通过考试选拔官员——是中国对世界政治文明最伟大的贡献之一。在此之前，官员选拔靠出身（九品中正制），此后靠能力。\n\n**大运河**：修建了连接南北的大运河，全长约两千七百公里——那个时代世界上最大规模的基础设施工程。\n\n### 二、唐太宗与贞观之治\n\n李世民通过玄武门之变登上皇位。但他证明了夺权的方式不等于治理的水平。\n\n他任用魏征——一个曾为他的敌人效力的人。魏征以犯颜直谏闻名，李世民说：「以铜为镜，可以正衣冠；以古为镜，可以知兴替；以人为镜，可以明得失。魏征死，我失去了一面镜子。」\n\n> 贞观四年，全国被判死刑的仅二十九人。夜不闭户，路不拾遗。\n\n### 三、开元盛世与安史之乱\n\n唐玄宗李隆基用姚崇、宋璟为相，开创了「开元盛世」。长安成为当时世界上最大的城市，常住人口超过百万。李白、杜甫、王维同一时期活跃——中国文学史上最璀璨的时代。\n\n但成也玄宗，败也玄宗。他晚年宠爱杨贵妃，任用杨国忠，纵容安禄山。公元755年，安禄山起兵造反——**安史之乱**爆发。这场持续八年的内战让唐帝国从巅峰跌落。杜甫写道：「国破山河在，城春草木深。」\n\n> **李世民靠制度让庸人也能治国，李隆基靠天才却亲手毁了盛世。**`,
+    quiz:[
+      {q:"科举制由谁创立？",opts:["唐太宗","隋文帝","汉武帝","秦始皇"],answer:1,explain:"隋文帝杨坚创立科举制——通过考试选拔官员，打破门阀垄断。"},
+      {q:"唐太宗的'镜子'比喻指的是谁？",opts:["房玄龄","杜如晦","魏征","长孙无忌"],answer:2,explain:"魏征死，李世民说'我失去了一面镜子'。魏征以犯颜直谏闻名，君臣关系堪称典范。"},
+      {q:"安史之乱爆发于哪一年？",opts:["745年","755年","765年","775年"],answer:1,explain:"755年安禄山起兵，持续八年的内战让唐帝国从巅峰跌落。"},
+      {q:"'国破山河在，城春草木深'是谁写的？",opts:["李白","王维","杜甫","白居易"],answer:2,explain:"杜甫《春望》写于安史之乱期间，表达了对国破家亡的深切悲恸。"},
+      {q:"贞观之治时期全国年死刑人数少到多少？",opts:["约100人","约50人","29人","0人"],answer:2,explain:"贞观四年，全国被判死刑的仅二十九人，反映贞观之治的社会安定程度。"}
+    ]
+  },
+  {
+    id:5,
+    title:"集权巅峰 — 宋元明清",
+    desc:"杯酒释兵权、郑和下西洋、康乾盛世——从文治巅峰到专制顶峰",
+    tags:["核心","5课时"],
+    content:`## 集权巅峰：宋元明清\n\n### 一、赵匡胤与宋朝的文治\n\n公元960年，赵匡胤在陈桥驿被部下「黄袍加身」——被迫当上了皇帝。他做的第一件大事是**杯酒释兵权**——请将领们喝酒，劝他们交出兵权回家享福。\n\n> 「人生如白驹过隙，所求富贵者，不过欲多积金钱，厚自娱乐，使子孙无贫乏耳。卿等何不释去兵权，出守大藩，择便好田宅市之，为子孙立永远不可动之业？」\n\n这是一次罕见的、没有血腥的权力交接。宋朝从此定下了「重文轻武」的国策，三百余年没有发生武将叛乱。代价是军事实力薄弱，始终无法收复燕云十六州。\n\n### 二、成吉思汗与元朝\n\n成吉思汗统一蒙古草原后，建立了人类历史上**疆域最大的陆上帝国**——蒙古帝国。他的孙子忽必烈建立元朝，定都大都（北京）。\n\n> 成吉思汗的军事才能至今被世界军事史公认。但元朝统治不到百年就被推翻——因为蒙元贵族始终没有真正融入中原文化。\n\n马可·波罗正是在元朝来到中国。他的游记让欧洲人第一次知道了东方的富庶——间接刺激了后来哥伦布的远航。\n\n### 三、郑和下西洋\n\n明成祖朱棣派郑和七次下西洋。船队拥有二百多艘船、两万七千多人——当时世界上最大规模的海上远征。最远到达非洲东海岸。\n\n> 郑和船队的宝船据记载长四十四丈、宽十八丈——大约是今天一个标准足球场的大小。\n\n但明宣宗之后，明朝主动放弃了航海事业。半个世纪后，哥伦布才带着三艘小船发现了美洲。**中国错过了大航海时代**。\n\n### 四、康乾盛世\n\n清朝康熙、雍正、乾隆三朝，中国疆域达到极盛——总面积约一千三百万平方公里。人口从明末的约七千万增长到三亿。\n\n但乾隆之后，清朝与世界的差距迅速拉大。当英国工业革命的蒸汽机轰鸣时，清朝还在用牛耕田。乾隆在给英国国王的回信中说：「天朝物产丰盈，无所不有，原不藉外夷货物以通有无。」——两代人的傲慢，换来了一百年的屈辱。`,
+    quiz:[
+      {q:"'杯酒释兵权'发生在哪个朝代？",opts:["唐朝","宋朝","明朝","清朝"],answer:1,explain:"赵匡胤建宋后以酒宴劝将领交出兵权，是一次罕见的无血腥的权力交接。"},
+      {q:"郑和几次下西洋？",opts:["3次","5次","6次","7次"],answer:3,explain:"郑和七次下西洋，船队最远到达非洲东海岸。"},
+      {q:"蒙古帝国建立者是谁？",opts:["忽必烈","成吉思汗","窝阔台","拖雷"],answer:1,explain:"成吉思汗统一蒙古草原后建立蒙古帝国，疆域最大的陆上帝国。"},
+      {q:"马可·波罗在哪个朝代来到中国？",opts:["宋朝","元朝","明朝","清朝"],answer:1,explain:"马可·波罗在元朝忽必烈时期来到中国，他的游记刺激了欧洲的大航海时代。"},
+      {q:"康乾盛世时期中国人口从多少增长到多少？",opts:["5千万到1亿","7千万到3亿","1亿到2亿","5千万到1.5亿"],answer:1,explain:"清朝人口从明末约七千万增长到三亿，农业技术改进和美洲作物引入是主要原因。"}
+    ]
+  },
+  {
+    id:6,
+    title:"帝制终结 — 晚清到民国",
+    desc:"鸦片战争、太平天国、百日维新、辛亥革命——千年帝制的最后一幕",
+    tags:["核心","4课时"],
+    content:`## 帝制终结：晚清到民国\n\n### 一、鸦片战争\n\n1840年，英国以虎门销烟为借口发动战争。清朝的旧式水师在英国蒸汽铁甲舰面前不堪一击。\n\n《南京条约》割让香港岛、开放五口通商、赔款两千一百万银元——这是中国近代史上第一个不平等条约，也是「百年国耻」的开端。\n\n### 二、太平天国\n\n洪秀全自称耶稣的弟弟，发动了中国历史上规模最大的农民起义。太平天国占据江南半壁江山十四年，定都南京。\n\n> 太平天国运动造成的死亡人数超过三千万——是人类历史上最致命的战争之一。\n\n曾国藩、李鸿章以地方团练起兵，组建了湘军和淮军。这是中国军事史上一个转折——私人军队开始取代国家正规军。\n\n### 三、百日维新\n\n1898年，光绪皇帝在康有为、梁启超辅佐下，推行全面改革——废除科举、建立新式学堂、改革官僚体制。\n\n但变法仅维持了一百零三天就被慈禧太后发动的政变推翻。光绪被囚禁，六君子血洒菜市口。\n\n### 四、辛亥革命\n\n1911年，武昌起义一声枪响，各省纷纷响应。1912年元旦，孙中山在南京就任中华民国临时大总统。2月12日，隆裕太后代宣统帝溥仪颁布退位诏书。\n\n> 延续了两千一百三十二年的中国帝制，正式终结。\n\n**四千年帝制遗产**：从禅让到家天下、从分封到郡县、从九品中正到科举、从闭关到开放……四千年权力实验的核心教训：**制度比人更持久，信任比暴力更有效，开放比封闭更强大。**`,
+    quiz:[
+      {q:"鸦片战争是哪一年爆发的？",opts:["1839年","1840年","1842年","1856年"],answer:1,explain:"1840年英国以虎门销烟为借口发动鸦片战争，中国近代史的开端。"},
+      {q:"太平天国定都在哪里？",opts:["北京","武昌","南京","广州"],answer:2,explain:"洪秀全定都南京（天京），占据江南十四年。"},
+      {q:"百日维新维持了多少天？",opts:["30天","50天","103天","200天"],answer:2,explain:"1898年光绪变法仅103天即被慈禧政变推翻，六君子血洒菜市口。"},
+      {q:"辛亥革命发生在哪一年？",opts:["1905年","1911年","1912年","1919年"],answer:1,explain:"1911年武昌起义，各省响应。1912年宣统退位，帝制终结。"},
+      {q:"中国帝制延续了多少年？",opts:["约1000年","约1500年","约1800年","约2132年"],answer:3,explain:"从秦始皇（前221年）到宣统退位（1912年），中国帝制延续2132年。"}
+    ]
+  }
+];
 </script>
 </body>
 </html>
