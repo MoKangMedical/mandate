@@ -3,420 +3,425 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mandate Chat · 与帝王对话</title>
+<title>帝王群聊 — Mandate</title>
+<meta name="description" content="让秦始皇、唐太宗、康熙大帝同群对话！任何话题，历代帝王齐聚一堂，各抒己见。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+*{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#09090b;--bg2:#0f0f13;--card:#1c1c21;--card2:#222228;
+  --bg:#09090b;--bg2:#0f0f13;--bg3:#18181b;
+  --card:#1c1c21;--card2:#222228;--card3:#2a2a32;
   --border:#27272a;--border2:#3f3f46;
   --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
-  --gold:#e2b64f;--red:#c43a31;--red2:#e85d50;
-  --serif:'Noto Serif SC',serif;--sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --gold:#e2b64f;--gold2:#f5d98a;
+  --red:#c43a31;--blue:#3b82f6;--green:#22c55e;
+  --serif:'Noto Serif SC',serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
   --radius:16px;--radius-sm:10px;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh}
+a{color:inherit;text-decoration:none}
 
-/* CHAT LAYOUT */
-.chat-container{flex:1;display:flex;flex-direction:column;max-width:800px;margin:0 auto;width:100%;height:100vh}
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(9,9,11,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:var(--serif);font-size:1.2rem;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:8px}
+.nav-links{display:flex;gap:24px;align-items:center}
+.nav-links a{font-size:0.85rem;color:var(--text2);transition:color .2s;font-weight:500}
+.nav-links a:hover,.nav-links a.active{color:var(--gold)}
+
+/* LAYOUT */
+.main{max-width:860px;margin:0 auto;padding:80px 24px 40px}
 
 /* HEADER */
-.chat-header{display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(9,9,11,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);flex-shrink:0}
-.chat-header .avatar-icon{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,rgba(226,182,79,0.2),rgba(196,58,49,0.15));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
-.chat-header .info{flex:1;min-width:0}
-.chat-header .name{font-family:var(--serif);font-weight:700;font-size:1rem}
-.chat-header .dynasty{font-size:0.75rem;color:var(--text3)}
-.chat-header .status{font-size:0.7rem;color:var(--green);display:flex;align-items:center;gap:4px}
-.chat-header .status .dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-.chat-header .back-btn{color:var(--text3);font-size:0.8rem;transition:color .2s;flex-shrink:0}
-.chat-header .back-btn:hover{color:var(--gold)}
+.chat-header{text-align:center;padding:20px 0 32px}
+.chat-header .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(226,182,79,0.1);border:1px solid rgba(226,182,79,0.2);padding:6px 16px;border-radius:100px;font-size:0.8rem;color:var(--gold);margin-bottom:16px}
+.chat-header h1{font-family:var(--serif);font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:900;margin-bottom:8px}
+.chat-header h1 .gold{color:var(--gold)}
+.chat-header p{color:var(--text2);font-size:0.95rem}
 
-/* MESSAGES */
-.chat-messages{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:20px}
-.chat-messages::-webkit-scrollbar{width:4px}
-.chat-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+/* TOPIC INPUT */
+.topic-area{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.topic-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px;color:var(--text);font-size:1rem;font-family:var(--sans);resize:none;min-height:60px;transition:border-color .3s}
+.topic-input:focus{outline:none;border-color:var(--gold)}
+.topic-input::placeholder{color:var(--text3)}
+.topic-hint{font-size:0.75rem;color:var(--text3);margin-top:8px}
 
-.message{max-width:85%;animation:msgIn .3s ease-out}
+/* EMPEROR SELECT */
+.emperor-select{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;max-height:200px;overflow-y:auto;padding:8px 0}
+.emperor-select::-webkit-scrollbar{width:4px}
+.emperor-select::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+.emp-chip{padding:6px 14px;border-radius:100px;font-size:0.78rem;font-weight:500;cursor:pointer;transition:all .2s;
+  background:var(--card3);color:var(--text3);border:1px solid transparent;user-select:none}
+.emp-chip:hover{border-color:var(--border2);color:var(--text2)}
+.emp-chip.selected{background:rgba(226,182,79,0.12);border-color:var(--gold);color:var(--gold)}
+.emp-chip.auto-selected{background:rgba(196,58,49,0.1);border-color:var(--red);color:var(--red)}
+
+/* ACTIONS */
+.actions{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.btn{padding:10px 22px;border-radius:8px;font-weight:600;font-size:0.88rem;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--gold);color:#000}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:#e85d50}
+
+/* CHAT AREA */
+.chat-area{display:flex;flex-direction:column;gap:16px;margin-bottom:24px}
+.chat-empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.chat-empty .icon{font-size:3rem;margin-bottom:12px;opacity:0.5}
+.chat-empty h3{font-family:var(--serif);font-size:1.2rem;margin-bottom:8px;color:var(--text2)}
+.chat-empty p{font-size:0.9rem}
+
+/* CHAT BUBBLE */
+.chat-msg{display:flex;gap:14px;animation:msgIn 0.4s ease-out}
 @keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.message.emperor{align-self:flex-start}
-.message.user{align-self:flex-end}
+.chat-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(226,182,79,0.15),rgba(196,58,49,0.1));border:1px solid rgba(226,182,79,0.15)}
+.chat-bubble{flex:1;min-width:0}
+.chat-name{font-family:var(--serif);font-size:0.85rem;font-weight:700;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.chat-name .dynasty{font-size:0.7rem;color:var(--text3);font-weight:400;font-family:var(--sans)}
+.chat-text{background:var(--card);border:1px solid var(--border);border-radius:0 var(--radius) var(--radius) var(--radius);padding:14px 18px;color:var(--text2);font-size:0.92rem;line-height:1.8}
+.chat-text p{margin:0}
+.chat-msg:nth-child(odd) .chat-text{background:var(--card2);border-color:rgba(226,182,79,0.08)}
 
-.message .bubble{padding:14px 18px;border-radius:var(--radius-sm);line-height:1.7;font-size:0.92rem}
-.message.emperor .bubble{background:var(--card);border:1px solid var(--border);border-top-left-radius:2px}
-.message.user .bubble{background:rgba(226,182,79,0.1);border:1px solid rgba(226,182,79,0.2);border-top-right-radius:2px;color:var(--text)}
+/* LOADING */
+.loading-msg{display:flex;align-items:center;gap:10px;padding:16px;color:var(--text3);font-size:0.85rem}
+.loading-dots{display:flex;gap:4px}
+.loading-dots span{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:dotBounce 1.4s infinite ease-in-out}
+.loading-dots span:nth-child(2){animation-delay:0.2s}
+.loading-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes dotBounce{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
 
-.message .meta{font-size:0.7rem;color:var(--text3);margin-top:6px;padding:0 4px}
-.message.user .meta{text-align:right}
+/* SUGGESTIONS */
+.suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.sug-chip{padding:8px 16px;border-radius:100px;font-size:0.8rem;cursor:pointer;transition:all .2s;
+  background:var(--card2);border:1px solid var(--border);color:var(--text2)}
+.sug-chip:hover{border-color:var(--gold);color:var(--gold);background:rgba(226,182,79,0.05)}
 
-/* TYPING INDICATOR */
-.typing .bubble{display:flex;gap:6px;padding:16px 20px}
-.typing .bubble span{width:6px;height:6px;background:var(--text3);border-radius:50%;animation:bounce 1.4s infinite}
-.typing .bubble span:nth-child(2){animation-delay:.2s}
-.typing .bubble span:nth-child(3){animation-delay:.4s}
-@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+/* FOOTER */
+.footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;margin-top:40px}
+.footer p{font-size:0.8rem;color:var(--text3)}
 
-/* WELCOME MESSAGE */
-.welcome-card{background:linear-gradient(135deg,rgba(226,182,79,0.05),rgba(196,58,49,0.05));border:1px solid var(--border);border-radius:var(--radius);padding:28px;text-align:center;margin-bottom:8px}
-.welcome-card .welcome-icon{font-size:3rem;margin-bottom:12px}
-.welcome-card h2{font-family:var(--serif);font-size:1.3rem;margin-bottom:8px}
-.welcome-card p{font-size:0.85rem;color:var(--text2);line-height:1.7;margin-bottom:16px}
-.welcome-suggestions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-.welcome-suggestion{padding:8px 16px;background:var(--card2);border:1px solid var(--border);border-radius:100px;font-size:0.8rem;color:var(--text2);cursor:pointer;transition:all .2s}
-.welcome-suggestion:hover{border-color:var(--gold);color:var(--gold)}
-
-/* INPUT */
-.chat-input-container{padding:16px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg2)}
-.chat-input-wrap{display:flex;gap:10px;align-items:flex-end}
-.chat-input{flex:1;padding:12px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--card);color:var(--text);font-size:0.9rem;font-family:var(--sans);resize:none;outline:none;line-height:1.5;min-height:44px;max-height:120px;transition:border-color .2s}
-.chat-input:focus{border-color:var(--gold)}
-.chat-input::placeholder{color:var(--text3)}
-.send-btn{width:44px;height:44px;border-radius:var(--radius-sm);border:none;background:var(--gold);color:#000;font-size:1.2rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.send-btn:hover{background:var(--gold2);transform:translateY(-1px)}
-.send-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
-.send-btn.loading{background:var(--card3);color:var(--text3)}
-
-/* ERROR */
-.error-card{background:rgba(196,58,49,0.08);border:1px solid rgba(196,58,49,0.2);border-radius:var(--radius-sm);padding:16px;text-align:center;margin:12px 0}
-.error-card p{color:var(--red);font-size:0.85rem}
-
-/* API CONFIG MODAL */
-.api-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
-.api-modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px;max-width:440px;width:100%}
-.api-modal h3{font-family:var(--serif);margin-bottom:8px}
-.api-modal p{font-size:0.85rem;color:var(--text2);margin-bottom:20px}
-.api-modal label{display:block;font-size:0.8rem;color:var(--text3);margin-bottom:6px}
-.api-modal input, .api-modal select{width:100%;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--card);color:var(--text);margin-bottom:16px;font-size:0.9rem;font-family:var(--sans);outline:none}
-.api-modal input:focus,.api-modal select:focus{border-color:var(--gold)}
-.api-modal .btn-row{display:flex;gap:10px}
-.api-modal .btn{flex:1;padding:12px;border-radius:var(--radius-sm);font-weight:600;font-size:0.9rem;cursor:pointer;border:none;transition:all .2s;text-align:center}
-.api-modal .btn-save{background:var(--gold);color:#000}
-.api-modal .btn-save:hover{background:var(--gold2)}
-.api-modal .btn-cancel{background:var(--card);color:var(--text2);border:1px solid var(--border2)}
-.api-modal .btn-cancel:hover{border-color:var(--gold);color:var(--gold)}
+@media(max-width:768px){
+  .main{padding:72px 16px 32px}
+  .chat-avatar{width:36px;height:36px;font-size:1.1rem}
+  .chat-text{padding:12px 14px;font-size:0.88rem}
+  .topic-input{font-size:0.92rem;padding:12px 14px}
+}
 </style>
 </head>
 <body>
 
-<div class="chat-container">
-  <!-- HEADER -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="4" width="24" height="20" rx="2" stroke="#e2b64f" stroke-width="1.5"/><path d="M2 10h24M2 16h24" stroke="#e2b64f" stroke-width="1"/><circle cx="14" cy="13" r="5" stroke="#c43a31" stroke-width="1.2" fill="none"/></svg>
+      Mandate
+    </a>
+    <div class="nav-links">
+      <a href="index.html">首页</a>
+      <a href="index.html#emperors">帝王录</a>
+      <a href="courses.html">课程</a>
+      <a href="chat.html" class="active">群聊</a>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
   <div class="chat-header">
-    <div class="avatar-icon">👑</div>
-    <div class="info">
-      <div class="name" id="chatEmperorName">加载中...</div>
-      <div class="dynasty" id="chatEmperorDynasty"></div>
-      <div class="status"><span class="dot"></span> 在线 · 数字分身</div>
-    </div>
-    <a href="index.html" class="back-btn">← 返回</a>
+    <div class="badge">💬 多人群聊</div>
+    <h1>历代帝王<span class="gold">群聊室</span></h1>
+    <p>选择一个话题，秦始皇、唐太宗、康熙大帝同台对话。任何话题，畅所欲言。</p>
   </div>
-  
-  <!-- MESSAGES -->
-  <div class="chat-messages" id="chatMessages">
-    <!-- Welcomes rendered by JS -->
+
+  <!-- SUGGESTIONS -->
+  <div class="suggestions" id="suggestions"></div>
+
+  <!-- TOPIC INPUT -->
+  <div class="topic-area">
+    <textarea class="topic-input" id="topicInput" placeholder="输入话题，开启帝王群聊...&#10;例如：「如果秦始皇遇到ChatGPT」「做皇帝最重要的是什么」「最好的治国之道」" rows="2"></textarea>
+    <div class="topic-hint">💡 输入话题后选择参与的帝王，或让AI自动匹配最合适的帝王参与讨论</div>
   </div>
-  
-  <!-- INPUT -->
-  <div class="chat-input-container">
-    <div class="chat-input-wrap">
-      <textarea class="chat-input" id="chatInput" placeholder="输入你想问的问题..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+
+  <!-- EMPEROR SELECT -->
+  <div class="emperor-select" id="emperorSelect"></div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button class="btn btn-primary" id="startBtn" onclick="startChat()">👑 开启群聊</button>
+    <button class="btn btn-secondary" id="continueBtn" onclick="continueChat()" style="display:none">💬 继续讨论</button>
+    <button class="btn btn-red" id="autoBtn" onclick="autoChat()">🤖 AI自动匹配帝王</button>
+    <button class="btn btn-secondary" onclick="clearChat()">🔄 清空</button>
+  </div>
+
+  <!-- CHAT AREA -->
+  <div class="chat-area" id="chatArea">
+    <div class="chat-empty">
+      <div class="icon">👑</div>
+      <h3>帝王群聊室</h3>
+      <p>选择话题，让历代帝王开始对话</p>
     </div>
   </div>
 </div>
 
-<!-- API CONFIG MODAL -->
-<div class="api-modal-overlay" id="apiModal" style="display:none">
-  <div class="api-modal">
-    <h3>⚙️ 配置 DeepSeek API</h3>
-    <p>请输入你的 DeepSeek API Key 以激活帝王数字分身。API Key 仅保存在你的浏览器本地。</p>
-    <label>API Key</label>
-    <input type="password" id="apiKeyInput" placeholder="sk-...">
-    <label>API 地址</label>
-    <input type="text" id="apiUrlInput" value="https://api.deepseek.com/v1/chat/completions" placeholder="https://api.deepseek.com/v1/chat/completions">
-    <label>模型</label>
-    <select id="modelSelect">
-      <option value="deepseek-chat">deepseek-chat</option>
-      <option value="deepseek-v4-pro">deepseek-v4-pro</option>
-    </select>
-    <div class="btn-row">
-      <button class="btn btn-cancel" onclick="hideApiModal()">取消</button>
-      <button class="btn btn-save" onclick="saveApiConfig()">保存并开始</button>
-    </div>
-  </div>
-</div>
+<footer class="footer">
+  <p>Mandate © 2026 · AI模拟历史人物对话 · 仅供娱乐与学习参考</p>
+</footer>
 
-<script src="js/data.js"></script>
 <script>
-'use strict';
+const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8003' : 'https://mandate-chat.example.com';
+let allEmperors = [];
+let selectedEmperors = new Set();
+let chatHistory = [];
 
-function getQueryParam(name) {
-  return new URLSearchParams(window.location.search).get(name);
-}
+const AVATARS = ['👑','🐉','⚔️','🛡️','🏯','📜','🔮','🗡️','🎭','🏛️','⚜️','🦁','🐲','💎','🎯','🎪','🏺','🗿','🔱','⭐'];
 
-function getDynastyName(id) {
-  const d = DYNASTIES.find(d=>d.id===id);
-  return d ? d.name : id;
-}
+const SUGGESTIONS = [
+  "做皇帝最重要的是什么？",
+  "如果你能穿越到2026年，第一件事做什么？",
+  "历史上最被低估的帝王是谁？",
+  "治国之道的核心是什么？",
+  "如何处理与大臣的关系？",
+  "继承人问题为什么这么难？",
+  "如何看待战争与和平？",
+  "什么是好的制度？",
+  "你最大的遗憾是什么？",
+  "给现代CEO的一条建议",
+];
 
-// ═══════ STATE ═══════
-let currentEmperor = null;
-let messages = [];
-let isLoading = false;
-let apiKey = localStorage.getItem('mandate_deepseek_key') || '';
-let apiUrl = localStorage.getItem('mandate_deepseek_url') || 'https://api.deepseek.com/v1/chat/completions';
-let apiModel = localStorage.getItem('mandate_deepseek_model') || 'deepseek-chat';
-
-// ═══════ INIT ═══════
-const emperorId = getQueryParam('id');
-if(!emperorId) {
-  window.location.href = 'index.html#avatars';
-} else {
-  const emp = EMPERORS.find(e=>e.id===emperorId);
-  if(!emp) {
-    window.location.href = 'index.html#avatars';
-  } else {
-    currentEmperor = emp;
-    initChat();
+// Load emperors
+async function loadEmperors() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/emperors`);
+    const data = await resp.json();
+    allEmperors = data.emperors;
+    renderEmperorChips();
+    renderSuggestions();
+  } catch(e) {
+    console.log('API not available, using local data');
+    await loadLocalEmperors();
   }
 }
 
-function initChat() {
-  document.getElementById('chatEmperorName').textContent = currentEmperor.name;
-  document.getElementById('chatEmperorDynasty').textContent = `${getDynastyName(currentEmperor.dynasty)} · ${currentEmperor.reign}`;
-  document.title = `与${currentEmperor.name}对话 — Mandate`;
-  
-  // Check API key
-  if(!apiKey) {
-    showApiModal();
+async function loadLocalEmperors() {
+  // Try to load from courses-data.js
+  if (typeof COURSES_EXTENDED !== 'undefined') {
+    allEmperors = COURSES_EXTENDED.map(c => ({
+      name: c.title.split('：')[0].split('（')[0].trim(),
+      preview: c.desc
+    }));
   } else {
-    // Load saved messages
-    const saved = localStorage.getItem(`mandate_chat_${currentEmperor.id}`);
-    messages = saved ? JSON.parse(saved) : [];
-    renderMessages();
-    if(messages.length === 0) {
-      showWelcome();
+    // Fallback to hardcoded list
+    const names = ['秦始皇','刘邦','项羽','汉武帝','曹操','刘备','诸葛亮','孙权','唐太宗','武则天','唐玄宗','宋太祖','王安石','苏轼','成吉思汗','忽必烈','朱元璋','朱棣','康熙','雍正','乾隆','慈禧','孙中山'];
+    allEmperors = names.map(n => ({name: n, preview: ''}));
+  }
+  renderEmperorChips();
+  renderSuggestions();
+}
+
+function renderEmperorChips() {
+  const container = document.getElementById('emperorSelect');
+  const unique = [];
+  const seen = new Set();
+  for (const e of allEmperors) {
+    if (!seen.has(e.name)) { seen.add(e.name); unique.push(e); }
+  }
+  container.innerHTML = unique.map((e,i) => {
+    const sel = selectedEmperors.has(e.name) ? ' selected' : '';
+    return `<span class="emp-chip${sel}" onclick="toggleEmperor('${e.name.replace(/'/g,"\\'")}', this)" data-name="${e.name}">${e.name}</span>`;
+  }).join('');
+}
+
+function renderSuggestions() {
+  document.getElementById('suggestions').innerHTML = SUGGESTIONS.map(s =>
+    `<span class="sug-chip" onclick="document.getElementById('topicInput').value='${s}';startChat()">${s}</span>`
+  ).join('');
+}
+
+function toggleEmperor(name, el) {
+  if (selectedEmperors.has(name)) {
+    selectedEmperors.delete(name);
+    el.classList.remove('selected');
+  } else {
+    if (selectedEmperors.size >= 10) {
+      alert('最多选择10位帝王参与群聊');
+      return;
     }
+    selectedEmperors.add(name);
+    el.classList.add('selected');
   }
 }
 
-// ═══════ WELCOME ═══════
-function showWelcome() {
-  const container = document.getElementById('chatMessages');
-  const suggestions = [
-    `你一生最得意的政绩是什么？`,
-    `你如何评价自己的统治？`,
-    `如果让你重新做一次皇帝，你会改变什么？`,
-    `你对后世的评价有什么想说的？`,
-    currentEmperor.tags[0] ? `聊聊关于"${currentEmperor.tags[0]}"的看法` : '你觉得自己是明君还是暴君？'
-  ];
+function getAvatar(name) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATARS[Math.abs(hash) % AVATARS.length];
+}
+
+async function startChat() {
+  const topic = document.getElementById('topicInput').value.trim();
+  if (!topic) {
+    document.getElementById('topicInput').focus();
+    return;
+  }
+
+  const participants = selectedEmperors.size > 0 ? [...selectedEmperors] : ['秦始皇','刘邦','唐太宗','康熙','曹操'];
   
-  container.innerHTML = `
-    <div class="welcome-card">
-      <div class="welcome-icon">👑</div>
-      <h2>${currentEmperor.name} · 数字分身已就绪</h2>
-      <p>「${currentEmperor.avatar.quote}」<br><br>我是基于DeepSeek AI生成的${currentEmperor.name}数字人格，包含了TA的性格、政见与历史知识。你可以自由提问。</p>
-      <div class="welcome-suggestions">
-        ${suggestions.map(s=>`<span class="welcome-suggestion" onclick="sendSuggestion('${s.replace(/'/g,"\\'")}')">${s}</span>`).join('')}
+  const area = document.getElementById('chatArea');
+  area.innerHTML = `<div class="loading-msg"><div class="loading-dots"><span></span><span></span><span></span></div> 帝王们正在思考「${topic.substring(0,30)}」...</div>`;
+  
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('autoBtn').disabled = true;
+
+  try {
+    const resp = await fetch(`${API_BASE}/api/chat`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        topic: topic,
+        participants: participants,
+        max_responses: participants.length > 8 ? 8 : participants.length,
+        history: chatHistory
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.detail || 'Chat failed');
+    }
+
+    const data = await resp.json();
+    renderMessages(data.messages, data.participants);
+  } catch(e) {
+    area.innerHTML = `<div class="chat-empty"><div class="icon">⚠️</div><h3>群聊服务暂不可用</h3><p>${e.message}</p><p style="font-size:0.8rem;margin-top:8px">请确认后端服务已启动 (port 8003)</p></div>`;
+  }
+
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('autoBtn').disabled = false;
+}
+
+async function continueChat() {
+  const topic = document.getElementById('topicInput').value.trim() || '请继续讨论';
+  const participants = selectedEmperors.size > 0 ? [...selectedEmperors] : [];
+  
+  const area = document.getElementById('chatArea');
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'loading-msg';
+  loadingDiv.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> 帝王们正在继续讨论...';
+  area.appendChild(loadingDiv);
+  loadingDiv.scrollIntoView({behavior:'smooth'});
+
+  document.getElementById('continueBtn').disabled = true;
+
+  try {
+    const resp = await fetch(`${API_BASE}/api/chat`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        topic: topic,
+        participants: participants.length > 0 ? participants : ['all'],
+        max_responses: 5,
+        history: chatHistory
+      })
+    });
+
+    loadingDiv.remove();
+
+    if (!resp.ok) throw new Error('Chat failed');
+    const data = await resp.json();
+    appendMessages(data.messages);
+  } catch(e) {
+    loadingDiv.remove();
+  }
+
+  document.getElementById('continueBtn').disabled = false;
+}
+
+async function autoChat() {
+  // Auto-select emperors and start
+  const topic = document.getElementById('topicInput').value.trim() || SUGGESTIONS[Math.floor(Math.random()*SUGGESTIONS.length)];
+  document.getElementById('topicInput').value = topic;
+  selectedEmperors.clear();
+  document.querySelectorAll('.emp-chip').forEach(c => c.classList.remove('selected','auto-selected'));
+  
+  // Select a random diverse group
+  const names = allEmperors.map(e => e.name).filter((v,i,a) => a.indexOf(v)===i);
+  const shuffled = names.sort(() => Math.random() - 0.5);
+  const autoPick = shuffled.slice(0, 5);
+  autoPick.forEach(n => selectedEmperors.add(n));
+  
+  document.querySelectorAll('.emp-chip').forEach(c => {
+    if (autoPick.includes(c.dataset.name)) c.classList.add('auto-selected');
+  });
+
+  setTimeout(() => startChat(), 300);
+}
+
+function renderMessages(messages, participants) {
+  const area = document.getElementById('chatArea');
+  chatHistory = messages;
+  
+  area.innerHTML = messages.map((m, i) => `
+    <div class="chat-msg" style="animation-delay:${i*0.1}s">
+      <div class="chat-avatar">${getAvatar(m.emperor)}</div>
+      <div class="chat-bubble">
+        <div class="chat-name">${m.emperor}</div>
+        <div class="chat-text"><p>${m.message}</p></div>
       </div>
     </div>
-  `;
-}
-
-function sendSuggestion(text) {
-  document.getElementById('chatInput').value = text;
-  sendMessage();
-}
-
-// ═══════ RENDER ═══════
-function renderMessages() {
-  const container = document.getElementById('chatMessages');
-  if(messages.length === 0) {
-    showWelcome();
-    return;
-  }
-  
-  container.innerHTML = messages.map(m => `
-    <div class="message ${m.role}">
-      <div class="bubble">${escapeHtml(m.content)}</div>
-      <div class="meta">${m.role==='emperor' ? currentEmperor.name : '你'} · ${m.time||''}</div>
-    </div>
   `).join('');
-  
-  // Scroll to bottom
-  container.scrollTop = container.scrollHeight;
+
+  document.getElementById('continueBtn').style.display = 'inline-flex';
+  area.lastElementChild?.scrollIntoView({behavior:'smooth'});
 }
 
-function addMessage(role, content) {
-  const now = new Date();
-  const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
-  messages.push({role, content, time});
+function appendMessages(messages) {
+  const area = document.getElementById('chatArea');
+  chatHistory = [...chatHistory, ...messages];
   
-  // Save
-  localStorage.setItem(`mandate_chat_${currentEmperor.id}`, JSON.stringify(messages.slice(-50)));
-  
-  renderMessages();
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML.replace(/\n/g, '<br>');
-}
-
-// ═══════ SEND ═══════
-function handleKeyDown(e) {
-  if(e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-}
-
-async function sendMessage() {
-  if(isLoading) return;
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if(!text) return;
-  
-  if(!apiKey) {
-    showApiModal();
-    return;
-  }
-  
-  input.value = '';
-  input.style.height = 'auto';
-  addMessage('user', text);
-  
-  // Show typing indicator
-  isLoading = true;
-  document.getElementById('sendBtn').classList.add('loading');
-  showTyping();
-  
-  try {
-    const response = await callDeepSeek(text);
-    hideTyping();
-    addMessage('emperor', response);
-  } catch(err) {
-    hideTyping();
-    showError(err.message || '连接失败，请检查API配置');
-  } finally {
-    isLoading = false;
-    document.getElementById('sendBtn').classList.remove('loading');
-  }
-  
-  // Auto-resize input
-  input.style.height = 'auto';
-}
-
-function showTyping() {
-  const container = document.getElementById('chatMessages');
-  const typing = document.createElement('div');
-  typing.className = 'message emperor typing';
-  typing.id = 'typingIndicator';
-  typing.innerHTML = '<div class="bubble"><span></span><span></span><span></span></div>';
-  container.appendChild(typing);
-  container.scrollTop = container.scrollHeight;
-}
-
-function hideTyping() {
-  const typing = document.getElementById('typingIndicator');
-  if(typing) typing.remove();
-}
-
-function showError(msg) {
-  const container = document.getElementById('chatMessages');
-  const err = document.createElement('div');
-  err.className = 'error-card';
-  err.innerHTML = `<p>⚠️ ${escapeHtml(msg)}</p><button onclick="showApiModal()" style="margin-top:8px;padding:6px 16px;border-radius:6px;border:1px solid var(--red);background:transparent;color:var(--red);cursor:pointer;font-size:0.8rem">重新配置 API</button>`;
-  container.appendChild(err);
-  container.scrollTop = container.scrollHeight;
-}
-
-// ═══════ DEEPSEEK API ═══════
-async function callDeepSeek(userMessage) {
-  // Build conversation context
-  const systemPrompt = buildSystemPrompt();
-  const convMessages = [
-    {role:'system',content:systemPrompt},
-    ...messages.slice(-10).filter(m=>m.role!=='error').map(m=>({
-      role: m.role==='user'?'user':'assistant',
-      content: m.content
-    }))
-  ];
-  // Add current message (already in messages, but let's make sure)
-  if(convMessages[convMessages.length-1]?.role !== 'user') {
-    convMessages.push({role:'user',content:userMessage});
-  }
-  
-  const resp = await fetch(apiUrl, {
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'Authorization':`Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: apiModel,
-      messages: convMessages,
-      temperature: 0.8,
-      max_tokens: 800
-    })
+  messages.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'chat-msg';
+    div.style.animationDelay = `${i*0.1}s`;
+    div.innerHTML = `
+      <div class="chat-avatar">${getAvatar(m.emperor)}</div>
+      <div class="chat-bubble">
+        <div class="chat-name">${m.emperor}</div>
+        <div class="chat-text"><p>${m.message}</p></div>
+      </div>
+    `;
+    area.appendChild(div);
+    div.scrollIntoView({behavior:'smooth'});
   });
-  
-  if(!resp.ok) {
-    const err = await resp.json().catch(()=>({}));
-    throw new Error(err.error?.message || `API 错误 (${resp.status})`);
+}
+
+function clearChat() {
+  chatHistory = [];
+  document.getElementById('chatArea').innerHTML = `
+    <div class="chat-empty">
+      <div class="icon">👑</div>
+      <h3>帝王群聊室</h3>
+      <p>选择话题，让历代帝王开始对话</p>
+    </div>
+  `;
+  document.getElementById('continueBtn').style.display = 'none';
+}
+
+// Enter to submit
+document.getElementById('topicInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    startChat();
   }
-  
-  const data = await resp.json();
-  return data.choices[0].message.content;
-}
+});
 
-function buildSystemPrompt() {
-  const e = currentEmperor;
-  return `你是${e.name}（${e.temple}），${getDynastyName(e.dynasty)}时期的皇帝，在位时间${e.reign}。
-
-${e.avatar.prompt}
-
-重要规则：
-- 你是${e.name}本人，用第一人称"朕"或"我"说话（根据你的性格选择）
-- 你只知道你活着时发生的事（${e.reign}及之前），不知道后世发生的事情
-- 如果有人提到后世的事件或评价，你会感到困惑或好奇
-- 保持你的性格特点：${e.avatar.personality}
-- 说话风格：${e.avatar.style}
-- 回复长度控制在2-4句话，不要太长
-- 你是古代帝王，不要使用现代网络用语`;
-}
-
-// ═══════ API CONFIG ═══════
-function showApiModal() {
-  document.getElementById('apiModal').style.display = 'flex';
-  document.getElementById('apiKeyInput').value = apiKey;
-  document.getElementById('apiUrlInput').value = apiUrl;
-  document.getElementById('modelSelect').value = apiModel;
-}
-
-function hideApiModal() {
-  document.getElementById('apiModal').style.display = 'none';
-}
-
-function saveApiConfig() {
-  apiKey = document.getElementById('apiKeyInput').value.trim();
-  apiUrl = document.getElementById('apiUrlInput').value.trim();
-  apiModel = document.getElementById('modelSelect').value;
-  
-  localStorage.setItem('mandate_deepseek_key', apiKey);
-  localStorage.setItem('mandate_deepseek_url', apiUrl);
-  localStorage.setItem('mandate_deepseek_model', apiModel);
-  
-  hideApiModal();
-  
-  if(!apiKey) return;
-  
-  // Reset and show welcome if first time
-  if(messages.length === 0) {
-    showWelcome();
-  }
-}
+document.addEventListener('DOMContentLoaded', loadEmperors);
 </script>
+
+<script src="js/courses-data.js"></script>
 </body>
 </html>
