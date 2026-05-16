@@ -1,0 +1,125 @@
+{
+  "theme": {
+    "extend": {
+      "colors": {
+        "bg": "#09090b",
+        "bg2": "#0f0f13",
+        "bg3": "#18181b",
+        "card": "#1c1c21",
+        "card2": "#222228",
+        "card3": "#2a2a32",
+        "border": "#27272a",
+        "border2": "#3f3f46",
+        "text": "#fafafa",
+        "text2": "#a1a1aa",
+        "text3": "#71717a",
+        "gold": "#e2b64f",
+        "gold2": "#f5d98a",
+        "gold-dim": "#b8860b",
+        "red": "#c43a31",
+        "red2": "#e85d50",
+        "red-dark": "#8b0000",
+        "green": "#22c55e",
+        "blue": "#3b82f6",
+        "purple": "#a78bfa",
+        "firefly": "#f0c060",
+        "firefly-soft": "#f5e6b8",
+        "primary": "#e2b64f"
+      },
+      "fontFamily": {
+        "h1": [
+          "Noto Serif SC"
+        ],
+        "h2": [
+          "Noto Serif SC"
+        ],
+        "h3": [
+          "Noto Serif SC"
+        ],
+        "body-lg": [
+          "Inter"
+        ],
+        "body": [
+          "Inter"
+        ],
+        "body-sm": [
+          "Inter"
+        ],
+        "label": [
+          "Inter"
+        ],
+        "nav-link": [
+          "Inter"
+        ]
+      },
+      "fontSize": {
+        "h1": [
+          "3.8rem",
+          {
+            "letterSpacing": "-0.02em",
+            "fontWeight": "900"
+          }
+        ],
+        "h2": [
+          "2.2rem",
+          {
+            "letterSpacing": "-0.01em",
+            "fontWeight": "700"
+          }
+        ],
+        "h3": [
+          "1.2rem",
+          {
+            "fontWeight": "600"
+          }
+        ],
+        "body-lg": [
+          "1.125rem",
+          {
+            "fontWeight": "400"
+          }
+        ],
+        "body": [
+          "1rem",
+          {
+            "fontWeight": "400"
+          }
+        ],
+        "body-sm": [
+          "0.875rem",
+          {
+            "fontWeight": "400"
+          }
+        ],
+        "label": [
+          "0.75rem",
+          {
+            "letterSpacing": "0.12em",
+            "fontWeight": "600"
+          }
+        ],
+        "nav-link": [
+          "0.875rem",
+          {
+            "fontWeight": "500"
+          }
+        ]
+      },
+      "borderRadius": {
+        "sm": "10px",
+        "md": "16px",
+        "lg": "24px",
+        "pill": "100px"
+      },
+      "spacing": {
+        "xs": "8px",
+        "sm": "16px",
+        "md": "24px",
+        "lg": "32px",
+        "xl": "48px",
+        "section": "100px",
+        "section-sm": "60px"
+      }
+    }
+  }
+}
