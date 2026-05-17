@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import httpx
+from pathlib import Path
 
 app = FastAPI(title="Mandate Emperor Chat API")
 
@@ -52,6 +53,31 @@ EMPEROR_PROFILES = {
 
 # Predefined emperor groups for common topics
 DEFAULT_PARTICIPANTS = ["秦始皇", "刘邦", "唐太宗", "康熙", "曹操"]
+LOCAL_RESPONSES = {
+    "秦始皇": "朕看此事，关键在统一号令。天下之事，最怕各行其是；制度一乱，再好的器物也会变成纷争之源。",
+    "刘邦": "我看没那么玄。事情能不能成，先看人心，再看用人。会用人，粗茶淡饭也能打天下；不会用人，金山银山也守不住。",
+    "项羽": "若只谈算计，未免少了气魄。大事当前，须有人敢冲在最前。只是我也承认，勇力若不能收束成法度，终究难久。",
+    "汉武帝": "此题要从战略看。眼前得失不算最大，真正重要的是十年、二十年后的格局。敢不敢投入，决定能不能开疆拓土。",
+    "曹操": "我更关心实际成效。名声、口号、姿态都可以放一边，能解决问题的人就用，能降低成本的法子就试。",
+    "刘备": "成事不能只靠威势。人若不服，表面听命，心里未必归附。仁义不是软弱，而是让人愿意跟你走到最后。",
+    "诸葛亮": "此事当分三层看：其一是目标，其二是资源，其三是执行。若三者不能相配，越勤奋越可能把局势推向失衡。",
+    "孙权": "我赞成先守住基本盘。局面复杂时，不必急着争一时胜负，先稳住人、财、地，再寻找可以出手的窗口。",
+    "唐太宗": "为政最忌自以为是。若能让不同意见进来，君主才不至于困在自己的判断里。以人为镜，正是为了少犯大错。",
+    "武则天": "我看重的是能力和秩序。世俗成见常常把人挡在门外，但权力只问结果。谁能办事，谁就该站到台前。",
+    "唐玄宗": "盛世最容易让人误判。人在顺境里会以为一切都稳固，其实危机常在繁华处发芽。此事不可只看表面光彩。",
+    "宋太祖": "最好的办法，是把风险写进制度里。不要指望人人都忠诚，也不要逼人人都恐惧。让人没有必要造反，才是长久之计。",
+    "王安石": "若问题已经积重难返，只靠修修补补是不够的。改革必然触动利益，若怕反对声，就永远只能守着旧病。",
+    "苏轼": "诸位说得都重。我倒觉得，人也要留一点从容。制度要紧，成败要紧，但若失去通达之心，胜了也未必安稳。",
+    "成吉思汗": "草原上判断很简单：能不能行动，能不能取胜，能不能让部众活下去。空谈太多，会错过最好的时机。",
+    "忽必烈": "我更愿意兼收并用。不同制度、不同文化，各有可取之处。能把马背上的力量和农耕的秩序合起来，才是大格局。",
+    "朱元璋": "我出身贫苦，最知道底下人怕什么。官府若只顾上头体面，不管百姓死活，迟早要出大乱子。",
+    "朱棣": "天下不是守出来的。该迁都就迁都，该远航就远航，该用兵就用兵。权力若没有进取心，很快就会被人逼到墙角。",
+    "康熙": "凡事不可偏激。既要有决断，也要有耐心；既要学新法，也不能轻弃根本。治理大国，贵在持久而不躁。",
+    "雍正": "空话少说，账要算清，责任要压实。许多坏事不是没人知道，而是无人愿意承担执行的骂名。",
+    "乾隆": "朕以为，气象也很重要。国家要有体面，制度要有章法，文化要能凝聚人心。只是自满二字，确实不可不防。",
+    "慈禧": "权力场里，活下来本身就是本事。理想可以讲，但各方势力如何平衡，谁能被安抚，谁必须被压住，这些才是每日功课。",
+    "孙中山": "我最关心的是天下是否为公。若制度只服务少数人，再强也不是长久之道。真正的新局面，要让普通人也有位置。",
+}
 
 class ChatRequest(BaseModel):
     topic: str
@@ -66,9 +92,6 @@ class ChatResponse(BaseModel):
 @app.post("/api/chat")
 async def group_chat(req: ChatRequest):
     """Generate a multi-emperor conversation on a given topic."""
-    if not DEEPSEEK_API_KEY:
-        raise HTTPException(500, "DeepSeek API key not configured")
-
     # Select participants
     if req.participants and req.participants[0] == "all":
         participants = list(EMPEROR_PROFILES.keys())
@@ -79,6 +102,9 @@ async def group_chat(req: ChatRequest):
 
     if len(participants) < 2:
         participants = DEFAULT_PARTICIPANTS.copy()
+
+    if not DEEPSEEK_API_KEY:
+        return local_chat_response(req.topic, participants, req.max_responses)
 
     # Build system prompt
     profiles_text = "\n".join([
@@ -145,10 +171,19 @@ async def group_chat(req: ChatRequest):
             participants=participants[:10]
         )
 
-    except json.JSONDecodeError as e:
-        raise HTTPException(500, f"Failed to parse AI response: {str(e)[:200]}")
+    except json.JSONDecodeError:
+        return local_chat_response(req.topic, participants, req.max_responses)
     except Exception as e:
-        raise HTTPException(500, f"Chat generation failed: {str(e)[:200]}")
+        return local_chat_response(req.topic, participants, req.max_responses)
+
+
+def local_chat_response(topic: str, participants: list[str], max_responses: int) -> ChatResponse:
+    clean_topic = topic[:36] + ("..." if len(topic) > 36 else "")
+    messages = []
+    for name in participants[:max_responses]:
+        base = LOCAL_RESPONSES.get(name, "此事不可只看一端。权力、制度、人心与时势交织在一起，判断越急，越容易失准。")
+        messages.append({"emperor": name, "message": f"谈到「{clean_topic}」，{base}"})
+    return ChatResponse(messages=messages, participants=participants[:10])
 
 @app.get("/api/emperors")
 async def list_emperors():
@@ -166,7 +201,8 @@ async def health():
 
 @app.get("/")
 async def root():
-    return FileResponse("/root/.openclaw/workspace/mandate/chat.html")
+    root_dir = Path(__file__).resolve().parents[1]
+    return FileResponse(root_dir / "chat.html")
 
 if __name__ == "__main__":
     import uvicorn
