@@ -188,7 +188,7 @@ a{color:inherit;text-decoration:none}
 
 <script>
 let API_BASE = window.MANDATE_CHAT_API || localStorage.getItem('mandate_chat_api') || (
-  ['localhost', '127.0.0.1'].includes(location.hostname) ? 'http://localhost:8003' : ''
+  ['localhost', '127.0.0.1'].includes(location.hostname) ? 'http://localhost:8003' : location.origin
 );
 let allEmperors = [];
 let selectedEmperors = new Set();
