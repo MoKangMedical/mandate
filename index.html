@@ -259,8 +259,8 @@ h3{font-size:1.2rem;font-weight:600}
 .price-desc{font-size:0.85rem;color:var(--text3);margin-bottom:24px}
 .price-features{list-style:none;margin-bottom:32px}
 .price-features li{padding:8px 0;font-size:0.88rem;color:var(--text2);display:flex;align-items:flex-start;gap:10px}
-.price-features li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
-.price-features li.red::before{content:'✦';color:var(--red)}
+.price-features li::before{content:'';color:var(--green);font-weight:700;flex-shrink:0}
+.price-features li.red::before{content:'';color:var(--red)}
 .price-btn{display:block;width:100%;text-align:center;padding:14px;border-radius:var(--radius-sm);font-weight:600;font-size:0.95rem;transition:all .25s;border:none;cursor:pointer}
 .price-btn-primary{background:var(--gold);color:#000}
 .price-btn-primary:hover{background:var(--gold2)}
@@ -324,7 +324,7 @@ h3{font-size:1.2rem;font-weight:600}
       <a href="#pricing">定价</a>
       <a href="#avatars" class="nav-cta">与帝王对话</a>
     </div>
-    <div class="hamburger" onclick="document.getElementById('navLinks')?.classList.toggle('open')">☰</div>
+    <div class="hamburger" onclick="document.getElementById('navLinks')?.classList.toggle('open')">菜单</div>
   </div>
 </nav>
 
@@ -335,9 +335,9 @@ h3{font-size:1.2rem;font-weight:600}
     <h1 class="serif">四千年的<span class="gold">权力答卷</span><br>由<span class="red">史料</span>来打分</h1>
     <p class="hero-sub">融合二十四史、四库全书、百家讲坛、影视作品、民间叙事——每一个帝王都不止一面。更有AI数字分身，让你与帝王直接对话。</p>
     <div class="hero-actions">
-      <a href="#emperors" class="btn btn-primary">🔍 探索帝王录</a>
-      <a href="#avatars" class="btn btn-red">💬 与帝王对话</a>
-      <a href="#courses" class="btn btn-secondary">📚 课程体系</a>
+      <a href="#emperors" class="btn btn-primary">探索帝王录</a>
+      <a href="#avatars" class="btn btn-red">与帝王对话</a>
+      <a href="#courses" class="btn btn-secondary">课程体系</a>
     </div>
     <div class="hero-stats">
       <div class="hero-stat"><div class="num">24</div><div class="desc">王朝迭代</div></div>
@@ -360,7 +360,7 @@ h3{font-size:1.2rem;font-weight:600}
 <section id="imperial" class="imperial-section section">
   <div class="container">
     <div class="section-header fade-in">
-      <div class="label">👑 黄袍帝王录</div>
+      <div class="label">黄袍帝王录</div>
       <h2>九十四位帝王，<span style="color:var(--gold)">一部权力史</span></h2>
       <p>从秦始皇的龙袍到宣统帝的退位诏书——每一位帝王的名字，都是四千年文明的一个刻度。</p>
     </div>
@@ -398,7 +398,7 @@ h3{font-size:1.2rem;font-weight:600}
       <p>正史、学术、影视、通俗、民间——五源交叉验证。点击任意帝王查看完整政绩与多维评价。</p>
     </div>
     <div class="search-wrap fade-in">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"></span>
       <input type="text" class="search-input" id="searchInput" placeholder="搜索帝王、庙号、朝代...（如：唐太宗、康熙、秦始皇）" oninput="renderEmperors()">
     </div>
     <div class="dynasty-filter fade-in" id="dynastyFilter"></div>
@@ -410,7 +410,7 @@ h3{font-size:1.2rem;font-weight:600}
 <section id="avatars" class="section avatar-hero">
   <div class="container">
     <div class="section-header fade-in">
-      <div class="label" style="color:var(--red)">🔥 数字分身</div>
+      <div class="label" style="color:var(--red)">数字分身</div>
       <h2>穿越千年，与帝王<span style="color:var(--red)">面对面</span></h2>
       <p>基于DeepSeek AI，每一位帝王都拥有独立的数字人格——包含其性格、政见、历史知识。你可以直接问秦始皇为何焚书坑儒，问唐太宗如何看待魏征。</p>
     </div>
@@ -418,18 +418,18 @@ h3{font-size:1.2rem;font-weight:600}
   </div>
 </section>
 
-<!-- ═══════════════ COURSES (All 94) ═══════════════ -->
+<!-- ═══════════════ COURSES ═══════════════ -->
 <section id="courses" class="section" style="background:var(--bg2)">
   <div class="container">
     <div class="section-header fade-in">
       <div class="label">课程体系</div>
-      <h2><span style="color:var(--gold)">94门</span>课程，从秦始皇到宣统帝</h2>
-      <p>每一门课都是一位帝王或一个时代的深度解析 — 全部开放 · 逐课解锁 · 含AI互动思辨</p>
+      <h2><span style="color:var(--gold)">100门</span>课程，纵览中国帝王史</h2>
+      <p>每一门课都是一位帝王或一个时代的深度解析，全部开放，含音频、测验与AI互动思辨。</p>
     </div>
 
     <!-- Search & Filter -->
     <div class="search-wrap fade-in" style="margin-bottom:20px">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"></span>
       <input type="text" class="search-input" id="courseSearch" placeholder="搜索课程...（如：秦始皇、贞观、王安石）" oninput="renderHomeCourses()">
     </div>
     <div class="dynasty-filter fade-in" id="courseTagFilter"></div>
@@ -440,7 +440,7 @@ h3{font-size:1.2rem;font-weight:600}
     <!-- View All CTA -->
     <div style="text-align:center;margin-top:40px" class="fade-in">
       <a href="courses.html" class="btn btn-primary" style="font-size:1.05rem;padding:16px 36px">
-        📚 进入完整课程体系（含测验 + 音频 + AI对话）→
+        进入完整课程体系（含测验、音频与AI对话）
       </a>
     </div>
   </div>
@@ -507,7 +507,7 @@ h3{font-size:1.2rem;font-weight:600}
     <div class="cta-content fade-in">
       <h2 class="serif">今天你想和<span style="color:var(--red)">哪位帝王</span>对话？</h2>
       <p>秦始皇的霸气、李世民的谦逊、康熙的睿智——选一位，开始穿越时空的对话。</p>
-      <a href="#avatars" class="btn btn-red" style="font-size:1.1rem;padding:16px 36px">💬 进入数字分身 →</a>
+      <a href="#avatars" class="btn btn-red" style="font-size:1.1rem;padding:16px 36px">进入数字分身</a>
     </div>
   </div>
 </section>
@@ -575,7 +575,7 @@ function renderHomeCourses() {
     (c.tags||[]).some(t=>String(t).split('|')[0]===homeCourseTag)
   );
   if (!courses.length) {
-    grid.innerHTML = '<div class="courses-empty"><div class="icon">📭</div><p>没有匹配的课程，试试其他关键词</p></div>';
+    grid.innerHTML = '<div class="courses-empty"><p>没有匹配的课程，试试其他关键词</p></div>';
     return;
   }
   grid.innerHTML = courses.map(c => {
@@ -594,7 +594,7 @@ function renderHomeCourses() {
         </div>
       </div>
       <div class="hc-tags">${tags||''}</div>
-      <span class="hc-arrow">→</span>
+      <span class="hc-arrow">查看</span>
     </a>`;
   }).join('');
   // Re-observe fade-in elements

@@ -107,7 +107,6 @@ a{color:inherit;text-decoration:none}
 
 <div id="app">
   <div style="text-align:center;padding:200px 0;color:var(--text3)">
-    <p style="font-size:1.5rem;margin-bottom:12px">👑</p>
     <p>加载中...</p>
   </div>
 </div>
@@ -145,7 +144,7 @@ if(!emperorId) {
 function renderEmperor(emp) {
   document.title = `${emp.name}（${emp.temple}）— Mandate`;
   
-  const stars = '★'.repeat(Math.floor(emp.stars)) + (emp.stars%1>=0.5?'☆':'');
+  const stars = `${emp.stars.toFixed(1)}/5`;
   
   // Generate mock evaluations
   const evaluations = generateEvaluations(emp);
@@ -156,7 +155,7 @@ function renderEmperor(emp) {
   document.getElementById('app').innerHTML = `
     <!-- HEADER -->
     <div class="emperor-header">
-      <div class="emperor-portrait">👑</div>
+      <div class="emperor-portrait">帝</div>
       <h1>${emp.name}</h1>
       <div class="sub">${emp.temple} · ${getDynastyName(emp.dynasty)} · ${emp.reign}</div>
       <div class="rating"><span class="stars">${stars}</span><span class="score">${emp.score}</span><span style="color:var(--text3);font-size:0.9rem">/10</span></div>
@@ -202,7 +201,7 @@ function renderEmperor(emp) {
               <span class="eval-source-type">${ev.type}</span>
             </div>
             <div class="eval-text">「${ev.text}」</div>
-            <div class="eval-rating">${'★'.repeat(ev.rating)} ${ev.rating}/5</div>
+            <div class="eval-rating">${ev.rating}/5</div>
           </div>
         `).join('')}
       </div>
@@ -213,7 +212,7 @@ function renderEmperor(emp) {
       <div class="chat-cta-content">
         <h2>想和${emp.name}直接对话吗？</h2>
         <p>基于DeepSeek AI，${emp.name}的数字分身已就绪。<br>你可以问TA任何历史问题、政治理念，甚至进行跨越时空的辩论。</p>
-        <a href="chat.html?id=${emp.id}" class="btn btn-red">💬 与${emp.name}对话</a>
+        <a href="chat.html?id=${emp.id}" class="btn btn-red">与${emp.name}对话</a>
         <a href="index.html#emperors" class="btn btn-secondary">← 浏览更多帝王</a>
       </div>
     </div>
@@ -239,10 +238,10 @@ function generateEvaluations(emp) {
   };
   const text = emp.score >= 8 ? 'high' : emp.score >= 5 ? 'mid' : 'low';
   
-  evals.push({icon:'📜',source:'二十四史',type:'正史',text:zhengshiTexts[text],rating:Math.round(emp.score/2)});
+  evals.push({icon:'正史',source:'二十四史',type:'正史',text:zhengshiTexts[text],rating:Math.round(emp.score/2)});
   
   // Academic
-  evals.push({icon:'📖',source:'百家讲坛',type:'学术',text:`"${emp.name}是中国历史上${emp.score>=8?'极为重要':'颇具争议'}的一位帝王..."——学者评价摘录`,rating:Math.round(emp.score/2)});
+  evals.push({icon:'学术',source:'百家讲坛',type:'学术',text:`"${emp.name}是中国历史上${emp.score>=8?'极为重要':'颇具争议'}的一位帝王..."——学者评价摘录`,rating:Math.round(emp.score/2)});
   
   // TV/Film
   const filmTexts = {
@@ -250,7 +249,7 @@ function generateEvaluations(emp) {
     mid: `影视作品中${emp.name}的形象较为复杂，既有正面刻画也有反面描写，反映出其历史评价的分歧。`,
     low: `在影视改编中，${emp.name}多以负面形象出现，是历史剧中典型的反面教材。`
   };
-  evals.push({icon:'🎬',source:'影视作品',type:'影视',text:filmTexts[text],rating:Math.round(emp.score/2)});
+  evals.push({icon:'影视',source:'影视作品',type:'影视',text:filmTexts[text],rating:Math.round(emp.score/2)});
   
   // Popular
   const popularTexts = {
@@ -258,7 +257,7 @@ function generateEvaluations(emp) {
     mid: `民间对${emp.name}的评价褒贬不一，有人欣赏其功业，有人批评其手段。`,
     low: `民间口碑不佳，常被视为失败的统治者，相关的民间故事多以批判为主。`
   };
-  evals.push({icon:'📚',source:'通俗读物',type:'通俗',text:popularTexts[text],rating:Math.round(emp.score/2)});
+  evals.push({icon:'通俗',source:'通俗读物',type:'通俗',text:popularTexts[text],rating:Math.round(emp.score/2)});
   
   // Online
   const onlineTexts = {
@@ -266,7 +265,7 @@ function generateEvaluations(emp) {
     mid: `网络社区对${emp.name}的讨论较为热烈，观点两极分化，争论不休。`,
     low: `网络上对${emp.name}的评价普遍负面，经常出现在"最差帝王"的讨论中。`
   };
-  evals.push({icon:'🗣️',source:'网络社区',type:'民间',text:onlineTexts[text],rating:Math.round(emp.score/2)});
+  evals.push({icon:'民间',source:'网络社区',type:'民间',text:onlineTexts[text],rating:Math.round(emp.score/2)});
   
   return evals;
 }
@@ -288,10 +287,10 @@ function generateAchievements(emp) {
   
   const pool = emp.score >= 6 ? highAchs : lowAchs;
   return [
-    {category:'⚔️ 军事',detail:pool.military[emp.id.length % pool.military.length]},
-    {category:'💰 经济',detail:pool.economy[emp.id.length % pool.economy.length]},
-    {category:'📚 文化',detail:pool.culture[emp.id.length % pool.culture.length]},
-    {category:'🏛️ 吏治',detail:pool.governance[emp.id.length % pool.governance.length]},
+    {category:'军事',detail:pool.military[emp.id.length % pool.military.length]},
+    {category:'经济',detail:pool.economy[emp.id.length % pool.economy.length]},
+    {category:'文化',detail:pool.culture[emp.id.length % pool.culture.length]},
+    {category:'吏治',detail:pool.governance[emp.id.length % pool.governance.length]},
   ];
 }
 </script>

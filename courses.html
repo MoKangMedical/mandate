@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>课程体系 — Mandate 帝王学</title>
-<meta name="description" content="Mandate 交互式课程体系：100门帝王学课程·逐课解锁·每课含随堂测验和AI帝王对话。">
+<meta name="description" content="Mandate 交互式课程体系：100门帝王学课程，每课含正文、音频和随堂测验。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -172,6 +172,7 @@ h3{font-size:1.15rem;font-weight:600}
 .audio-player{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px;transition:border-color .3s}
 .audio-player:hover{border-color:rgba(226,182,79,0.2)}
 .audio-label{font-size:0.78rem;color:var(--text3);margin-bottom:2px}
+.audio-mark{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:28px;padding:0 10px;border:1px solid rgba(226,182,79,0.35);border-radius:6px;color:var(--gold);font-size:0.75rem;font-weight:700;letter-spacing:0.08em}
 .audio-player audio{width:100%}/* QUIZ */
 .quiz-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:24px}
 .quiz-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
@@ -263,12 +264,12 @@ h3{font-size:1.15rem;font-weight:600}
 <!-- HERO (Kangbo Style) -->
 <div class="hero">
   <div class="hero-badge"><span class="dot"></span> 交互式学习系统</div>
-  <h1>逐课解锁，<span class="gold">测验通过</span>才能继续</h1>
-  <p>完成每课测验后解锁下一课。答对60%即通过，可反复作答。全部通过获得「帝王学分析师」认证。</p>
+  <h1>百门帝王学课程，<span class="gold">自由研读</span></h1>
+  <p>每门课程包含正文、音频和随堂测验。可按主题进入，也可按历史顺序系统学习。</p>
   
   <div class="stats-bar">
     <div class="stat-item"><div class="stat-num" id="statCompleted">0</div><div class="stat-label">已完成</div></div>
-    <div class="stat-item"><div class="stat-num" id="statTotal">94</div><div class="stat-label">总课程</div></div>
+    <div class="stat-item"><div class="stat-num" id="statTotal">100</div><div class="stat-label">总课程</div></div>
     <div class="stat-item"><div class="stat-num" id="statScore">0</div><div class="stat-label">答对题数</div></div>
     <div class="stat-item"><div class="stat-num" id="statStreak">0</div><div class="stat-label">连续通过</div></div>
   </div>
@@ -396,7 +397,7 @@ function renderGrid(moduleFilter) {
   }
   
   if (!courses.length) {
-    grid.innerHTML = '<div class="empty-state"><div class="icon">📚</div><p>该模块暂无课程</p></div>';
+    grid.innerHTML = '<div class="empty-state"><p>该模块暂无课程</p></div>';
     return;
   }
   
@@ -408,7 +409,7 @@ function renderGrid(moduleFilter) {
     else if (completed) cardClass += ' completed';
     
     let statusText = '';
-    if (completed) statusText = '✓ 已完成';
+    if (completed) statusText = '已完成';
     else if (isCurrent) statusText = '进行中';
     
     const tags = (c.tags||[]).map(t => {
@@ -457,16 +458,16 @@ function openDetail(cid) {
           ${(course.tags||[]).map(t => `<span class="course-tag ${t.includes('核心')||t.includes('入门')?'core':t.includes('分钟')?'time':''}">${t}</span>`).join('')}
         </div>
       </div>
-      <button class="course-detail-close" onclick="closeDetail()">✕</button>
+      <button class="course-detail-close" onclick="closeDetail()">×</button>
     </div>
     <div class="course-detail-body">
       <div class="audio-player">
         <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:1.4rem">🎙️</span>
+          <span class="audio-mark">音频</span>
           <div style="flex:1;min-width:0">
             <div class="audio-label">课程音频 · 温暖浑厚男声</div>
-            <audio controls preload="none" style="width:100%;height:32px;filter:sepia(100%) saturate(300%) hue-rotate(350deg)">
-              <source src="audio/lesson${course.id}.mp3" type="audio/mpeg">
+            <audio controls preload="metadata" src="audio/lesson${course.id}.mp3" style="width:100%;height:32px;filter:sepia(100%) saturate(300%) hue-rotate(350deg)">
+              当前浏览器不支持音频播放。
             </audio>
           </div>
         </div>
@@ -520,10 +521,10 @@ function renderQuiz(course) {
     if (!state.completed.includes(course.id)) {
       return `<div class="quiz-section" style="text-align:center">
         <p style="color:var(--text2);margin-bottom:16px">本课程为阅读材料，无测验。</p>
-        <button class="btn btn-primary" onclick="markComplete(${course.id})">✓ 标记为已完成</button>
+        <button class="btn btn-primary" onclick="markComplete(${course.id})">标记为已完成</button>
       </div>`;
     }
-    return '<div class="quiz-section" style="text-align:center"><p style="color:var(--green)">✓ 已完成</p></div>';
+    return '<div class="quiz-section" style="text-align:center"><p style="color:var(--green)">已完成</p></div>';
   }
   
   const answers = quizAnswers[course.id] || {};
@@ -531,7 +532,7 @@ function renderQuiz(course) {
   const passed = state.completed.includes(course.id);
   
   let html = '<div class="quiz-section">';
-  html += '<div class="quiz-header"><h3>📝 随堂测验</h3><span class="badge">' + course.quiz.length + '题</span></div>';
+  html += '<div class="quiz-header"><h3>随堂测验</h3><span class="badge">' + course.quiz.length + '题</span></div>';
   
   course.quiz.forEach((q, qi) => {
     const answered = answers[qi] !== undefined;
@@ -573,7 +574,7 @@ function renderQuiz(course) {
   if (passed) {
     html += `<div class="quiz-footer">
       <div class="quiz-score">得分：<span class="num">${score.correct}/${score.total}</span> (${Math.round(score.correct/score.total*100)}%)</div>
-      <button class="btn btn-secondary" onclick="retakeQuiz(${course.id})">🔄 重新作答</button>
+      <button class="btn btn-secondary" onclick="retakeQuiz(${course.id})">重新作答</button>
     </div>`;
   } else {
     const answeredCount = Object.keys(answers).length;
@@ -708,18 +709,18 @@ function toggleAudio(cid) {
     if (audioState.paused) {
       window.speechSynthesis.resume();
       audioState.paused = false;
-      if (btn) { btn.className = 'audio-btn playing'; btn.innerHTML = '⏸ 暂停'; }
+      if (btn) { btn.className = 'audio-btn playing'; btn.innerHTML = '暂停'; }
     } else {
       window.speechSynthesis.pause();
       audioState.paused = true;
-      if (btn) { btn.className = 'audio-btn paused'; btn.innerHTML = '▶ 继续'; }
+      if (btn) { btn.className = 'audio-btn paused'; btn.innerHTML = '继续'; }
     }
     return;
   }
   window.speechSynthesis.cancel();
   if (audioState.currentId) {
     const oldBtn = document.getElementById('audioBtn-' + audioState.currentId);
-    if (oldBtn) { oldBtn.className = 'audio-btn'; oldBtn.innerHTML = '🔊 朗读'; }
+    if (oldBtn) { oldBtn.className = 'audio-btn'; oldBtn.innerHTML = '朗读'; }
   }
   const course = allCourses.find(c => c.id === cid);
   if (!course || !course.content || !window.speechSynthesis) return;
@@ -729,15 +730,15 @@ function toggleAudio(cid) {
   utterance.rate = 0.9;
   utterance.onend = () => {
     audioState = { currentId: null, utterance: null, paused: false };
-    if (btn) { btn.className = 'audio-btn'; btn.innerHTML = '🔊 朗读'; }
+    if (btn) { btn.className = 'audio-btn'; btn.innerHTML = '朗读'; }
   };
   utterance.onerror = () => {
     audioState = { currentId: null, utterance: null, paused: false };
-    if (btn) { btn.className = 'audio-btn'; btn.innerHTML = '🔊 朗读'; }
+    if (btn) { btn.className = 'audio-btn'; btn.innerHTML = '朗读'; }
   };
   audioState = { currentId: cid, utterance, paused: false };
   window.speechSynthesis.speak(utterance);
-  if (btn) { btn.className = 'audio-btn playing'; btn.innerHTML = '⏸ 暂停'; }
+  if (btn) { btn.className = 'audio-btn playing'; btn.innerHTML = '暂停'; }
 }
 
 /* ═══════════════ INIT ═══════════════ */
@@ -759,11 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function openDetailDirect(cid) {
   const course = allCourses.find(c => c.id === cid);
   if (!course) return;
-  activeDetail = cid;
-  quizAnswers = {};
-  document.getElementById('detailOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  renderDetail(course);
+  openDetail(cid);
 }
 
 // Keyboard shortcuts
