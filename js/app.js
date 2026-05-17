@@ -101,19 +101,19 @@ function renderEmperors() {
   
   if(filtered.length === 0) {
     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text3)">
-      <p style="font-size:1.2rem;margin-bottom:8px">🔍 未找到匹配的帝王</p>
+      <p style="font-size:1.2rem;margin-bottom:8px">未找到匹配的帝王</p>
       <p style="font-size:0.9rem">试试其他关键词或朝代</p>
     </div>`;
     return;
   }
   
   grid.innerHTML = filtered.map(e => {
-    const starsHtml = '★'.repeat(Math.floor(e.stars)) + (e.stars%1>=0.5?'☆':'');
+    const starsHtml = `${e.stars.toFixed(1)}/5`;
     const hasAvatar = AVATAR_SPOTLIGHT.includes(e.id);
     return `
     <div class="emperor-card" onclick="goToEmperor('${e.id}')">
       <div class="card-top">
-        <div class="portrait">👑</div>
+        <div class="portrait">帝</div>
         <div class="rating">
           <div class="stars">${starsHtml}</div>
           <div class="score">${e.score}/10</div>
@@ -132,7 +132,7 @@ function renderEmperors() {
       <div class="tags">
         ${e.tags.slice(0,3).map(t=>`<span class="tag${hasAvatar?' gold':''}">${t}</span>`).join('')}
       </div>
-      ${hasAvatar ? `<div class="chat-badge">💬 AI对话</div>` : ''}
+      ${hasAvatar ? `<div class="chat-badge">AI对话</div>` : ''}
     </div>`;
   }).join('');
 }
@@ -161,7 +161,7 @@ function renderAvatarGrid() {
     if(!e) return '';
     return `
     <div class="avatar-card" onclick="openChat('${e.id}')">
-      <div class="avatar-icon">👑</div>
+      <div class="avatar-icon">帝</div>
       <h3>${e.name}</h3>
       <div class="avatar-dynasty">${getDynastyName(e.dynasty)} · ${e.reign}</div>
       <div class="avatar-quote">「${e.avatar.quote}」</div>

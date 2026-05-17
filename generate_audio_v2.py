@@ -305,35 +305,31 @@ def audit_audio(filepath: str) -> dict:
 # Course Extraction
 # ═══════════════════════════════════════════════════════════════
 def extract_courses(filepath: str) -> list:
-    """Extract (id, title, content) from courses-data.js."""
+    """Extract (id, title, content) from a JS/HTML file containing course objects."""
     with open(filepath, "r") as f:
         raw = f.read()
 
-    # Find all course objects
     courses = []
-    # Split by "id: N," pattern
-    pattern = re.compile(r'id:\s*(\d+),\s*\n\s*title:\s*[\'"](.+?)[\'"],\s*\n.*?content:\s*`', re.DOTALL)
-    
-    # Simpler approach: find content blocks
-    segs = raw.split('content: `')
-    for i, seg in enumerate(segs[1:], start=1):  # First split is before first content
-        close = seg.find('`,\n')  # End of template literal
+    content_markers = list(re.finditer(r'content\s*:\s*`', raw))
+    for marker in content_markers:
+        start = marker.end()
+        close = raw.find('`,', start)
         if close < 0:
-            close = seg.find('`,\\n')  # Escaped newline variant
-        if close < 0:
-            close = seg.find('`\n')
+            close = raw.find('`\n', start)
         if close < 0:
             continue
-        content_raw = seg[:close]
+        content_raw = raw[start:close]
         content = content_raw.replace('\\n', '\n')
 
         # Find course id and title from the segment before this content
-        # The id is at the start of course objects
-        before = raw.split('content: `')[i-1] if i > 0 else ""
-        id_match = re.search(r'id:\s*(\d+)', before)
-        title_match = re.search(r"title:\s*'([^']+)'", before)
+        before = raw[:marker.start()]
+        id_matches = list(re.finditer(r'id\s*:\s*(\d+)', before))
+        id_match = id_matches[-1] if id_matches else None
+        title_matches = list(re.finditer(r"title\s*:\s*'([^']+)'", before))
+        title_match = title_matches[-1] if title_matches else None
         if not title_match:
-            title_match = re.search(r'title:\s*"([^"]+)"', before)
+            title_matches = list(re.finditer(r'title\s*:\s*"([^"]+)"', before))
+            title_match = title_matches[-1] if title_matches else None
 
         if id_match:
             cid = int(id_match.group(1))
@@ -341,6 +337,22 @@ def extract_courses(filepath: str) -> list:
             courses.append((cid, title, content))
 
     return courses
+
+
+def extract_all_courses() -> list:
+    """Extract inline overview courses and extended course data."""
+    courses = []
+    if os.path.exists("courses.html"):
+        courses.extend(c for c in extract_courses("courses.html") if c[0] <= 6)
+    courses.extend(extract_courses("js/courses-data.js"))
+    seen = set()
+    unique = []
+    for cid, title, content in sorted(courses, key=lambda item: item[0]):
+        if cid in seen:
+            continue
+        seen.add(cid)
+        unique.append((cid, title, content))
+    return unique
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -397,13 +409,13 @@ def main():
     os.makedirs(AUDIO_DIR, exist_ok=True)
 
     # Extract courses
-    courses = extract_courses("js/courses-data.js")
-    print(f"📚 Extracted {len(courses)} courses from courses-data.js")
+    courses = extract_all_courses()
+    print(f"Extracted {len(courses)} courses")
 
     if args.courses:
         target_ids = {int(x) for x in args.courses.split(",")}
         courses = [(cid, t, c) for cid, t, c in courses if cid in target_ids]
-        print(f"🎯 Filtered to {len(courses)} courses: {sorted(target_ids)}")
+        print(f"Filtered to {len(courses)} courses: {sorted(target_ids)}")
 
     if args.dry_run:
         for cid, title, content in courses:
@@ -411,9 +423,9 @@ def main():
             print(f"  #{cid}: {title} ({cn} cn chars)")
         return
 
-    print(f"🎙️  Voice: {VOICE} | Rate: {RATE} | Pitch: {PITCH}")
-    print(f"🔊 Loudnorm: I=-16:TP=-1.5:LRA=9 | {24000}Hz mono {BITRATE}")
-    print(f"⚡ Workers: {MAX_WORKERS} | Force: {args.force}")
+    print(f"Voice: {VOICE} | Rate: {RATE} | Pitch: {PITCH}")
+    print(f"Loudnorm: I=-16:TP=-1.5:LRA=9 | {24000}Hz mono {BITRATE}")
+    print(f"Workers: {MAX_WORKERS} | Force: {args.force}")
     print(f"{'─'*60}")
 
     start_time = time.time()
@@ -447,13 +459,13 @@ def main():
 
     elapsed = time.time() - start_time
     print(f"\n{'═'*60}")
-    print(f"✅ Done in {elapsed:.0f}s")
+    print(f"Done in {elapsed:.0f}s")
     print(f"   A-grade: {completed['A']} | B-grade: {completed['B']} | C-grade: {completed['C']}")
     print(f"   Skipped: {completed['skipped']} | Failed: {completed['failed']}")
 
     # Full audit at end if any files were generated
     if completed["A"] + completed["B"] + completed["C"] > 0:
-        print(f"\n📋 Running full audit...")
+        print(f"\nRunning full audit...")
         time.sleep(1)
         audit_results = {}
         for cid, title, _ in courses:
