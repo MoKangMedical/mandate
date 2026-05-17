@@ -47,6 +47,10 @@ a{color:inherit;text-decoration:none}
 .topic-input:focus{outline:none;border-color:var(--gold)}
 .topic-input::placeholder{color:var(--text3)}
 .topic-hint{font-size:0.75rem;color:var(--text3);margin-top:8px}
+.api-panel{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.api-input{flex:1;min-width:220px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text2);font-size:0.78rem}
+.api-input:focus{outline:none;border-color:var(--gold);color:var(--text)}
+.api-status{font-size:0.75rem;color:var(--text3)}
 
 /* EMPEROR SELECT */
 .emperor-select{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;max-height:200px;overflow-y:auto;padding:8px 0}
@@ -87,6 +91,11 @@ a{color:inherit;text-decoration:none}
 .chat-text{background:var(--card);border:1px solid var(--border);border-radius:0 var(--radius) var(--radius) var(--radius);padding:14px 18px;color:var(--text2);font-size:0.92rem;line-height:1.8}
 .chat-text p{margin:0}
 .chat-msg:nth-child(odd) .chat-text{background:var(--card2);border-color:rgba(226,182,79,0.08)}
+.chat-msg.user{justify-content:flex-end}
+.chat-msg.user .chat-bubble{max-width:78%;flex:0 1 auto}
+.chat-msg.user .chat-name{justify-content:flex-end;color:var(--text2);font-family:var(--sans)}
+.chat-msg.user .chat-text{border-radius:var(--radius) 0 var(--radius) var(--radius);background:rgba(226,182,79,0.1);border-color:rgba(226,182,79,0.18);color:var(--text)}
+.chat-msg.user .chat-avatar{display:none}
 
 /* LOADING */
 .loading-msg{display:flex;align-items:center;gap:10px;padding:16px;color:var(--text3);font-size:0.85rem}
@@ -143,8 +152,13 @@ a{color:inherit;text-decoration:none}
 
   <!-- TOPIC INPUT -->
   <div class="topic-area">
-    <textarea class="topic-input" id="topicInput" placeholder="输入话题，开启帝王群聊...&#10;例如：「如果秦始皇遇到ChatGPT」「做皇帝最重要的是什么」「最好的治国之道」" rows="2"></textarea>
-    <div class="topic-hint">输入话题后选择参与的帝王，或让AI自动匹配最合适的帝王参与讨论</div>
+    <textarea class="topic-input" id="topicInput" placeholder="先输入一个问题或话题，例如：如何治理一个长期复杂的组织" rows="2"></textarea>
+    <div class="topic-hint">用户每发一条，DeepSeek 会选择一位帝王回应；也可以让帝王之间继续交锋。</div>
+    <div class="api-panel">
+      <input class="api-input" id="apiInput" placeholder="DeepSeek 后端地址，例如 http://localhost:8003">
+      <button class="btn btn-secondary" onclick="saveApiBase()">连接后端</button>
+      <span class="api-status" id="apiStatus"></span>
+    </div>
   </div>
 
   <!-- EMPEROR SELECT -->
@@ -152,8 +166,8 @@ a{color:inherit;text-decoration:none}
 
   <!-- ACTIONS -->
   <div class="actions">
-    <button class="btn btn-primary" id="startBtn" onclick="startChat()">开启群聊</button>
-    <button class="btn btn-secondary" id="continueBtn" onclick="continueChat()" style="display:none">继续讨论</button>
+    <button class="btn btn-primary" id="startBtn" onclick="sendUserTurn()">发送给帝王</button>
+    <button class="btn btn-secondary" id="continueBtn" onclick="continueChat()" style="display:none">帝王继续交锋</button>
     <button class="btn btn-red" id="autoBtn" onclick="autoChat()">AI自动匹配帝王</button>
     <button class="btn btn-secondary" onclick="clearChat()">清空</button>
   </div>
@@ -173,42 +187,20 @@ a{color:inherit;text-decoration:none}
 </footer>
 
 <script>
-const API_BASE = window.MANDATE_CHAT_API || (
+let API_BASE = window.MANDATE_CHAT_API || localStorage.getItem('mandate_chat_api') || (
   ['localhost', '127.0.0.1'].includes(location.hostname) ? 'http://localhost:8003' : ''
 );
 let allEmperors = [];
 let selectedEmperors = new Set();
 let chatHistory = [];
+let activeParticipants = [];
+let conversationTopic = '';
+let isRequesting = false;
 
 const AVATARS = ['秦','汉','唐','宋','元','明','清','魏','晋','隋','周','楚','赵','燕','齐','梁','陈','辽','金','帝'];
 const LOCAL_EMPERORS = [
   '秦始皇','刘邦','项羽','汉武帝','曹操','刘备','诸葛亮','孙权','唐太宗','武则天','唐玄宗','宋太祖','王安石','苏轼','成吉思汗','忽必烈','朱元璋','朱棣','康熙','雍正','乾隆','慈禧','孙中山'
 ];
-const LOCAL_VOICES = {
-  '秦始皇': '朕看此事，关键在统一号令。天下之事，最怕各行其是；制度一乱，再好的器物也会变成纷争之源。',
-  '刘邦': '我看没那么玄。事情能不能成，先看人心，再看用人。会用人，粗茶淡饭也能打天下；不会用人，金山银山也守不住。',
-  '项羽': '若只谈算计，未免少了气魄。大事当前，须有人敢冲在最前。只是我也承认，勇力若不能收束成法度，终究难久。',
-  '汉武帝': '此题要从战略看。眼前得失不算最大，真正重要的是十年、二十年后的格局。敢不敢投入，决定能不能开疆拓土。',
-  '曹操': '我更关心实际成效。名声、口号、姿态都可以放一边，能解决问题的人就用，能降低成本的法子就试。',
-  '刘备': '成事不能只靠威势。人若不服，表面听命，心里未必归附。仁义不是软弱，而是让人愿意跟你走到最后。',
-  '诸葛亮': '此事当分三层看：其一是目标，其二是资源，其三是执行。若三者不能相配，越勤奋越可能把局势推向失衡。',
-  '孙权': '我赞成先守住基本盘。局面复杂时，不必急着争一时胜负，先稳住人、财、地，再寻找可以出手的窗口。',
-  '唐太宗': '为政最忌自以为是。若能让不同意见进来，君主才不至于困在自己的判断里。以人为镜，正是为了少犯大错。',
-  '武则天': '我看重的是能力和秩序。世俗成见常常把人挡在门外，但权力只问结果。谁能办事，谁就该站到台前。',
-  '唐玄宗': '盛世最容易让人误判。人在顺境里会以为一切都稳固，其实危机常在繁华处发芽。此事不可只看表面光彩。',
-  '宋太祖': '最好的办法，是把风险写进制度里。不要指望人人都忠诚，也不要逼人人都恐惧。让人没有必要造反，才是长久之计。',
-  '王安石': '若问题已经积重难返，只靠修修补补是不够的。改革必然触动利益，若怕反对声，就永远只能守着旧病。',
-  '苏轼': '诸位说得都重。我倒觉得，人也要留一点从容。制度要紧，成败要紧，但若失去通达之心，胜了也未必安稳。',
-  '成吉思汗': '草原上判断很简单：能不能行动，能不能取胜，能不能让部众活下去。空谈太多，会错过最好的时机。',
-  '忽必烈': '我更愿意兼收并用。不同制度、不同文化，各有可取之处。能把马背上的力量和农耕的秩序合起来，才是大格局。',
-  '朱元璋': '我出身贫苦，最知道底下人怕什么。官府若只顾上头体面，不管百姓死活，迟早要出大乱子。',
-  '朱棣': '天下不是守出来的。该迁都就迁都，该远航就远航，该用兵就用兵。权力若没有进取心，很快就会被人逼到墙角。',
-  '康熙': '凡事不可偏激。既要有决断，也要有耐心；既要学新法，也不能轻弃根本。治理大国，贵在持久而不躁。',
-  '雍正': '空话少说，账要算清，责任要压实。许多坏事不是没人知道，而是无人愿意承担执行的骂名。',
-  '乾隆': '朕以为，气象也很重要。国家要有体面，制度要有章法，文化要能凝聚人心。只是自满二字，确实不可不防。',
-  '慈禧': '权力场里，活下来本身就是本事。理想可以讲，但各方势力如何平衡，谁能被安抚，谁必须被压住，这些才是每日功课。',
-  '孙中山': '我最关心的是天下是否为公。若制度只服务少数人，再强也不是长久之道。真正的新局面，要让普通人也有位置。'
-};
 
 const SUGGESTIONS = [
   "做皇帝最重要的是什么？",
@@ -225,6 +217,7 @@ const SUGGESTIONS = [
 
 // Load emperors
 async function loadEmperors() {
+  initApiPanel();
   if (!API_BASE) {
     loadLocalEmperors();
     return;
@@ -242,9 +235,30 @@ async function loadEmperors() {
 }
 
 async function loadLocalEmperors() {
-  allEmperors = LOCAL_EMPERORS.map(n => ({name: n, preview: LOCAL_VOICES[n] || ''}));
+  allEmperors = LOCAL_EMPERORS.map(n => ({name: n, preview: ''}));
   renderEmperorChips();
   renderSuggestions();
+}
+
+function initApiPanel() {
+  const input = document.getElementById('apiInput');
+  if (input) input.value = API_BASE || '';
+  updateApiStatus();
+}
+
+function saveApiBase() {
+  const input = document.getElementById('apiInput');
+  API_BASE = (input?.value || '').trim().replace(/\/$/, '');
+  if (API_BASE) localStorage.setItem('mandate_chat_api', API_BASE);
+  else localStorage.removeItem('mandate_chat_api');
+  updateApiStatus();
+  loadEmperors();
+}
+
+function updateApiStatus(text) {
+  const el = document.getElementById('apiStatus');
+  if (!el) return;
+  el.textContent = text || (API_BASE ? `已连接：${API_BASE}` : '需要连接 DeepSeek 后端后才能对话');
 }
 
 function renderEmperorChips() {
@@ -262,7 +276,7 @@ function renderEmperorChips() {
 
 function renderSuggestions() {
   document.getElementById('suggestions').innerHTML = SUGGESTIONS.map(s =>
-    `<span class="sug-chip" onclick="document.getElementById('topicInput').value='${s}';startChat()">${s}</span>`
+    `<span class="sug-chip" onclick="document.getElementById('topicInput').value='${s}';sendUserTurn()">${s}</span>`
   ).join('');
 }
 
@@ -286,98 +300,57 @@ function getAvatar(name) {
   return AVATARS[Math.abs(hash) % AVATARS.length];
 }
 
-async function startChat() {
-  const topic = document.getElementById('topicInput').value.trim();
-  if (!topic) {
-    document.getElementById('topicInput').focus();
+function getParticipants() {
+  if (selectedEmperors.size > 0) return [...selectedEmperors];
+  return ['秦始皇','刘邦','唐太宗','康熙','曹操'];
+}
+
+function escapeHTML(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function sendUserTurn() {
+  const input = document.getElementById('topicInput');
+  const message = input.value.trim();
+  if (!message) {
+    input.focus();
     return;
   }
-
-  const participants = selectedEmperors.size > 0 ? [...selectedEmperors] : ['秦始皇','刘邦','唐太宗','康熙','曹操'];
-  
-  const area = document.getElementById('chatArea');
-  area.innerHTML = `<div class="loading-msg"><div class="loading-dots"><span></span><span></span><span></span></div> 帝王们正在思考「${topic.substring(0,30)}」...</div>`;
-  
-  document.getElementById('startBtn').disabled = true;
-  document.getElementById('autoBtn').disabled = true;
-
-  try {
-    if (!API_BASE) throw new Error('local fallback');
-    const resp = await fetch(`${API_BASE}/api/chat`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        topic: topic,
-        participants: participants,
-        max_responses: participants.length > 8 ? 8 : participants.length,
-        history: chatHistory
-      })
-    });
-
-    if (!resp.ok) {
-      const err = await resp.json();
-      throw new Error(err.detail || 'Chat failed');
-    }
-
-    const data = await resp.json();
-    renderMessages(data.messages, data.participants);
-  } catch(e) {
-    const messages = generateLocalMessages(topic, participants, participants.length > 8 ? 8 : participants.length);
-    renderMessages(messages, participants);
+  if (!API_BASE) {
+    showSystemNotice('请先填写 DeepSeek 后端地址。前端不会保存或暴露 DeepSeek API Key。');
+    return;
   }
-
-  document.getElementById('startBtn').disabled = false;
-  document.getElementById('autoBtn').disabled = false;
+  if (!conversationTopic) conversationTopic = message;
+  activeParticipants = getParticipants();
+  input.value = '';
+  appendMessage({role: 'user', message});
+  await requestEmperorTurn('reply_to_user');
 }
 
 async function continueChat() {
-  const topic = document.getElementById('topicInput').value.trim() || '请继续讨论';
-  const participants = selectedEmperors.size > 0 ? [...selectedEmperors] : [];
-  
-  const area = document.getElementById('chatArea');
-  const loadingDiv = document.createElement('div');
-  loadingDiv.className = 'loading-msg';
-  loadingDiv.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> 帝王们正在继续讨论...';
-  area.appendChild(loadingDiv);
-  loadingDiv.scrollIntoView({behavior:'smooth'});
-
-  document.getElementById('continueBtn').disabled = true;
-
-  try {
-    if (!API_BASE) throw new Error('local fallback');
-    const resp = await fetch(`${API_BASE}/api/chat`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        topic: topic,
-        participants: participants.length > 0 ? participants : ['all'],
-        max_responses: 5,
-        history: chatHistory
-      })
-    });
-
-    loadingDiv.remove();
-
-    if (!resp.ok) throw new Error('Chat failed');
-    const data = await resp.json();
-    appendMessages(data.messages);
-  } catch(e) {
-    loadingDiv.remove();
-    const fallbackParticipants = participants.length > 0 ? participants : ['秦始皇','刘邦','唐太宗','康熙','曹操'];
-    appendMessages(generateLocalMessages(topic, fallbackParticipants, 5, chatHistory.length));
+  if (!chatHistory.length) {
+    showSystemNotice('请先发送一个问题。');
+    return;
   }
-
-  document.getElementById('continueBtn').disabled = false;
+  if (!API_BASE) {
+    showSystemNotice('请先填写 DeepSeek 后端地址。');
+    return;
+  }
+  if (!activeParticipants.length) activeParticipants = getParticipants();
+  await requestEmperorTurn('emperor_to_emperor');
 }
 
 async function autoChat() {
-  // Auto-select emperors and start
   const topic = document.getElementById('topicInput').value.trim() || SUGGESTIONS[Math.floor(Math.random()*SUGGESTIONS.length)];
   document.getElementById('topicInput').value = topic;
   selectedEmperors.clear();
   document.querySelectorAll('.emp-chip').forEach(c => c.classList.remove('selected','auto-selected'));
   
-  // Select a random diverse group
   const names = allEmperors.map(e => e.name).filter((v,i,a) => a.indexOf(v)===i);
   const shuffled = names.sort(() => Math.random() - 0.5);
   const autoPick = shuffled.slice(0, 5);
@@ -387,63 +360,113 @@ async function autoChat() {
     if (autoPick.includes(c.dataset.name)) c.classList.add('auto-selected');
   });
 
-  setTimeout(() => startChat(), 300);
+  setTimeout(() => sendUserTurn(), 300);
 }
 
-function renderMessages(messages, participants) {
+async function requestEmperorTurn(mode) {
+  if (isRequesting) return;
+  isRequesting = true;
+  setButtonsDisabled(true);
+  const loadingDiv = appendLoading(mode === 'reply_to_user' ? 'DeepSeek 正在选择帝王回应...' : 'DeepSeek 正在生成下一位帝王发言...');
+  try {
+    const resp = await fetch(`${API_BASE}/api/turn`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        topic: conversationTopic,
+        participants: activeParticipants,
+        history: chatHistory,
+        mode
+      })
+    });
+    loadingDiv.remove();
+    if (!resp.ok) {
+      let detail = 'DeepSeek 后端请求失败';
+      try {
+        const err = await resp.json();
+        detail = err.detail || detail;
+      } catch (_) {}
+      throw new Error(detail);
+    }
+    const data = await resp.json();
+    appendMessage(data.message);
+    document.getElementById('continueBtn').style.display = 'inline-flex';
+    updateApiStatus('DeepSeek 已完成本轮回应');
+  } catch (e) {
+    loadingDiv.remove();
+    showSystemNotice(e.message || 'DeepSeek 后端暂不可用');
+  } finally {
+    setButtonsDisabled(false);
+    isRequesting = false;
+  }
+}
+
+function appendMessage(message) {
   const area = document.getElementById('chatArea');
-  chatHistory = messages;
-  
-  area.innerHTML = messages.map((m, i) => `
-    <div class="chat-msg" style="animation-delay:${i*0.1}s">
-      <div class="chat-avatar">${getAvatar(m.emperor)}</div>
-      <div class="chat-bubble">
-        <div class="chat-name">${m.emperor}</div>
-        <div class="chat-text"><p>${m.message}</p></div>
-      </div>
+  if (area.querySelector('.chat-empty')) area.innerHTML = '';
+  chatHistory.push(message);
+  const div = document.createElement('div');
+  const isUser = message.role === 'user';
+  div.className = `chat-msg${isUser ? ' user' : ''}`;
+  div.innerHTML = isUser ? `
+    <div class="chat-bubble">
+      <div class="chat-name">你</div>
+      <div class="chat-text"><p>${escapeHTML(message.message)}</p></div>
     </div>
-  `).join('');
-
-  document.getElementById('continueBtn').style.display = 'inline-flex';
-  area.lastElementChild?.scrollIntoView({behavior:'smooth'});
+  ` : `
+    <div class="chat-avatar">${escapeHTML(getAvatar(message.emperor))}</div>
+    <div class="chat-bubble">
+      <div class="chat-name">${escapeHTML(message.emperor)}</div>
+      <div class="chat-text"><p>${escapeHTML(message.message)}</p></div>
+    </div>
+  `;
+  area.appendChild(div);
+  div.scrollIntoView({behavior:'smooth'});
 }
 
-function generateLocalMessages(topic, participants, limit = 5, offset = 0) {
-  const cleanTopic = topic.length > 36 ? topic.slice(0, 36) + '...' : topic;
-  return participants.slice(0, Math.max(1, limit)).map((name, index) => {
-    const base = LOCAL_VOICES[name] || '此事不可只看一端。权力、制度、人心与时势交织在一起，判断越急，越容易失准。';
-    const lead = offset > 0
-      ? `接着「${cleanTopic}」这个话题，我补一句。`
-      : `谈到「${cleanTopic}」，`;
-    return {
-      emperor: name,
-      message: lead + base
-    };
-  });
-}
-
-function appendMessages(messages) {
+function appendLoading(text) {
   const area = document.getElementById('chatArea');
-  chatHistory = [...chatHistory, ...messages];
-  
-  messages.forEach((m, i) => {
-    const div = document.createElement('div');
-    div.className = 'chat-msg';
-    div.style.animationDelay = `${i*0.1}s`;
-    div.innerHTML = `
-      <div class="chat-avatar">${getAvatar(m.emperor)}</div>
-      <div class="chat-bubble">
-        <div class="chat-name">${m.emperor}</div>
-        <div class="chat-text"><p>${m.message}</p></div>
-      </div>
-    `;
-    area.appendChild(div);
-    div.scrollIntoView({behavior:'smooth'});
-  });
+  if (area.querySelector('.chat-empty')) area.innerHTML = '';
+  const div = document.createElement('div');
+  div.className = 'loading-msg';
+  div.innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div> ${escapeHTML(text)}`;
+  area.appendChild(div);
+  div.scrollIntoView({behavior:'smooth'});
+  return div;
+}
+
+function showSystemNotice(text) {
+  const area = document.getElementById('chatArea');
+  if (area.querySelector('.chat-empty')) area.innerHTML = '';
+  const div = document.createElement('div');
+  div.className = 'chat-empty';
+  div.innerHTML = `
+    <div class="icon">提示</div>
+    <h3>需要 DeepSeek 后端</h3>
+    <p>${escapeHTML(text)}</p>
+  `;
+  area.appendChild(div);
+  div.scrollIntoView({behavior:'smooth'});
+}
+
+function setButtonsDisabled(disabled) {
+  document.getElementById('startBtn').disabled = disabled;
+  document.getElementById('continueBtn').disabled = disabled;
+  document.getElementById('autoBtn').disabled = disabled;
+}
+
+function renderMessages(messages) {
+  const area = document.getElementById('chatArea');
+  area.innerHTML = '';
+  chatHistory = [];
+  messages.forEach(appendMessage);
+  document.getElementById('continueBtn').style.display = chatHistory.length ? 'inline-flex' : 'none';
 }
 
 function clearChat() {
   chatHistory = [];
+  activeParticipants = [];
+  conversationTopic = '';
   document.getElementById('chatArea').innerHTML = `
     <div class="chat-empty">
       <div class="icon">Mandate</div>
@@ -458,7 +481,7 @@ function clearChat() {
 document.getElementById('topicInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
-    startChat();
+    sendUserTurn();
   }
 });
 

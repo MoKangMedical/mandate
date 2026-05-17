@@ -89,6 +89,16 @@ class ChatResponse(BaseModel):
     messages: list[dict]
     participants: list[str]
 
+class TurnRequest(BaseModel):
+    topic: str = ""
+    participants: Optional[list[str]] = None
+    history: Optional[list[dict]] = None
+    mode: str = "reply_to_user"
+
+class TurnResponse(BaseModel):
+    message: dict
+    participants: list[str]
+
 @app.post("/api/chat")
 async def group_chat(req: ChatRequest):
     """Generate a multi-emperor conversation on a given topic."""
@@ -184,6 +194,139 @@ def local_chat_response(topic: str, participants: list[str], max_responses: int)
         base = LOCAL_RESPONSES.get(name, "此事不可只看一端。权力、制度、人心与时势交织在一起，判断越急，越容易失准。")
         messages.append({"emperor": name, "message": f"谈到「{clean_topic}」，{base}"})
     return ChatResponse(messages=messages, participants=participants[:10])
+
+@app.post("/api/turn")
+async def dialogue_turn(req: TurnRequest):
+    """Generate one DeepSeek-powered dialogue turn."""
+    participants = resolve_participants(req.participants)
+    speaker = choose_next_speaker(participants, req.history or [], req.mode)
+
+    if not DEEPSEEK_API_KEY:
+        raise HTTPException(503, "DeepSeek API key not configured on chat backend")
+
+    prompt = build_turn_prompt(
+        topic=req.topic,
+        participants=participants,
+        history=req.history or [],
+        speaker=speaker,
+        mode=req.mode,
+    )
+
+    try:
+        content = await call_deepseek(prompt, max_tokens=700, temperature=0.85)
+        message = parse_turn_response(content, speaker)
+        return TurnResponse(message=message, participants=participants)
+    except Exception as e:
+        raise HTTPException(502, f"DeepSeek turn generation failed: {str(e)[:200]}")
+
+
+def resolve_participants(participants: Optional[list[str]]) -> list[str]:
+    if participants and participants[0] == "all":
+        selected = list(EMPEROR_PROFILES.keys())
+    elif participants:
+        selected = [p for p in participants if p in EMPEROR_PROFILES]
+    else:
+        selected = DEFAULT_PARTICIPANTS.copy()
+    if len(selected) < 2:
+        selected = DEFAULT_PARTICIPANTS.copy()
+    return selected[:10]
+
+
+def choose_next_speaker(participants: list[str], history: list[dict], mode: str) -> str:
+    emperor_turns = [m.get("emperor") for m in history if m.get("role") == "emperor" or m.get("emperor")]
+    if not emperor_turns:
+        return participants[0]
+    last = emperor_turns[-1]
+    try:
+        start = (participants.index(last) + 1) % len(participants)
+    except ValueError:
+        start = len(emperor_turns) % len(participants)
+    if mode == "reply_to_user":
+        recent = set(emperor_turns[-2:])
+        for i in range(len(participants)):
+            candidate = participants[(start + i) % len(participants)]
+            if candidate not in recent:
+                return candidate
+    return participants[start]
+
+
+def build_turn_prompt(topic: str, participants: list[str], history: list[dict], speaker: str, mode: str) -> str:
+    profiles_text = "\n".join(f"【{name}】{EMPEROR_PROFILES[name]}" for name in participants)
+    history_lines = []
+    for item in history[-14:]:
+        role = item.get("role")
+        if role == "user":
+            history_lines.append(f"【用户】{item.get('message', '')}")
+        else:
+            history_lines.append(f"【{item.get('emperor', '帝王')}】{item.get('message', '')}")
+    history_text = "\n".join(history_lines) or "（尚无对话）"
+    mode_text = "回应用户刚刚的问题，同时可以点名回应其他帝王观点。" if mode == "reply_to_user" else "接着上一位帝王的观点发言，可以赞同、反驳或补充。"
+
+    return f"""你是 Mandate 帝王群聊中的角色扮演引擎。你只生成一轮发言，不要一次生成整场对话。
+
+## 参与帝王
+{profiles_text}
+
+## 当前总话题
+{topic or "围绕当前对话继续讨论"}
+
+## 已有对话
+{history_text}
+
+## 本轮发言者
+{speaker}
+
+## 任务
+请只让【{speaker}】发言一轮。{mode_text}
+要求：
+1. 必须符合该帝王的历史身份、性格和语言气质。
+2. 要自然接住已有上下文，不要像独立作文。
+3. 发言控制在 80 到 180 个中文字符。
+4. 不要使用 emoji，不要使用网络烂梗。
+5. 只输出 JSON 对象，不要 Markdown，不要解释。
+
+输出格式：
+{{"emperor":"{speaker}","message":"..."}}
+"""
+
+
+async def call_deepseek(prompt: str, max_tokens: int, temperature: float) -> str:
+    async with httpx.AsyncClient(timeout=60) as client:
+        resp = await client.post(
+            f"{DEEPSEEK_BASE}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": MODEL,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            },
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data["choices"][0]["message"]["content"]
+
+
+def parse_turn_response(content: str, speaker: str) -> dict:
+    text = content.strip()
+    if text.startswith("```"):
+        text = re.sub(r'^```\w*\n', '', text)
+        text = re.sub(r'\n```$', '', text)
+    data = json.loads(text)
+    if isinstance(data, list):
+        data = data[0]
+    if not isinstance(data, dict):
+        raise ValueError("DeepSeek returned non-object turn")
+    emperor = data.get("emperor") or speaker
+    message = data.get("message") or ""
+    if emperor not in EMPEROR_PROFILES:
+        emperor = speaker
+    if not message.strip():
+        raise ValueError("DeepSeek returned empty message")
+    return {"role": "emperor", "emperor": emperor, "message": message.strip()}
 
 @app.get("/api/emperors")
 async def list_emperors():
