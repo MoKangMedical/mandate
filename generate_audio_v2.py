@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Mandate Audio Generation v2.0.0 — 4-Layer Production Pipeline
+Mandate Audio Generation v2.1.1 — 4-Layer Production Pipeline
 =============================================================
-Layer 1: DeepSeek spoken script (150-230 chars natural lecture intro)
+Layer 1: DeepSeek spoken script (natural lecture intro, <=500 chars)
 Layer 2: edge-tts zh-CN-YunyangNeural (rate -8%, pitch -2Hz)
 Layer 3: ffmpeg loudnorm (I=-16:TP=-1.5:LRA=9, 24000Hz, mono, 48kbps)
 Layer 4: Quality audit (duration, sample rate, channels, bitrate)
@@ -20,17 +20,50 @@ RATE = "-8%"
 PITCH = "-2Hz"
 BITRATE = "48k"
 MAX_WORKERS = 3
-SCRIPT_MIN_CHARS = 100   # Minimum spoken script length
-SCRIPT_MAX_CHARS = 300   # Maximum
+SCRIPT_MIN_CHARS = 180
+SCRIPT_MAX_CHARS = 500
 
 # ── DeepSeek API ───────────────────────────────────────────────
 def _load_api_key():
-    """Load DeepSeek API key from Hermes config."""
+    """Load DeepSeek API key from env or Hermes config."""
+    if os.getenv("DEEPSEEK_API_KEY"):
+        return os.getenv("DEEPSEEK_API_KEY", "").strip()
+
     config_path = os.path.expanduser("~/.hermes/config.yaml")
-    for line in open(config_path):
-        if line.startswith("  api_key:"):
-            return line.split(":", 1)[1].strip()
-    return os.getenv("DEEPSEEK_API_KEY", "")
+    if not os.path.exists(config_path):
+        return ""
+
+    try:
+        import yaml  # type: ignore
+    except Exception:
+        yaml = None
+
+    if yaml is not None:
+        try:
+            data = yaml.safe_load(Path(config_path).read_text()) or {}
+            providers = data.get("providers", {})
+            deepseek = providers.get("deepseek", {})
+            if isinstance(deepseek, dict):
+                if deepseek.get("api_key"):
+                    return str(deepseek["api_key"]).strip()
+                models = deepseek.get("models", {})
+                if isinstance(models, dict):
+                    for model_cfg in models.values():
+                        if isinstance(model_cfg, dict) and model_cfg.get("api_key"):
+                            return str(model_cfg["api_key"]).strip()
+            model_cfg = data.get("model", {})
+            if isinstance(model_cfg, dict) and model_cfg.get("provider") == "deepseek" and model_cfg.get("api_key"):
+                return str(model_cfg["api_key"]).strip()
+        except Exception:
+            pass
+
+    text = Path(config_path).read_text(errors="ignore")
+    block = re.search(r'(?ms)^\\s*deepseek:\\s*\\n(?P<body>(?:^\\s{4}.*\\n?)*)', text)
+    if block:
+        key_match = re.search(r'(?m)^\\s{4}api_key:\\s*(.+?)\\s*$', block.group("body"))
+        if key_match:
+            return key_match.group(1).strip().strip("'\"")
+    return ""
 
 DEEPSEEK_KEY = _load_api_key()
 DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions"
@@ -40,7 +73,7 @@ DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions"
 # Layer 1: DeepSeek Spoken Script Generation
 # ═══════════════════════════════════════════════════════════════
 def generate_spoken_script(title: str, content: str, course_id: int) -> str:
-    """Compress course content into 150-230 char natural spoken intro."""
+    """Compress course content into a 150-230 char natural spoken intro."""
     excerpt = content[:2000]  # Enough context for DeepSeek
 
     prompt = f"""你是课程口播稿撰写专家。请将以下课程内容压缩成一段150-230字的自然口播导入稿。
@@ -84,19 +117,57 @@ def generate_spoken_script(title: str, content: str, course_id: int) -> str:
         return script
     except Exception as e:
         print(f"  ✗ DeepSeek API error for #{course_id}: {e}", file=sys.stderr)
-        # Fallback: clean first 300 chars of content
-        return clean_fallback(content)
+        return build_fallback_script(title, content)
 
 
-def clean_fallback(text: str) -> str:
-    """Fallback: clean markdown from course text for TTS."""
+def _clean_course_text(text: str) -> str:
+    """Strip markdown/noise while keeping readable Chinese prose."""
+    text = text.replace("\\n", "\n")
     text = re.sub(r'[#>*`_|\-]', '', text)
     text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
-    text = re.sub(r'[「」]', '', text)
-    text = re.sub(r'([。！？；])', r'\1 ', text)
-    text = re.sub(r'\n{3,}', '\n\n', text)
-    text = re.sub(r' +', ' ', text)
-    return text.strip()[:280]
+    text = re.sub(r'[「」"()]', '', text)
+    text = re.sub(r'\n{2,}', '\n', text)
+    text = re.sub(r'[ \t]+', ' ', text)
+    return text.strip()
+
+
+def build_fallback_script(title: str, text: str) -> str:
+    """Deterministic fallback that still sounds like a spoken course intro."""
+    cleaned = _clean_course_text(text)
+    sentences = [s.strip() for s in re.split(r'[。！？；\n]+', cleaned) if s.strip()]
+    intro = f"这一讲我们来看{title}。"
+    bridge = "你会看到，这门课真正要讲的，不只是故事本身，更是背后的权力逻辑、制度选择和历史后果。"
+    closing = "听完以后，你会更容易理解这段历史为什么会走到那一步。"
+    booster = "重点不是记住细节，而是看清关键人物如何在局势、资源和人心之间做选择。"
+
+    summary_parts = []
+    reserved = len(intro) + len(bridge) + len(closing)
+    body_budget = max(0, SCRIPT_MAX_CHARS - reserved)
+    body_length = 0
+    for sentence in sentences:
+        sentence = re.sub(r'\s+', '', sentence).strip("，、；： ")
+        if not sentence:
+            continue
+        add_len = len(sentence) + (1 if summary_parts else 0)
+        if body_length + add_len > body_budget:
+            break
+        summary_parts.append(sentence)
+        body_length += add_len
+        if body_length >= min(260, body_budget):
+            break
+
+    summary = "，".join(summary_parts)
+    script = intro + bridge
+    if summary:
+        script += summary
+        if not script.endswith(("。", "！", "？")):
+            script += "。"
+
+    if len(script) + len(closing) < SCRIPT_MIN_CHARS and len(script) + len(booster) + len(closing) <= SCRIPT_MAX_CHARS:
+        script += booster
+
+    script += closing
+    return script[:SCRIPT_MAX_CHARS]
 
 
 # ═══════════════════════════════════════════════════════════════

@@ -403,15 +403,12 @@ function renderGrid(moduleFilter) {
   grid.innerHTML = courses.map((c,i) => {
     const completed = state.completed.includes(c.id);
     const isCurrent = state.current === i && !completed;
-    const locked = i > 0 && !state.completed.includes(courses[i-1].id) && !completed;
     let cardClass = 'course-card';
-    if (locked) cardClass += ' locked';
-    else if (isCurrent) cardClass += ' current';
+    if (isCurrent) cardClass += ' current';
     else if (completed) cardClass += ' completed';
     
     let statusText = '';
-    if (locked) statusText = '🔒 待解锁';
-    else if (completed) statusText = '✓ 已完成';
+    if (completed) statusText = '✓ 已完成';
     else if (isCurrent) statusText = '进行中';
     
     const tags = (c.tags||[]).map(t => {
@@ -443,11 +440,7 @@ function renderGrid(moduleFilter) {
 function openDetail(cid) {
   const course = allCourses.find(c => c.id === cid);
   if (!course) return;
-  
-  // Check if locked
-  const idx = allCourses.findIndex(c => c.id === cid);
-  if (idx > 0 && !state.completed.includes(allCourses[idx-1].id) && !state.completed.includes(cid)) return;
-  
+
   activeDetail = cid;
   quizAnswers[cid] = quizAnswers[cid] || {};
   

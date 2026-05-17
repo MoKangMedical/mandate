@@ -533,12 +533,25 @@ h3{font-size:1.2rem;font-weight:600}
 <script>
 // ═══════ Homepage Course Grid Renderer ═══════
 let homeCourseTag = null;
+const HOME_INLINE_COURSES = [
+  { id: 1, title: '帝制起源 — 从禅让到家天下', desc: '夏商周三代：天命观的形成、禅让制到家天下的转变、分封制的逻辑与弊端', tags: ['入门', '3课时'] },
+  { id: 2, title: '大一统奠基 — 秦汉帝王', desc: '秦始皇统一六国、汉武帝北逐匈奴——中国帝制基本框架的确立', tags: ['核心', '5课时'] },
+  { id: 3, title: '分裂与融合 — 魏晋南北朝', desc: '三国争霸、淝水之战、北魏孝文帝改革——长达四百年的分裂与民族大融合', tags: ['进阶', '6课时'] },
+  { id: 4, title: '盛世巅峰 — 隋唐五代', desc: '开皇之治、贞观之治、开元盛世——中国帝制时代的黄金年代', tags: ['核心', '5课时'] },
+  { id: 5, title: '集权巅峰 — 宋元明清', desc: '杯酒释兵权、郑和下西洋、康乾盛世——从文治巅峰到专制顶峰', tags: ['核心', '5课时'] },
+  { id: 6, title: '帝制终结 — 晚清到民国', desc: '鸦片战争、太平天国、百日维新、辛亥革命——千年帝制的最后一幕', tags: ['核心', '4课时'] }
+];
+
+function getHomeCourses() {
+  const metaCourses = Array.isArray(window.COURSES_META) ? window.COURSES_META : [];
+  return [...HOME_INLINE_COURSES, ...metaCourses].sort((a, b) => a.id - b.id);
+}
 
 function renderCourseTagFilter() {
   const filter = document.getElementById('courseTagFilter');
   if (!filter) return;
   const tags = new Set();
-  (window.COURSES_META||[]).forEach(c => {
+  getHomeCourses().forEach(c => {
     (c.tags||[]).forEach(t => {
       const label = String(t).split('|')[0];
       if (label) tags.add(label);
@@ -552,9 +565,9 @@ function renderCourseTagFilter() {
 
 function renderHomeCourses() {
   const grid = document.getElementById('homeCourseGrid');
-  if (!grid || !window.COURSES_META) return;
+  if (!grid) return;
   const q = (document.getElementById('courseSearch')?.value||'').toLowerCase();
-  let courses = window.COURSES_META;
+  let courses = getHomeCourses();
   if (q) courses = courses.filter(c =>
     c.title.includes(q) || c.desc.includes(q) || (c.tags||[]).some(t=>String(t).includes(q))
   );
@@ -592,10 +605,8 @@ function renderHomeCourses() {
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.COURSES_META) {
-    renderCourseTagFilter();
-    renderHomeCourses();
-  }
+  renderCourseTagFilter();
+  renderHomeCourses();
   // Create observer for course cards
   window._courseObserver = new IntersectionObserver((entries) => {
     entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
