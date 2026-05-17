@@ -1,0 +1,407 @@
+#!/usr/bin/env python3
+"""
+Mandate Audio Generation v2.0.0 — 4-Layer Production Pipeline
+=============================================================
+Layer 1: DeepSeek spoken script (150-230 chars natural lecture intro)
+Layer 2: edge-tts zh-CN-YunyangNeural (rate -8%, pitch -2Hz)
+Layer 3: ffmpeg loudnorm (I=-16:TP=-1.5:LRA=9, 24000Hz, mono, 48kbps)
+Layer 4: Quality audit (duration, sample rate, channels, bitrate)
+
+Usage: python3 generate_audio_v2.py [--force] [--courses 7,8,9]
+"""
+import json, os, re, shlex, shutil, subprocess, sys, time, urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+
+# ── Configuration ──────────────────────────────────────────────
+AUDIO_DIR = "audio"
+VOICE = "zh-CN-YunyangNeural"   # v2.0: professional news voice
+RATE = "-8%"
+PITCH = "-2Hz"
+BITRATE = "48k"
+MAX_WORKERS = 3
+SCRIPT_MIN_CHARS = 100   # Minimum spoken script length
+SCRIPT_MAX_CHARS = 300   # Maximum
+
+# ── DeepSeek API ───────────────────────────────────────────────
+def _load_api_key():
+    """Load DeepSeek API key from Hermes config."""
+    config_path = os.path.expanduser("~/.hermes/config.yaml")
+    for line in open(config_path):
+        if line.startswith("  api_key:"):
+            return line.split(":", 1)[1].strip()
+    return os.getenv("DEEPSEEK_API_KEY", "")
+
+DEEPSEEK_KEY = _load_api_key()
+DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions"
+
+
+# ═══════════════════════════════════════════════════════════════
+# Layer 1: DeepSeek Spoken Script Generation
+# ═══════════════════════════════════════════════════════════════
+def generate_spoken_script(title: str, content: str, course_id: int) -> str:
+    """Compress course content into 150-230 char natural spoken intro."""
+    excerpt = content[:2000]  # Enough context for DeepSeek
+
+    prompt = f"""你是课程口播稿撰写专家。请将以下课程内容压缩成一段150-230字的自然口播导入稿。
+
+要求：
+1. 像老师在讲课的开场白，口语化、自然
+2. 涵盖课程核心要点，但不罗列细节
+3. 语速适中，句与句之间有呼吸感
+4. 不要使用markdown、括号、引号等书面符号
+5. 以引人入胜的提问或陈述开头
+
+课程标题：{title}
+课程内容（节选）：{excerpt}
+
+请直接输出口播稿，不要加任何说明。"""
+
+    req = urllib.request.Request(
+        DEEPSEEK_URL,
+        data=json.dumps({
+            "model": "deepseek-chat",
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.7,
+            "max_tokens": 500,
+        }).encode(),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {DEEPSEEK_KEY}",
+        },
+    )
+    try:
+        resp = urllib.request.urlopen(req, timeout=60)
+        data = json.loads(resp.read())
+        script = data["choices"][0]["message"]["content"].strip()
+        # Enforce length bounds
+        if len(script) < SCRIPT_MIN_CHARS:
+            print(f"  ⚠ #{course_id} script too short ({len(script)} chars), retrying...", file=sys.stderr)
+            time.sleep(1)
+            return generate_spoken_script(title, content, course_id)  # Retry once
+        if len(script) > SCRIPT_MAX_CHARS:
+            script = script[:SCRIPT_MAX_CHARS]
+        return script
+    except Exception as e:
+        print(f"  ✗ DeepSeek API error for #{course_id}: {e}", file=sys.stderr)
+        # Fallback: clean first 300 chars of content
+        return clean_fallback(content)
+
+
+def clean_fallback(text: str) -> str:
+    """Fallback: clean markdown from course text for TTS."""
+    text = re.sub(r'[#>*`_|\-]', '', text)
+    text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+    text = re.sub(r'[「」]', '', text)
+    text = re.sub(r'([。！？；])', r'\1 ', text)
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    text = re.sub(r' +', ' ', text)
+    return text.strip()[:280]
+
+
+# ═══════════════════════════════════════════════════════════════
+# Layer 2: edge-tts Neural TTS
+# ═══════════════════════════════════════════════════════════════
+def synthesize_audio(script: str, outpath: str, course_id: int) -> bool:
+    """Synthesize speech with edge-tts zh-CN-YunyangNeural."""
+    tmpfile = f"/tmp/mandate_v2_{course_id}.txt"
+    with open(tmpfile, "w") as f:
+        f.write(script)
+
+    # shell=True required for --rate=-8% (subprocess list mode fails with %)
+    cmd = (
+        f"edge-tts -v {shlex.quote(VOICE)} "
+        f"--rate={RATE} --pitch={PITCH} "
+        f"-f {shlex.quote(tmpfile)} "
+        f"--write-media {shlex.quote(outpath)}"
+    )
+    try:
+        result = subprocess.run(
+            cmd, shell=True, capture_output=True, text=True, timeout=120
+        )
+        os.remove(tmpfile)
+        return os.path.exists(outpath) and os.path.getsize(outpath) > 1000
+    except Exception as e:
+        print(f"  ✗ TTS error #{course_id}: {e}", file=sys.stderr)
+        if os.path.exists(tmpfile):
+            os.remove(tmpfile)
+        return False
+
+
+# ═══════════════════════════════════════════════════════════════
+# Layer 3: ffmpeg Loudnorm + Format Standardization
+# ═══════════════════════════════════════════════════════════════
+def normalize_audio(raw_path: str, final_path: str, course_id: int) -> bool:
+    """Apply loudnorm & reformat to 24000Hz mono 48kbps."""
+    cmd = [
+        "ffmpeg", "-y", "-i", raw_path,
+        "-af", "loudnorm=I=-16:TP=-1.5:LRA=9",
+        "-ar", "24000", "-ac", "1", "-b:a", BITRATE,
+        final_path,
+    ]
+    try:
+        subprocess.run(cmd, capture_output=True, text=True, timeout=60, check=True)
+        if os.path.exists(raw_path):
+            os.remove(raw_path)
+        return os.path.exists(final_path) and os.path.getsize(final_path) > 1000
+    except subprocess.CalledProcessError:
+        # Fallback: simple volume normalization
+        cmd2 = [
+            "ffmpeg", "-y", "-i", raw_path,
+            "-af", "volume=1.2",
+            "-ar", "24000", "-ac", "1", "-b:a", BITRATE,
+            final_path,
+        ]
+        try:
+            subprocess.run(cmd2, capture_output=True, text=True, timeout=60)
+            if os.path.exists(raw_path):
+                os.remove(raw_path)
+            return os.path.exists(final_path) and os.path.getsize(final_path) > 1000
+        except Exception as e:
+            print(f"  ✗ ffmpeg error #{course_id}: {e}", file=sys.stderr)
+            return False
+
+
+# ═══════════════════════════════════════════════════════════════
+# Layer 4: Quality Audit
+# ═══════════════════════════════════════════════════════════════
+def audit_audio(filepath: str) -> dict:
+    """Audit a single audio file. Returns dict with grade and issues."""
+    result = {"file": os.path.basename(filepath), "grade": "A", "issues": []}
+
+    if not os.path.exists(filepath):
+        return {**result, "grade": "F", "issues": ["missing"]}
+
+    size = os.path.getsize(filepath)
+    if size < 1000:
+        result["issues"].append(f"too small: {size}B")
+        result["grade"] = "F"
+        return result
+
+    cmd = [
+        "ffprobe", "-v", "quiet", "-print_format", "json",
+        "-show_format", "-show_streams", filepath,
+    ]
+    try:
+        probe = json.loads(subprocess.check_output(cmd, text=True, timeout=10))
+    except Exception as e:
+        result["issues"].append(f"ffprobe failed: {e}")
+        result["grade"] = "C"
+        return result
+
+    fmt = probe.get("format", {})
+    duration = float(fmt.get("duration", 0))
+    streams = probe.get("streams", [])
+    audio = next((s for s in streams if s.get("codec_type") == "audio"), {})
+
+    # Duration check (25-90s for spoken scripts)
+    if duration < 20:
+        result["issues"].append(f"too short: {duration:.1f}s")
+        if result["grade"] == "A": result["grade"] = "B"
+    elif duration > 120:
+        result["issues"].append(f"too long: {duration:.1f}s")
+        if result["grade"] == "A": result["grade"] = "B"
+
+    # Sample rate
+    sr = int(audio.get("sample_rate", 0))
+    if sr != 24000:
+        result["issues"].append(f"sample rate: {sr}Hz (expected 24000)")
+        result["grade"] = "C"
+
+    # Channels
+    ch = int(audio.get("channels", 0))
+    if ch != 1:
+        result["issues"].append(f"channels: {ch} (expected 1)")
+        if result["grade"] == "A": result["grade"] = "B"
+
+    # Bitrate
+    br = int(fmt.get("bit_rate", 0)) // 1000
+    if br < 40 or br > 72:
+        result["issues"].append(f"bitrate: {br}kbps (expected 48-64)")
+        if result["grade"] == "A": result["grade"] = "B"
+
+    result["specs"] = {
+        "duration": f"{duration:.1f}s",
+        "sample_rate": f"{sr}Hz",
+        "channels": "mono" if ch == 1 else str(ch),
+        "bitrate": f"{br}kbps",
+        "size_kb": size // 1024,
+    }
+    return result
+
+
+# ═══════════════════════════════════════════════════════════════
+# Course Extraction
+# ═══════════════════════════════════════════════════════════════
+def extract_courses(filepath: str) -> list:
+    """Extract (id, title, content) from courses-data.js."""
+    with open(filepath, "r") as f:
+        raw = f.read()
+
+    # Find all course objects
+    courses = []
+    # Split by "id: N," pattern
+    pattern = re.compile(r'id:\s*(\d+),\s*\n\s*title:\s*[\'"](.+?)[\'"],\s*\n.*?content:\s*`', re.DOTALL)
+    
+    # Simpler approach: find content blocks
+    segs = raw.split('content: `')
+    for i, seg in enumerate(segs[1:], start=1):  # First split is before first content
+        close = seg.find('`,\n')  # End of template literal
+        if close < 0:
+            close = seg.find('`,\\n')  # Escaped newline variant
+        if close < 0:
+            close = seg.find('`\n')
+        if close < 0:
+            continue
+        content_raw = seg[:close]
+        content = content_raw.replace('\\n', '\n')
+
+        # Find course id and title from the segment before this content
+        # The id is at the start of course objects
+        before = raw.split('content: `')[i-1] if i > 0 else ""
+        id_match = re.search(r'id:\s*(\d+)', before)
+        title_match = re.search(r"title:\s*'([^']+)'", before)
+        if not title_match:
+            title_match = re.search(r'title:\s*"([^"]+)"', before)
+
+        if id_match:
+            cid = int(id_match.group(1))
+            title = title_match.group(1) if title_match else f"课程{cid}"
+            courses.append((cid, title, content))
+
+    return courses
+
+
+# ═══════════════════════════════════════════════════════════════
+# Full Pipeline (per course)
+# ═══════════════════════════════════════════════════════════════
+def process_course(course_id: int, title: str, content: str, outdir: str, force: bool) -> tuple:
+    """Run the full 4-layer pipeline for one course."""
+    final_path = os.path.join(outdir, f"lesson{course_id}.mp3")
+
+    # Check if already exists and passes audit
+    if not force and os.path.exists(final_path) and os.path.getsize(final_path) > 1000:
+        audit = audit_audio(final_path)
+        if audit["grade"] == "A":
+            return course_id, final_path, "skipped (A-grade)", audit["specs"]["duration"]
+
+    # Layer 1: DeepSeek spoken script
+    print(f"  [{course_id}] L1: Generating spoken script...", flush=True)
+    script = generate_spoken_script(title, content, course_id)
+    print(f"  [{course_id}] L1: Script {len(script)} chars", flush=True)
+
+    # Layer 2: edge-tts synthesis
+    raw_path = os.path.join(outdir, f"lesson{course_id}_raw.mp3")
+    print(f"  [{course_id}] L2: TTS synthesis...", flush=True)
+    if not synthesize_audio(script, raw_path, course_id):
+        return course_id, final_path, "FAILED (TTS)", "0s"
+
+    # Layer 3: ffmpeg loudnorm
+    print(f"  [{course_id}] L3: ffmpeg normalize...", flush=True)
+    if not normalize_audio(raw_path, final_path, course_id):
+        # If normalize fails but raw exists, keep raw as fallback
+        if os.path.exists(raw_path):
+            shutil.move(raw_path, final_path)
+            print(f"  [{course_id}] L3: Normalize failed, kept raw", flush=True)
+
+    # Layer 4: Quality audit
+    audit = audit_audio(final_path)
+    grade = audit["grade"]
+    duration = audit.get("specs", {}).get("duration", "?")
+    status = f"{grade}-grade" if grade != "F" else "FAILED (audit)"
+    return course_id, final_path, status, duration
+
+
+# ═══════════════════════════════════════════════════════════════
+# Main
+# ═══════════════════════════════════════════════════════════════
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Mandate Audio v2.0.0")
+    parser.add_argument("--force", action="store_true", help="Regenerate even if A-grade exists")
+    parser.add_argument("--courses", type=str, help="Comma-separated course IDs (default: all)")
+    parser.add_argument("--dry-run", action="store_true", help="Extract courses without generating")
+    args = parser.parse_args()
+
+    os.makedirs(AUDIO_DIR, exist_ok=True)
+
+    # Extract courses
+    courses = extract_courses("js/courses-data.js")
+    print(f"📚 Extracted {len(courses)} courses from courses-data.js")
+
+    if args.courses:
+        target_ids = {int(x) for x in args.courses.split(",")}
+        courses = [(cid, t, c) for cid, t, c in courses if cid in target_ids]
+        print(f"🎯 Filtered to {len(courses)} courses: {sorted(target_ids)}")
+
+    if args.dry_run:
+        for cid, title, content in courses:
+            cn = len(re.findall(r'[\u4e00-\u9fff\u3400-\u4dbf]', content))
+            print(f"  #{cid}: {title} ({cn} cn chars)")
+        return
+
+    print(f"🎙️  Voice: {VOICE} | Rate: {RATE} | Pitch: {PITCH}")
+    print(f"🔊 Loudnorm: I=-16:TP=-1.5:LRA=9 | {24000}Hz mono {BITRATE}")
+    print(f"⚡ Workers: {MAX_WORKERS} | Force: {args.force}")
+    print(f"{'─'*60}")
+
+    start_time = time.time()
+    completed = {"A": 0, "B": 0, "C": 0, "skipped": 0, "failed": 0}
+
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = {
+            executor.submit(process_course, cid, title, content, AUDIO_DIR, args.force): cid
+            for cid, title, content in courses
+        }
+        for future in as_completed(futures):
+            cid = futures[future]
+            try:
+                cid_result, path, status, duration = future.result()
+                status_lower = status.lower()
+                if "skipped" in status_lower:
+                    completed["skipped"] += 1
+                elif "a-grade" in status_lower:
+                    completed["A"] += 1
+                elif "b-grade" in status_lower:
+                    completed["B"] += 1
+                elif "c-grade" in status_lower:
+                    completed["C"] += 1
+                else:
+                    completed["failed"] += 1
+                done = sum(completed.values())
+                print(f"  #{cid:3d} {status:20s} {duration:>6s}  [{done}/{len(courses)}]", flush=True)
+            except Exception as e:
+                completed["failed"] += 1
+                print(f"  #{cid:3d} CRASH: {e}", flush=True)
+
+    elapsed = time.time() - start_time
+    print(f"\n{'═'*60}")
+    print(f"✅ Done in {elapsed:.0f}s")
+    print(f"   A-grade: {completed['A']} | B-grade: {completed['B']} | C-grade: {completed['C']}")
+    print(f"   Skipped: {completed['skipped']} | Failed: {completed['failed']}")
+
+    # Full audit at end if any files were generated
+    if completed["A"] + completed["B"] + completed["C"] > 0:
+        print(f"\n📋 Running full audit...")
+        time.sleep(1)
+        audit_results = {}
+        for cid, title, _ in courses:
+            fp = os.path.join(AUDIO_DIR, f"lesson{cid}.mp3")
+            audit_results[cid] = audit_audio(fp)
+
+        grades = {"A": 0, "B": 0, "C": 0, "F": 0}
+        issues = []
+        for cid, r in sorted(audit_results.items()):
+            grades[r["grade"]] += 1
+            if r["grade"] != "A":
+                issues.append((cid, r["grade"], r["issues"]))
+
+        print(f"   Final: A={grades['A']} B={grades['B']} C={grades['C']} F={grades['F']}")
+        if issues:
+            print(f"   Issues ({len(issues)}):")
+            for cid, grade, iss in issues:
+                print(f"     #{cid} [{grade}]: {', '.join(iss)}")
+
+
+if __name__ == "__main__":
+    main()
