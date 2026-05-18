@@ -301,6 +301,41 @@ h3{font-size:1.2rem;font-weight:600}
   padding:12px 24px;border-radius:100px;font-size:0.85rem;font-weight:600;z-index:200;
   opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
+
+/* ═══════════════ COURSE AUDIO COLLECTION ═══════════════ */
+.audio-collection{background:var(--bg2);position:relative;overflow:hidden}
+.audio-collection::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 80% 0%,rgba(226,182,79,0.05),transparent 65%)}
+.audio-panel{position:relative;z-index:1;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:0 22px 70px rgba(0,0,0,0.24)}
+.audio-panel-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:24px}
+.audio-panel-head h2{margin-top:8px}
+.audio-panel-head p{color:var(--text2);font-size:0.95rem;line-height:1.7;margin-top:8px}
+.audio-badge{display:inline-flex;align-items:center;border:1px solid rgba(226,182,79,0.25);background:rgba(226,182,79,0.08);color:var(--gold);border-radius:100px;padding:6px 14px;font-size:0.78rem;font-weight:700}
+.audio-count{color:var(--text3);font-size:0.86rem;white-space:nowrap}
+.audio-layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start}
+.audio-now{min-width:0}
+.audio-kicker{font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);font-weight:800;margin-bottom:8px}
+.audio-now-title{font-family:var(--serif);font-size:1.35rem;font-weight:800;color:var(--text);line-height:1.35;margin-bottom:8px}
+.audio-now-desc{color:var(--text3);font-size:0.92rem;line-height:1.7;min-height:3.2em}
+.collection-audio{width:100%;margin-top:20px;filter:sepia(100%) saturate(300%) hue-rotate(350deg)}
+.audio-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.audio-action{border:1px solid var(--border2);background:transparent;color:var(--text);border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer;transition:all .2s}
+.audio-action:hover,.audio-action.primary{background:var(--gold);border-color:var(--gold);color:#000}
+.audio-action:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+.audio-status-line{color:var(--text3);font-size:0.82rem;margin-top:12px}
+.audio-queue{border-left:1px solid var(--border);padding-left:20px;max-height:420px;overflow:auto}
+.audio-queue::-webkit-scrollbar{width:4px}
+.audio-queue::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+.audio-row{display:grid;grid-template-columns:42px minmax(0,1fr);gap:12px;align-items:center;width:100%;padding:11px 0;border:0;border-bottom:1px solid rgba(255,255,255,0.05);background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.audio-row:hover .audio-row-title,.audio-row.active .audio-row-title{color:var(--gold)}
+.audio-row.active .audio-row-num{background:var(--gold);color:#000;border-color:var(--gold)}
+.audio-row-num{width:34px;height:34px;border-radius:8px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:0.78rem;font-weight:800}
+.audio-row-title{color:var(--text2);font-size:0.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s}
+.audio-row-desc{color:var(--text3);font-size:0.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+@media(max-width:900px){
+  .audio-panel-head{align-items:flex-start;flex-direction:column}
+  .audio-layout{grid-template-columns:1fr}
+  .audio-queue{border-left:0;border-top:1px solid var(--border);padding-left:0;padding-top:12px}
+}
 </style>
 </head>
 <body>
@@ -320,6 +355,7 @@ h3{font-size:1.2rem;font-weight:600}
     <div class="nav-links">
       <a href="#emperors">帝王录</a>
       <a href="#avatars">数字分身</a>
+      <a href="#audio-collection">音频合集</a>
       <a href="#courses">课程</a>
       <a href="#pricing">定价</a>
       <a href="#avatars" class="nav-cta">与帝王对话</a>
@@ -337,6 +373,7 @@ h3{font-size:1.2rem;font-weight:600}
     <div class="hero-actions">
       <a href="#emperors" class="btn btn-primary">探索帝王录</a>
       <a href="#avatars" class="btn btn-red">与帝王对话</a>
+      <a href="#audio-collection" class="btn btn-secondary">音频合集</a>
       <a href="#courses" class="btn btn-secondary">课程体系</a>
     </div>
     <div class="hero-stats">
@@ -355,6 +392,38 @@ h3{font-size:1.2rem;font-weight:600}
     <p class="quote-author">— 唐太宗 李世民</p>
   </div>
 </div>
+
+<!-- ═══════════════ COURSE AUDIO COLLECTION ═══════════════ -->
+<section id="audio-collection" class="audio-collection section">
+  <div class="container">
+    <div class="audio-panel fade-in">
+      <div class="audio-panel-head">
+        <div>
+          <div class="audio-badge">课程音频合集</div>
+          <h2 class="serif">只听音频，连续学完一百门课</h2>
+          <p>这里不展开正文，只播放全部课程音频。适合通勤、散步、睡前复盘，播放结束后会自动进入下一课。</p>
+        </div>
+        <div class="audio-count" id="audioCollectionCount">100 条音频</div>
+      </div>
+      <div class="audio-layout">
+        <div class="audio-now">
+          <div class="audio-kicker" id="audioNowKicker">Lesson 1</div>
+          <div class="audio-now-title" id="audioNowTitle">帝制起源 — 从禅让到家天下</div>
+          <div class="audio-now-desc" id="audioNowDesc">夏商周三代：天命观的形成、禅让制到家天下的转变、分封制的逻辑与弊端</div>
+          <audio id="collectionAudio" class="collection-audio" controls preload="metadata"></audio>
+          <div class="audio-actions">
+            <button class="audio-action" id="audioPrevBtn" type="button" onclick="playCollectionOffset(-1)">上一课</button>
+            <button class="audio-action primary" id="audioPlayBtn" type="button" onclick="playCollectionCurrent()">播放当前</button>
+            <button class="audio-action" id="audioNextBtn" type="button" onclick="playCollectionOffset(1)">下一课</button>
+            <button class="audio-action" id="audioRestartBtn" type="button" onclick="restartCollection()">从第一课开始</button>
+          </div>
+          <div class="audio-status-line" id="audioCollectionStatus">已准备好，点击播放开始连续收听。</div>
+        </div>
+        <div class="audio-queue" id="audioCollectionQueue"></div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- ═══════════════ IMPERIAL ROBE GALLERY ═══════════════ -->
 <section id="imperial" class="imperial-section section">
@@ -547,6 +616,66 @@ function getHomeCourses() {
   return [...HOME_INLINE_COURSES, ...metaCourses].sort((a, b) => a.id - b.id);
 }
 
+// ═══════ Course Audio Collection ═══════
+let audioCollection = [];
+let audioCollectionIndex = 0;
+
+function renderAudioCollection() {
+  audioCollection = getHomeCourses().filter(c => c.id >= 1 && c.id <= 100);
+  const queue = document.getElementById('audioCollectionQueue');
+  const count = document.getElementById('audioCollectionCount');
+  if (!queue) return;
+  if (count) count.textContent = `${audioCollection.length} 条音频`;
+  queue.innerHTML = audioCollection.map((course, index) => `
+    <button class="audio-row${index === audioCollectionIndex ? ' active' : ''}" type="button" onclick="selectCollectionCourse(${index}, true)">
+      <span class="audio-row-num">${course.id}</span>
+      <span>
+        <span class="audio-row-title">${course.title}</span>
+        <span class="audio-row-desc">${course.desc || ''}</span>
+      </span>
+    </button>
+  `).join('');
+  selectCollectionCourse(audioCollectionIndex, false);
+}
+
+function selectCollectionCourse(index, shouldPlay) {
+  if (!audioCollection.length) return;
+  audioCollectionIndex = Math.max(0, Math.min(index, audioCollection.length - 1));
+  const course = audioCollection[audioCollectionIndex];
+  const audio = document.getElementById('collectionAudio');
+  document.getElementById('audioNowKicker').textContent = `Lesson ${course.id} · ${audioCollectionIndex + 1}/${audioCollection.length}`;
+  document.getElementById('audioNowTitle').textContent = course.title;
+  document.getElementById('audioNowDesc').textContent = course.desc || '';
+  if (audio && !audio.src.endsWith(`/audio/lesson${course.id}.mp3`)) {
+    audio.src = `audio/lesson${course.id}.mp3`;
+  }
+  document.querySelectorAll('.audio-row').forEach((row, i) => row.classList.toggle('active', i === audioCollectionIndex));
+  document.getElementById('audioPrevBtn').disabled = audioCollectionIndex === 0;
+  document.getElementById('audioNextBtn').disabled = audioCollectionIndex === audioCollection.length - 1;
+  document.getElementById('audioCollectionStatus').textContent = `当前：第 ${course.id} 课。`;
+  document.querySelector('.audio-row.active')?.scrollIntoView({block:'nearest'});
+  if (shouldPlay) playCollectionCurrent();
+}
+
+function playCollectionCurrent() {
+  const audio = document.getElementById('collectionAudio');
+  if (!audio || !audioCollection.length) return;
+  if (!audio.src) selectCollectionCourse(audioCollectionIndex, false);
+  audio.play().then(() => {
+    document.getElementById('audioCollectionStatus').textContent = '正在连续播放课程音频。';
+  }).catch(() => {
+    document.getElementById('audioCollectionStatus').textContent = '浏览器阻止了自动播放，请点音频控件上的播放键。';
+  });
+}
+
+function playCollectionOffset(offset) {
+  selectCollectionCourse(audioCollectionIndex + offset, true);
+}
+
+function restartCollection() {
+  selectCollectionCourse(0, true);
+}
+
 function renderCourseTagFilter() {
   const filter = document.getElementById('courseTagFilter');
   if (!filter) return;
@@ -607,6 +736,14 @@ function renderHomeCourses() {
 document.addEventListener('DOMContentLoaded', () => {
   renderCourseTagFilter();
   renderHomeCourses();
+  renderAudioCollection();
+  document.getElementById('collectionAudio')?.addEventListener('ended', () => {
+    if (audioCollectionIndex < audioCollection.length - 1) {
+      selectCollectionCourse(audioCollectionIndex + 1, true);
+    } else {
+      document.getElementById('audioCollectionStatus').textContent = '全部课程音频已播放完。';
+    }
+  });
   // Create observer for course cards
   window._courseObserver = new IntersectionObserver((entries) => {
     entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
