@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>帝王3D时间线 — Mandate</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#050508;
+  overflow:hidden;
+  font-family:'Inter',-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  cursor:grab;
+  height:100vh;width:100vw;
+}
+body:active{cursor:grabbing}
+body.grabbing{cursor:grabbing}
+
+#canvas-container{position:fixed;inset:0}
+
+/* ── UI Overlay ── */
+.ui-overlay{
+  position:fixed;inset:0;pointer-events:none;z-index:10;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.ui-overlay > *{pointer-events:auto}
+
+/* Title */
+.tl-title{
+  position:absolute;top:32px;left:50%;transform:translateX(-50%);
+  text-align:center;
+}
+.tl-title .badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(226,182,79,0.12);border:1px solid rgba(226,182,79,0.25);
+  padding:5px 16px;border-radius:100px;
+  font-size:0.72rem;color:#e2b64f;letter-spacing:0.08em;
+  margin-bottom:8px;
+}
+.tl-title .badge .dot{
+  width:5px;height:5px;background:#e2b64f;border-radius:50%;
+  animation:pulse-dot 2s infinite;
+}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.2}}
+.tl-title h1{
+  font-family:'Noto Serif SC',serif;
+  font-size:clamp(1.2rem,2.5vw,1.7rem);
+  font-weight:900;color:#fafafa;
+  text-shadow:0 0 60px rgba(226,182,79,0.3);
+}
+.tl-title .sub{
+  font-size:0.8rem;color:#a1a1aa;
+  margin-top:4px;
+}
+
+/* Info panel */
+.info-panel{
+  position:absolute;bottom:120px;left:50%;transform:translateX(-50%);
+  background:rgba(12,12,16,0.92);border:1px solid rgba(226,182,79,0.2);
+  border-radius:16px;padding:18px 28px;
+  backdrop-filter:blur(20px);
+  opacity:0;transition:all 0.35s cubic-bezier(.4,0,.2,1);
+  text-align:center;max-width:360px;
+}
+.info-panel.visible{opacity:1;transform:translateX(-50%) translateY(-8px)}
+.info-panel .dynasty-tag{
+  display:inline-block;padding:2px 10px;border-radius:4px;
+  font-size:0.65rem;font-weight:600;letter-spacing:0.06em;
+  margin-bottom:8px;
+}
+.info-panel h2{
+  font-family:'Noto Serif SC',serif;
+  font-size:1.2rem;color:#fafafa;margin-bottom:4px;
+}
+.info-panel .reign{
+  font-size:0.75rem;color:#a1a1aa;margin-bottom:2px;
+}
+.info-panel .tagline{
+  font-size:0.78rem;color:#71717a;
+  font-style:italic;line-height:1.4;
+}
+
+/* Controls hint */
+.controls-hint{
+  position:absolute;bottom:60px;left:50%;transform:translateX(-50%);
+  font-size:0.7rem;color:rgba(161,161,170,0.6);
+  display:flex;gap:16px;
+  opacity:0;animation:fadeInHint 2s 1.5s forwards;
+}
+@keyframes fadeInHint{to{opacity:1}}
+.controls-hint span{display:flex;align-items:center;gap:4px}
+
+/* Legend */
+.legend{
+  position:absolute;top:140px;right:24px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.legend-item{
+  display:flex;align-items:center;gap:8px;
+  font-size:0.68rem;color:#71717a;
+}
+.legend-dot{
+  width:8px;height:8px;border-radius:50%;
+  box-shadow:0 0 6px currentColor;
+}
+
+/* Back button */
+.back-btn{
+  position:absolute;top:32px;left:24px;
+  display:flex;align-items:center;gap:6px;
+  padding:10px 18px;
+  background:rgba(28,28,33,0.8);border:1px solid #27272a;
+  border-radius:8px;color:#a1a1aa;font-size:0.8rem;
+  cursor:pointer;transition:all .2s;
+  text-decoration:none;
+  backdrop-filter:blur(10px);
+}
+.back-btn:hover{border-color:#e2b64f;color:#e2b64f}
+
+/* Mobile */
+@media(max-width:768px){
+  .legend{display:none}
+  .controls-hint{display:none}
+  .info-panel{max-width:280px;bottom:100px}
+  .tl-title{top:16px}
+  .back-btn{top:16px;left:12px;padding:8px 14px;font-size:0.72rem}
+}
+
+/* Viewer counter */
+.year-counter{
+  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+  font-family:'Noto Serif SC',serif;
+  font-size:3rem;font-weight:900;
+  color:rgba(226,182,79,0.08);
+  pointer-events:none;
+  line-height:1;
+}
+</style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div class="ui-overlay">
+  <a href="index.html" class="back-btn">← 返回主页</a>
+
+  <div class="tl-title">
+    <div class="badge"><span class="dot"></span> THREE.JS · 交互式3D</div>
+    <h1>四千年帝业 · 时空长河</h1>
+    <p class="sub">从大禹治水到宣统退位 — 拖拽旋转 · 滚轮缩放 · 点击帝王</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#e2b64f"></span> 帝王节点</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#c43a31"></span> 秦 · 汉 · 明</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span> 唐 · 宋</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span> 夏商周 · 清</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#22c55e"></span> 朝代界碑</div>
+  </div>
+
+  <div class="info-panel" id="infoPanel">
+    <div class="dynasty-tag" id="infoDynasty"></div>
+    <h2 id="infoName"></h2>
+    <p class="reign" id="infoReign"></p>
+    <p class="tagline" id="infoTagline"></p>
+  </div>
+
+  <div class="year-counter" id="yearCounter"></div>
+
+  <div class="controls-hint">
+    <span>🖱 拖拽旋转</span>
+    <span>🔍 滚轮缩放</span>
+    <span>👆 点击探索</span>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ═══════════════ DATA ═══════════════
+const DYNASTY_COLORS = {
+  xia:'#8b7355', shang:'#a0785a', 'zhou-w':'#b8860b', 'zhou-e':'#c4a35a',
+  qin:'#c43a31', 'han-w':'#dc2626', xin:'#654321', 'han-e':'#b91c1c',
+  sanguo:'#2f4f4f', 'jin-w':'#556b2f', 'jin-e':'#6b8e23',
+  nanbei:'#4a4a6a', sui:'#191970', tang:'#1d4ed8',
+  wudai:'#5c4033', 'song-n':'#3b82f6', 'song-s':'#60a5fa',
+  liao:'#3e2723', jin:'#4e342e', xixia:'#5d4037',
+  yuan:'#22c55e', ming:'#ef4444', qing:'#a78bfa'
+};
+
+const EMPERORS = [
+  {name:'大禹',year:-2065,reign:'约前2070-前2060',dynasty:'xia',tagline:'治水定九州，开启家天下',courseId:null},
+  {name:'夏桀',year:-1600,reign:'约前1600',dynasty:'xia',tagline:'酒池肉林的原型，第一个亡国之君',courseId:null},
+  {name:'商汤',year:-1550,reign:'约前1600',dynasty:'shang',tagline:'顺天应人，革故鼎新',courseId:null},
+  {name:'商纣',year:-1046,reign:'约前1075-前1046',dynasty:'shang',tagline:'酒池肉林，炮烙之刑',courseId:null},
+  {name:'周武王',year:-1045,reign:'约前1046-前1043',dynasty:'zhou-w',tagline:'牧野之战灭商，开创周朝八百年',courseId:null},
+  {name:'周幽王',year:-771,reign:'前781-前771',dynasty:'zhou-w',tagline:'烽火戏诸侯，西周终结者',courseId:null},
+  {name:'齐桓公',year:-650,reign:'前685-前643',dynasty:'zhou-e',tagline:'春秋首霸，尊王攘夷',courseId:null},
+  {name:'秦始皇',year:-216,reign:'前221-前210',dynasty:'qin',tagline:'千古一帝。统一六国，功过皆极致',courseId:7},
+  {name:'胡亥',year:-209,reign:'前210-前207',dynasty:'qin',tagline:'被赵高操控的傀儡，三年葬送大秦',courseId:9},
+  {name:'刘邦',year:-199,reign:'前202-前195',dynasty:'han-w',tagline:'布衣天子，从亭长到皇帝的逆袭',courseId:12},
+  {name:'汉文帝',year:-169,reign:'前180-前157',dynasty:'han-w',tagline:'文景之治的奠基者，以德化民',courseId:14},
+  {name:'汉武帝',year:-114,reign:'前141-前87',dynasty:'han-w',tagline:'雄才大略，开疆拓土的千古一帝',courseId:15},
+  {name:'汉宣帝',year:-61,reign:'前74-前48',dynasty:'han-w',tagline:'中兴之主，孝宣之治',courseId:null},
+  {name:'汉光武帝',year:41,reign:'25-57',dynasty:'han-e',tagline:'中兴汉室，柔道治国',courseId:null},
+  {name:'汉明帝',year:70,reign:'58-75',dynasty:'han-e',tagline:'永平求法，佛教东传之始',courseId:null},
+  {name:'汉献帝',year:200,reign:'189-220',dynasty:'han-e',tagline:'末代天子，一生为傀儡',courseId:null},
+  {name:'曹操',year:210,reign:'196-220执政',dynasty:'sanguo',tagline:'治世之能臣，乱世之奸雄',courseId:null},
+  {name:'刘备',year:218,reign:'221-223',dynasty:'sanguo',tagline:'弘毅宽厚，知人待士',courseId:null},
+  {name:'孙权',year:230,reign:'229-252',dynasty:'sanguo',tagline:'生子当如孙仲谋',courseId:null},
+  {name:'司马炎',year:270,reign:'265-290',dynasty:'jin-w',tagline:'三分归一统，开国即衰',courseId:null},
+  {name:'司马睿',year:320,reign:'317-323',dynasty:'jin-e',tagline:'衣冠南渡，偏安江左',courseId:null},
+  {name:'刘裕',year:420,reign:'420-422',dynasty:'nanbei',tagline:'气吞万里如虎，南朝第一帝',courseId:null},
+  {name:'北魏孝文帝',year:485,reign:'471-499',dynasty:'nanbei',tagline:'迁都洛阳，全面汉化',courseId:null},
+  {name:'隋文帝',year:590,reign:'581-604',dynasty:'sui',tagline:'结束三百年分裂，开创开皇之治',courseId:null},
+  {name:'隋炀帝',year:608,reign:'604-618',dynasty:'sui',tagline:'大运河与科举，功过任人评说',courseId:null},
+  {name:'唐太宗',year:637,reign:'626-649',dynasty:'tang',tagline:'贞观之治，天可汗',courseId:null},
+  {name:'武则天',year:690,reign:'690-705',dynasty:'tang',tagline:'中国唯一的女皇帝',courseId:null},
+  {name:'唐玄宗',year:735,reign:'712-756',dynasty:'tang',tagline:'开元盛世与安史之乱',courseId:null},
+  {name:'李白',year:740,reign:'701-762在世',dynasty:'tang',tagline:'诗仙，绣口一吐就是半个盛唐',courseId:null},
+  {name:'杜甫',year:755,reign:'712-770在世',dynasty:'tang',tagline:'诗圣，安得广厦千万间',courseId:null},
+  {name:'唐宪宗',year:810,reign:'805-820',dynasty:'tang',tagline:'元和中兴，藩镇暂伏',courseId:null},
+  {name:'黄巢',year:880,reign:'875-884起义',dynasty:'tang',tagline:'满城尽带黄金甲',courseId:null},
+  {name:'赵匡胤',year:965,reign:'960-976',dynasty:'song-n',tagline:'陈桥兵变，杯酒释兵权',courseId:null},
+  {name:'宋仁宗',year:1040,reign:'1022-1063',dynasty:'song-n',tagline:'仁宗盛治，包拯的时代',courseId:57},
+  {name:'王安石',year:1070,reign:'1021-1086在世',dynasty:'song-n',tagline:'熙宁变法，拗相公',courseId:null},
+  {name:'苏轼',year:1080,reign:'1037-1101在世',dynasty:'song-n',tagline:'一蓑烟雨任平生',courseId:null},
+  {name:'宋徽宗',year:1110,reign:'1100-1126',dynasty:'song-n',tagline:'艺术天才，亡国之君',courseId:null},
+  {name:'岳飞',year:1135,reign:'1103-1142在世',dynasty:'song-s',tagline:'精忠报国，三十功名尘与土',courseId:null},
+  {name:'辛弃疾',year:1190,reign:'1140-1207在世',dynasty:'song-s',tagline:'醉里挑灯看剑',courseId:64},
+  {name:'成吉思汗',year:1210,reign:'1206-1227',dynasty:'yuan',tagline:'一代天骄，蒙古帝国缔造者',courseId:null},
+  {name:'忽必烈',year:1275,reign:'1260-1294',dynasty:'yuan',tagline:'大元开国，统一中国',courseId:null},
+  {name:'朱元璋',year:1375,reign:'1368-1398',dynasty:'ming',tagline:'乞丐皇帝，洪武之治',courseId:null},
+  {name:'朱棣',year:1415,reign:'1402-1424',dynasty:'ming',tagline:'永乐大帝，郑和下西洋',courseId:null},
+  {name:'明宣宗',year:1430,reign:'1425-1435',dynasty:'ming',tagline:'仁宣之治，宣德炉',courseId:null},
+  {name:'王阳明',year:1510,reign:'1472-1529在世',dynasty:'ming',tagline:'心学宗师，知行合一',courseId:null},
+  {name:'嘉靖帝',year:1540,reign:'1521-1567',dynasty:'ming',tagline:'二十八年不上朝的权术大师',courseId:null},
+  {name:'张居正',year:1580,reign:'1572-1582执政',dynasty:'ming',tagline:'一条鞭法，万历首辅',courseId:null},
+  {name:'万历帝',year:1600,reign:'1572-1620',dynasty:'ming',tagline:'明朝在位最长的皇帝',courseId:null},
+  {name:'崇祯帝',year:1640,reign:'1627-1644',dynasty:'ming',tagline:'亡国之君，君王死社稷',courseId:null},
+  {name:'努尔哈赤',year:1615,reign:'1616-1626',dynasty:'qing',tagline:'十三副铠甲起兵，清朝奠基者',courseId:null},
+  {name:'皇太极',year:1635,reign:'1626-1643',dynasty:'qing',tagline:'改国号为清，奠定入关基础',courseId:null},
+  {name:'顺治帝',year:1655,reign:'1643-1661',dynasty:'qing',tagline:'入关第一帝',courseId:null},
+  {name:'康熙帝',year:1690,reign:'1661-1722',dynasty:'qing',tagline:'千古一帝，康乾盛世开创者',courseId:null},
+  {name:'雍正帝',year:1730,reign:'1722-1735',dynasty:'qing',tagline:'承上启下的铁腕改革者',courseId:null},
+  {name:'乾隆帝',year:1770,reign:'1735-1796',dynasty:'qing',tagline:'十全老人，盛世巅峰与隐患',courseId:null},
+  {name:'和珅',year:1790,reign:'1750-1799在世',dynasty:'qing',tagline:'清朝第一贪',courseId:null},
+  {name:'道光帝',year:1835,reign:'1820-1850',dynasty:'qing',tagline:'鸦片战争，帝国黄昏',courseId:null},
+  {name:'咸丰帝',year:1858,reign:'1850-1861',dynasty:'qing',tagline:'内忧外患，火烧圆明园',courseId:null},
+  {name:'慈禧太后',year:1880,reign:'1861-1908执政',dynasty:'qing',tagline:'垂帘听政四十七年',courseId:null},
+  {name:'光绪帝',year:1895,reign:'1875-1908',dynasty:'qing',tagline:'戊戌变法，瀛台泣血',courseId:null},
+  {name:'宣统帝',year:1910,reign:'1908-1912',dynasty:'qing',tagline:'末代皇帝，帝国终章',courseId:null},
+];
+
+// Dynasty transition markers
+const DYNASTIES = [
+  {name:'夏',year:-2000,color:'#8b7355'},{name:'商',year:-1550,color:'#a0785a'},
+  {name:'周',year:-1000,color:'#b8860b'},{name:'春秋战国',year:-550,color:'#c4a35a'},
+  {name:'秦',year:-215,color:'#c43a31'},{name:'汉',year:-100,color:'#dc2626'},
+  {name:'三国',year:230,color:'#2f4f4f'},{name:'晋',year:300,color:'#556b2f'},
+  {name:'南北朝',year:480,color:'#4a4a6a'},{name:'隋',year:590,color:'#191970'},
+  {name:'唐',year:700,color:'#1d4ed8'},{name:'五代',year:930,color:'#5c4033'},
+  {name:'宋',year:1050,color:'#3b82f6'},{name:'元',year:1270,color:'#22c55e'},
+  {name:'明',year:1500,color:'#ef4444'},{name:'清',year:1800,color:'#a78bfa'},
+];
+
+// ═══════════════ THREE.JS SCENE ═══════════════
+const YEAR_MIN = -2100;
+const YEAR_MAX = 1920;
+const YEAR_SPAN = YEAR_MAX - YEAR_MIN;
+const TIMELINE_HEIGHT = 28; // virtual units
+const TIMELINE_RADIUS = 4.5;
+
+function yearToY(year) {
+  return ((year - YEAR_MIN) / YEAR_SPAN - 0.5) * TIMELINE_HEIGHT;
+}
+
+function yearToAngle(year) {
+  // Spiral: each dynasty gets a different angle range
+  return ((year - YEAR_MIN) / YEAR_SPAN) * Math.PI * 10;
+}
+
+// Scene setup
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+
+// Background: deep cosmic gradient
+scene.background = new THREE.Color('#050510');
+scene.fog = new THREE.FogExp2('#050510', 0.00015);
+
+const camera = new THREE.PerspectiveCamera(55, container.clientWidth / container.clientHeight, 0.5, 80);
+camera.position.set(8, 2, 12);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+container.appendChild(renderer.domElement);
+
+// ═══ LIGHTING ═══
+const ambientLight = new THREE.AmbientLight('#1a1a3a', 0.6);
+scene.add(ambientLight);
+
+const goldenLight = new THREE.PointLight('#e2b64f', 80, 30, 1.5);
+goldenLight.position.set(0, 0, 0);
+scene.add(goldenLight);
+
+const topLight = new THREE.PointLight('#f5d98a', 40, 20, 1.5);
+topLight.position.set(0, TIMELINE_HEIGHT/2, 0);
+scene.add(topLight);
+
+const bottomLight = new THREE.PointLight('#e2b64f', 30, 15, 1.5);
+bottomLight.position.set(0, -TIMELINE_HEIGHT/2, 0);
+scene.add(bottomLight);
+
+// Red accent light
+const redLight = new THREE.PointLight('#c43a31', 15, 12, 2);
+redLight.position.set(6, 0, 0);
+scene.add(redLight);
+
+// ═══ CONTROLS ═══
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 4;
+controls.maxDistance = 25;
+controls.maxPolarAngle = Math.PI * 0.75;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.3;
+controls.target.set(0, 0, 0);
+controls.update();
+
+// ═══ STARFIELD ═══
+const starGeo = new THREE.BufferGeometry();
+const starCount = 2000;
+const starPositions = new Float32Array(starCount * 3);
+const starSizes = new Float32Array(starCount);
+for (let i = 0; i < starCount; i++) {
+  starPositions[i*3] = (Math.random() - 0.5) * 30;
+  starPositions[i*3+1] = (Math.random() - 0.5) * 30;
+  starPositions[i*3+2] = (Math.random() - 0.5) * 20;
+  starSizes[i] = Math.random() * 2;
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+starGeo.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
+const starMat = new THREE.PointsMaterial({
+  color:'#e2b64f', size:0.03, transparent:true, opacity:0.6,
+  blending:THREE.AdditiveBlending, depthWrite:false
+});
+const stars = new THREE.Points(starGeo, starMat);
+scene.add(stars);
+
+// ═══ CENTRAL PILLAR (TIME THREAD) ═══
+const pillarGroup = new THREE.Group();
+
+// Main pillar - golden glowing tube
+const pillarGeo = new THREE.CylinderGeometry(0.06, 0.06, TIMELINE_HEIGHT, 32);
+const pillarMat = new THREE.MeshStandardMaterial({
+  color:'#b8860b', emissive:'#e2b64f', emissiveIntensity:0.8,
+  metalness:0.9, roughness:0.2
+});
+const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+pillarGroup.add(pillar);
+
+// Inner glow tube
+const innerGeo = new THREE.CylinderGeometry(0.12, 0.12, TIMELINE_HEIGHT, 32, 1, true);
+const innerMat = new THREE.MeshBasicMaterial({
+  color:'#e2b64f', transparent:true, opacity:0.08,
+  side:THREE.DoubleSide, depthWrite:false
+});
+pillarGroup.add(new THREE.Mesh(innerGeo, innerMat));
+
+// Outer glow tube
+const outerGeo = new THREE.CylinderGeometry(0.25, 0.25, TIMELINE_HEIGHT, 32, 1, true);
+const outerMat = new THREE.MeshBasicMaterial({
+  color:'#e2b64f', transparent:true, opacity:0.03,
+  side:THREE.DoubleSide, depthWrite:false
+});
+pillarGroup.add(new THREE.Mesh(outerGeo, outerMat));
+
+scene.add(pillarGroup);
+
+// ═══ DYNASTY RINGS ═══
+const dynastyGroup = new THREE.Group();
+
+DYNASTIES.forEach(d => {
+  const y = yearToY(d.year);
+  const color = new THREE.Color(d.color);
+
+  // Main ring
+  const ringGeo = new THREE.TorusGeometry(TIMELINE_RADIUS - 0.5, 0.03, 16, 100);
+  const ringMat = new THREE.MeshStandardMaterial({
+    color:color, emissive:color, emissiveIntensity:0.5,
+    metalness:0.6, roughness:0.3
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.position.y = y;
+  ring.rotation.x = Math.PI / 2;
+  dynastyGroup.add(ring);
+
+  // Glow ring (slightly larger)
+  const glowGeo = new THREE.TorusGeometry(TIMELINE_RADIUS - 0.3, 0.12, 16, 100);
+  const glowMat = new THREE.MeshBasicMaterial({
+    color:color, transparent:true, opacity:0.12,
+    depthWrite:false
+  });
+  const glowRing = new THREE.Mesh(glowGeo, glowMat);
+  glowRing.position.y = y;
+  glowRing.rotation.x = Math.PI / 2;
+  dynastyGroup.add(glowRing);
+
+  // Small orb at ring position
+  const orbGeo = new THREE.SphereGeometry(0.15, 16, 16);
+  const orbMat = new THREE.MeshStandardMaterial({
+    color:color, emissive:color, emissiveIntensity:0.6,
+    metalness:0.8, roughness:0.2
+  });
+  const orb = new THREE.Mesh(orbGeo, orbMat);
+  orb.position.set(TIMELINE_RADIUS - 0.5, y, 0);
+  dynastyGroup.add(orb);
+
+  // Sprite label would be ideal but complex; use CSS overlay via world position
+  // Store positions for label rendering
+  d._worldY = y;
+});
+
+scene.add(dynastyGroup);
+
+// ═══ EMPEROR NODES ═══
+const emperorMeshes = [];
+const emperorGroup = new THREE.Group();
+
+EMPERORS.forEach((emp, i) => {
+  const y = yearToY(emp.year);
+  const angle = yearToAngle(emp.year);
+  const radius = TIMELINE_RADIUS - 0.8 + Math.sin(i * 0.7) * 0.3;
+
+  const x = Math.cos(angle) * radius;
+  const z = Math.sin(angle) * radius;
+
+  const dynastyColor = DYNASTY_COLORS[emp.dynasty] || '#e2b64f';
+  const color = new THREE.Color(dynastyColor);
+
+  // Main node
+  const size = (emp.courseId !== null) ? 0.13 : 0.08;
+  const nodeGeo = new THREE.SphereGeometry(size, 16, 16);
+  const nodeMat = new THREE.MeshStandardMaterial({
+    color:color, emissive:color, emissiveIntensity:0.5,
+    metalness:0.7, roughness:0.2
+  });
+  const node = new THREE.Mesh(nodeGeo, nodeMat);
+  node.position.set(x, y, z);
+  node.userData = {emperor:emp, index:i, type:'emperor'};
+  emperorGroup.add(node);
+  emperorMeshes.push(node);
+
+  // Connecting line to pillar
+  const lineDir = new THREE.Vector3(x, y, z).normalize();
+  const pillarPoint = lineDir.multiplyScalar(0.5);
+  const lineGeo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(x, y, z),
+    new THREE.Vector3(pillarPoint.x, pillarPoint.y, pillarPoint.z)
+  ]);
+  const lineMat = new THREE.LineBasicMaterial({
+    color:color, transparent:true, opacity:0.15, depthWrite:false
+  });
+  emperorGroup.add(new THREE.Line(lineGeo, lineMat));
+
+  // Glow sprite
+  const spriteMat = new THREE.SpriteMaterial({
+    map:createGlowTexture(color),
+    blending:THREE.AdditiveBlending,
+    transparent:true, opacity:0.4, depthWrite:false
+  });
+  const sprite = new THREE.Sprite(spriteMat);
+  sprite.position.copy(node.position);
+  sprite.scale.set(0.6, 0.6, 1);
+  emperorGroup.add(sprite);
+});
+
+scene.add(emperorGroup);
+
+// ═══ GLOW TEXTURE GENERATOR ═══
+function createGlowTexture(color) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 64; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gradient.addColorStop(0, color.getStyle());
+  gradient.addColorStop(0.3, color.clone().multiplyScalar(0.6).getStyle());
+  gradient.addColorStop(1, 'transparent');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 64, 64);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+// ═══ GOLDEN PARTICLES ═══
+const particleCount = 800;
+const particleGeo = new THREE.BufferGeometry();
+const particlePositions = new Float32Array(particleCount * 3);
+const particleVelocities = [];
+
+for (let i = 0; i < particleCount; i++) {
+  const y = (Math.random() - 0.5) * TIMELINE_HEIGHT;
+  const angle = Math.random() * Math.PI * 2;
+  const r = TIMELINE_RADIUS - 0.2 + Math.random() * 3;
+  particlePositions[i*3] = Math.cos(angle) * r;
+  particlePositions[i*3+1] = y;
+  particlePositions[i*3+2] = Math.sin(angle) * r;
+  particleVelocities.push({
+    speed: 0.01 + Math.random() * 0.04,
+    angle: angle,
+    radius: r,
+    y: y
+  });
+}
+particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+const particleMat = new THREE.PointsMaterial({
+  color:'#f5d98a', size:0.04,
+  blending:THREE.AdditiveBlending, transparent:true,
+  opacity:0.5, depthWrite:false
+});
+const particles = new THREE.Points(particleGeo, particleMat);
+scene.add(particles);
+
+// ═══ ORBIT RING INDICATOR ═══
+const orbitRingGeo = new THREE.TorusGeometry(TIMELINE_RADIUS + 0.3, 0.02, 8, 128);
+const orbitRingMat = new THREE.MeshBasicMaterial({
+  color:'#e2b64f', transparent:true, opacity:0.1, depthWrite:false
+});
+const orbitRing = new THREE.Mesh(orbitRingGeo, orbitRingMat);
+orbitRing.rotation.x = Math.PI / 2;
+orbitRing.position.y = 0;
+scene.add(orbitRing);
+
+// ═══ RAYCASTER ═══
+const raycaster = new THREE.Raycaster();
+raycaster.params.Points.threshold = 0.3;
+raycaster.params.Line = {threshold: 0.2};
+const mouse = new THREE.Vector2();
+let hoveredEmperor = null;
+let infoPanel = document.getElementById('infoPanel');
+let infoDynasty = document.getElementById('infoDynasty');
+let infoName = document.getElementById('infoName');
+let infoReign = document.getElementById('infoReign');
+let infoTagline = document.getElementById('infoTagline');
+let yearCounter = document.getElementById('yearCounter');
+
+// ═══ INTERACTION ═══
+function updateInfoPanel(emp) {
+  if (!emp) {
+    infoPanel.classList.remove('visible');
+    hoveredEmperor = null;
+    document.body.style.cursor = 'grab';
+    return;
+  }
+  const e = emp.userData.emperor;
+  const dColor = DYNASTY_COLORS[e.dynasty] || '#e2b64f';
+  infoDynasty.textContent = e.dynasty.toUpperCase();
+  infoDynasty.style.background = dColor + '22';
+  infoDynasty.style.color = dColor;
+  infoDynasty.style.border = '1px solid ' + dColor + '44';
+  infoName.textContent = e.name;
+  infoReign.textContent = e.reign;
+  infoTagline.textContent = e.tagline;
+  infoPanel.classList.add('visible');
+  document.body.style.cursor = 'pointer';
+}
+
+function onMouseMove(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(emperorMeshes);
+
+  if (intersects.length > 0) {
+    const obj = intersects[0].object;
+    if (hoveredEmperor !== obj) {
+      if (hoveredEmperor) {
+        hoveredEmperor.material.emissiveIntensity = 0.5;
+        hoveredEmperor.scale.set(1, 1, 1);
+      }
+      hoveredEmperor = obj;
+      hoveredEmperor.material.emissiveIntensity = 1.2;
+      hoveredEmperor.scale.set(1.6, 1.6, 1.6);
+      updateInfoPanel(obj);
+    }
+  } else {
+    if (hoveredEmperor) {
+      hoveredEmperor.material.emissiveIntensity = 0.5;
+      hoveredEmperor.scale.set(1, 1, 1);
+      hoveredEmperor = null;
+    }
+    updateInfoPanel(null);
+  }
+}
+
+function onClick(event) {
+  if (hoveredEmperor) {
+    const emp = hoveredEmperor.userData.emperor;
+    if (emp.courseId) {
+      window.location.href = `courses.html?course=${emp.courseId}`;
+    }
+  }
+}
+
+window.addEventListener('mousemove', onMouseMove, {passive:true});
+window.addEventListener('click', onClick);
+
+// Touch support
+window.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 1) {
+    onMouseMove(e.touches[0]);
+  }
+}, {passive:true});
+
+window.addEventListener('touchend', () => {
+  if (hoveredEmperor) {
+    const emp = hoveredEmperor.userData.emperor;
+    if (emp.courseId) {
+      window.location.href = `courses.html?course=${emp.courseId}`;
+    }
+  }
+});
+
+// ═══ ANIMATION LOOP ═══
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const dt = Math.min(clock.getDelta(), 0.1);
+  const t = performance.now() * 0.001;
+
+  controls.update();
+
+  // Rotate stars slowly
+  stars.rotation.y += dt * 0.03;
+  stars.rotation.x += dt * 0.01;
+
+  // Animate particles
+  const posArray = particleGeo.attributes.position.array;
+  for (let i = 0; i < particleCount; i++) {
+    const p = particleVelocities[i];
+    p.y += p.speed * dt;
+    if (p.y > TIMELINE_HEIGHT/2) p.y = -TIMELINE_HEIGHT/2;
+    p.angle += dt * 0.2;
+    posArray[i*3] = Math.cos(p.angle) * p.radius;
+    posArray[i*3+1] = p.y;
+    posArray[i*3+2] = Math.sin(p.angle) * p.radius;
+  }
+  particleGeo.attributes.position.needsUpdate = true;
+
+  // Pulse golden light
+  const pulse = 1 + Math.sin(t * 0.8) * 0.15;
+  goldenLight.intensity = 80 * pulse;
+  topLight.intensity = 40 * (1 + Math.sin(t * 1.2) * 0.2);
+
+  // Orbit ring subtle pulse
+  orbitRing.material.opacity = 0.08 + Math.sin(t * 0.6) * 0.04;
+
+  // Year counter based on camera vertical position
+  const camY = (camera.position.y + TIMELINE_HEIGHT/2) / TIMELINE_HEIGHT;
+  const appxYear = Math.round(YEAR_MIN + camY * YEAR_SPAN);
+  const yearLabel = appxYear < 0 ? `前${Math.abs(appxYear)}年` : `公元${appxYear}年`;
+  yearCounter.textContent = yearLabel;
+
+  renderer.render(scene, camera);
+}
+
+// ═══ RESIZE ═══
+window.addEventListener('resize', () => {
+  camera.aspect = container.clientWidth / container.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(container.clientWidth, container.clientHeight);
+});
+
+// ═══ KEYBOARD SHORTCUTS ═══
+window.addEventListener('keydown', (e) => {
+  switch(e.key.toLowerCase()) {
+    case 'r': controls.autoRotate = !controls.autoRotate; break;
+    case '0': controls.target.set(0,0,0); camera.position.set(8,2,12); controls.update(); break;
+    case 'f': controls.target.set(0, yearToY(-216), 0); controls.update(); break; // Jump to Qin
+    case 't': controls.target.set(0, yearToY(637), 0); controls.update(); break; // Jump to Tang
+    case 'm': controls.target.set(0, yearToY(1375), 0); controls.update(); break; // Jump to Ming
+  }
+});
+
+// Start
+animate();
+
+console.log('🏛  帝王3D时间线已就绪');
+console.log('  拖拽旋转 | 滚轮缩放 | 点击帝王跳转课程');
+console.log('  快捷键: R=自动旋转 F=秦朝 T=唐朝 M=明朝 0=全景');
+</script>
+</body>
+</html>
