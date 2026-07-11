@@ -1,27 +1,29 @@
 #!/usr/bin/env python3
 """
-Mandate Audio Generation v2.1.1 — 4-Layer Production Pipeline
-=============================================================
-Layer 1: DeepSeek spoken script (natural lecture intro, <=500 chars)
-Layer 2: edge-tts zh-CN-YunyangNeural (rate -8%, pitch -2Hz)
+Mandate Audio Generation v3.0 — Full-Course Narration
+======================================================
+Layer 1: Full course text cleaned for speech (NOT summary)
+Layer 2: edge-tts zh-CN-YunyangNeural (rate -5%, natural pitch)
 Layer 3: ffmpeg loudnorm (I=-16:TP=-1.5:LRA=9, 24000Hz, mono, 48kbps)
-Layer 4: Quality audit (duration, sample rate, channels, bitrate)
+Layer 4: Quality audit
 
 Usage: python3 generate_audio_v2.py [--force] [--courses 7,8,9]
 """
-import json, os, re, shlex, shutil, subprocess, sys, time, urllib.request
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import json, os, re, shlex, shutil, subprocess, sys, time
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import urllib.request
 
 # ── Configuration ──────────────────────────────────────────────
 AUDIO_DIR = "audio"
-VOICE = "zh-CN-YunyangNeural"   # v2.0: professional news voice
-RATE = "-8%"
-PITCH = "-2Hz"
+VOICE = "zh-CN-YunyangNeural"   # Professional male news voice
+RATE = "-5%"                    # v3.0: slightly faster, more natural
+PITCH = "+0Hz"                   # v3.0: natural pitch, no artificial change
 BITRATE = "48k"
 MAX_WORKERS = 3
-SCRIPT_MIN_CHARS = 180
-SCRIPT_MAX_CHARS = 500
+# v3.0: Full text limits (much larger for full-course reading)
+SCRIPT_MIN_CHARS = 200
+SCRIPT_MAX_CHARS = 8000  # Full course text can be long
 
 # ── DeepSeek API ───────────────────────────────────────────────
 def _load_api_key():
@@ -70,54 +72,50 @@ DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions"
 
 
 # ═══════════════════════════════════════════════════════════════
-# Layer 1: DeepSeek Spoken Script Generation
+# Layer 1: Full Course Text → Spoken Script (v3.0)
 # ═══════════════════════════════════════════════════════════════
 def generate_spoken_script(title: str, content: str, course_id: int) -> str:
-    """Compress course content into a 150-230 char natural spoken intro."""
-    excerpt = content[:2000]  # Enough context for DeepSeek
+    """v3.0: Convert full course content to spoken narration script.
+    Instead of summarizing into 150 chars, we take the FULL course text,
+    clean it for speech, and return the complete narration script.
+    """
+    text = _clean_course_text(content)
+    if not text.strip():
+        return f"这一讲我们来看{title}。课程内容暂时无法加载，请稍后再试。"
 
-    prompt = f"""你是课程口播稿撰写专家。请将以下课程内容压缩成一段150-230字的自然口播导入稿。
-
-要求：
-1. 像老师在讲课的开场白，口语化、自然
-2. 涵盖课程核心要点，但不罗列细节
-3. 语速适中，句与句之间有呼吸感
-4. 不要使用markdown、括号、引号等书面符号
-5. 以引人入胜的提问或陈述开头
-
-课程标题：{title}
-课程内容（节选）：{excerpt}
-
-请直接输出口播稿，不要加任何说明。"""
-
-    req = urllib.request.Request(
-        DEEPSEEK_URL,
-        data=json.dumps({
-            "model": "deepseek-chat",
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.7,
-            "max_tokens": 500,
-        }).encode(),
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {DEEPSEEK_KEY}",
-        },
-    )
-    try:
-        resp = urllib.request.urlopen(req, timeout=60)
-        data = json.loads(resp.read())
-        script = data["choices"][0]["message"]["content"].strip()
-        # Enforce length bounds
-        if len(script) < SCRIPT_MIN_CHARS:
-            print(f"  ⚠ #{course_id} script too short ({len(script)} chars), retrying...", file=sys.stderr)
-            time.sleep(1)
-            return generate_spoken_script(title, content, course_id)  # Retry once
-        if len(script) > SCRIPT_MAX_CHARS:
-            script = script[:SCRIPT_MAX_CHARS]
-        return script
-    except Exception as e:
-        print(f"  ✗ DeepSeek API error for #{course_id}: {e}", file=sys.stderr)
-        return build_fallback_script(title, content)
+    # Split into natural spoken segments (sentences/phrases)
+    sentences = [s.strip() for s in re.split(r'[。！？；\n]+', text) if s.strip()]
+    
+    if len(sentences) < 2:
+        return text[:SCRIPT_MAX_CHARS]
+    
+    # Build natural spoken script with pauses
+    script_parts = []
+    # Opening: course title as intro
+    script_parts.append(f"帝王学课程。{title}。")
+    
+    for s in sentences:
+        clean = s.strip('，、：； ""''「」()[]')
+        if not clean and s:
+            continue  # skip empty after cleaning punctuation
+        if clean and len(clean) >= 2:
+            script_parts.append(clean)
+    
+    full_script = "。".join(script_parts)
+    
+    # Enforce max length
+    if len(full_script) > SCRIPT_MAX_CHARS:
+        full_script = full_script[:SCRIPT_MAX_CHARS]
+        # Try to end at a natural break
+        last_period = full_script.rfind("。")
+        if last_period > SCRIPT_MAX_CHARS * 0.7:
+            full_script = full_script[:last_period+1]
+    
+    if len(full_script) < SCRIPT_MIN_CHARS:
+        # Fallback: use cleaned text directly
+        full_script = text[:SCRIPT_MAX_CHARS]
+    
+    return full_script
 
 
 def _clean_course_text(text: str) -> str:
