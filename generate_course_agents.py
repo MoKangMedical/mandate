@@ -411,6 +411,95 @@ def pipeline_generate(course_id: int, openings_only: bool = False):
 # ═══════════════════════════════════════════════════════════════
 # CLI
 # ═══════════════════════════════════════════════════════════════
+def write_course_content(course_id: int, result: dict):
+    """Write full course content back to courses-data.js."""
+    with open(COURSES_FILE) as f:
+        content = f.read()
+    
+    opening = result["opening"]
+    body = result["body"]
+    full_content = f"## 开场\\n\\n{opening}\\n\\n{body}" if opening else body
+    
+    # Escape for JS template literal
+    escaped = full_content.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
+    
+    # Find the course block and replace content
+    pattern = re.compile(
+        r'(id:\s*' + str(course_id) + r',\s*title:\s*\'[^\']+\'\s*,\s*'
+        r'desc:\s*\'[^\']+\'\s*,\s*'
+        r'tags:\s*.+?\s*,\s*'
+        r'content:\s*)`[\s\S]*?`(\s*,\s*quiz:)',
+        re.DOTALL
+    )
+    
+    new_content = content
+    m = pattern.search(content)
+    if m:
+        new_content = pattern.sub(rf'\1`{escaped}`\2', content)
+    else:
+        # Fallback: simpler pattern
+        start_marker = f"id: {course_id},"
+        pos = content.find(start_marker)
+        if pos >= 0:
+            content_start = content.find("content: `", pos)
+            content_end = content.find("`,\n", content_start + 12)
+            if content_end < 0:
+                content_end = content.find("`,\\", content_start + 12)
+            if content_start >= 0 and content_end >= 0:
+                new_content = content[:content_start+11] + escaped + content[content_end:]
+    
+    with open(COURSES_FILE, "w") as f:
+        f.write(new_content)
+    
+    cn = count_chinese(full_content)
+    print(f"  💾 #{course_id}: {cn} 中文字已写入")
+
+
+def write_course_opening(course_id: int, new_opening: str):
+    """Prepend a unique opening quote before the existing course content."""
+    with open(COURSES_FILE) as f:
+        content = f.read()
+    
+    # Find the exact content block for this course
+    # Pattern: content: `...`  (template literal)
+    start_marker = f"id: {course_id},"
+    pos = content.find(start_marker)
+    if pos < 0:
+        print(f"  ✗ 未找到课程 #{course_id}")
+        return
+    
+    # Find content start
+    content_key = "content: `"
+    cs = content.find(content_key, pos)
+    if cs < 0:
+        print(f"  ✗ 未找到课程 #{course_id} 的 content 字段")
+        return
+    
+    cs += len(content_key)
+    
+    # Find first ## or ### header - the new opening goes before this
+    first_header = content.find("## ", cs)
+    if first_header < 0 or first_header > cs + 200:
+        first_header = content.find("### ", cs)
+    if first_header < 0 or first_header > cs + 200:
+        # No header found - just prepend after content start
+        insert_pos = cs
+        opening_text = f"## 开场\\n\\n{new_opening}\\n\\n"
+    else:
+        # Insert before the first header
+        insert_pos = first_header
+        opening_text = f"{new_opening}\\n\\n"
+    
+    # Escape for JS template literal
+    escaped = opening_text.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
+    
+    new_content = content[:insert_pos] + escaped + content[insert_pos:]
+    
+    with open(COURSES_FILE, "w") as f:
+        f.write(new_content)
+    
+    print(f"  💾 #{course_id} 开头已插入 ({len(new_opening)}字)")
+
 if __name__ == "__main__":
     import argparse
 
@@ -459,87 +548,3 @@ if __name__ == "__main__":
         print(f"  已写入 courses-data.js")
 
 
-def write_course_content(course_id: int, result: dict):
-    """Write full course content back to courses-data.js."""
-    with open(COURSES_FILE) as f:
-        content = f.read()
-    
-    opening = result["opening"]
-    body = result["body"]
-    full_content = f"## 开场\\n\\n{opening}\\n\\n{body}" if opening else body
-    
-    # Escape for JS template literal
-    escaped = full_content.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
-    
-    # Find the course block and replace content
-    pattern = re.compile(
-        r'(id:\s*' + str(course_id) + r',\s*title:\s*\'[^\']+\'\s*,\s*'
-        r'desc:\s*\'[^\']+\'\s*,\s*'
-        r'tags:\s*.+?\s*,\s*'
-        r'content:\s*)`[\s\S]*?`(\s*,\s*quiz:)',
-        re.DOTALL
-    )
-    
-    new_content = content
-    m = pattern.search(content)
-    if m:
-        new_content = pattern.sub(rf'\1`{escaped}`\2', content)
-    else:
-        # Fallback: simpler pattern
-        start_marker = f"id: {course_id},"
-        pos = content.find(start_marker)
-        if pos >= 0:
-            content_start = content.find("content: `", pos)
-            content_end = content.find("`,\n", content_start + 12)
-            if content_end < 0:
-                content_end = content.find("`,\\", content_start + 12)
-            if content_start >= 0 and content_end >= 0:
-                new_content = content[:content_start+11] + escaped + content[content_end:]
-    
-    with open(COURSES_FILE, "w") as f:
-        f.write(new_content)
-    
-    cn = count_chinese(full_content)
-    print(f"  💾 #{course_id}: {cn} 中文字已写入")
-
-
-def write_course_opening(course_id: int, new_opening: str):
-    """Replace only the first paragraph (after title) with new opening."""
-    with open(COURSES_FILE) as f:
-        content = f.read()
-    
-    # Find the course block
-    start_marker = f"id: {course_id},"
-    pos = content.find(start_marker)
-    if pos < 0:
-        print(f"  ✗ 未找到课程 #{course_id}")
-        return
-    
-    # Find content start
-    content_start = content.find("## ", pos)
-    if content_start < 0:
-        content_start = content.find("# ", pos)
-    if content_start < 0:
-        print(f"  ✗ 未找到课程 #{course_id} 的正文")
-        return
-    
-    # Find first paragraph after headers
-    first_header_end = content.find("\\n", content_start)
-    if first_header_end < 0:
-        first_header_end = content_start + 50
-    
-    # Find end of first paragraph
-    first_para_end = content.find("\\n\\n", first_header_end)
-    if first_para_end < 0:
-        first_para_end = content.find("\\n## ", first_header_end)
-    if first_para_end < 0:
-        first_para_end = first_header_end + 200
-    
-    # Replace: keep headers, replace first paragraph
-    escape_opening = new_opening.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
-    new_content = content[:first_header_end+1] + escape_opening + content[first_para_end:]
-    
-    with open(COURSES_FILE, "w") as f:
-        f.write(new_content)
-    
-    print(f"  💾 #{course_id}: 开头已替换")
