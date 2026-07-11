@@ -21,9 +21,9 @@ RATE = "-5%"                    # v3.0: slightly faster, more natural
 PITCH = "+0Hz"                   # v3.0: natural pitch, no artificial change
 BITRATE = "48k"
 MAX_WORKERS = 3
-# v3.0: Full text limits (much larger for full-course reading)
-SCRIPT_MIN_CHARS = 200
-SCRIPT_MAX_CHARS = 8000  # Full course text can be long
+# v3.1: Chunked full-text reading with concatenation
+SCRIPT_MAX_CHARS = 1000     # Per-chunk limit (~5 min speech, fits edge-tts)
+CHUNK_OVERLAP = 2           # Sentences overlap between chunks for smooth transitions
 
 # ── DeepSeek API ───────────────────────────────────────────────
 def _load_api_key():
@@ -68,48 +68,50 @@ DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions"
 # ═══════════════════════════════════════════════════════════════
 # Layer 1: Full Course Text → Spoken Script (v3.0)
 # ═══════════════════════════════════════════════════════════════
-def generate_spoken_script(title: str, content: str, course_id: int) -> str:
-    """v3.0: Convert full course content to spoken narration script.
-    Instead of summarizing into 150 chars, we take the FULL course text,
-    clean it for speech, and return the complete narration script.
+def generate_spoken_script(title: str, content: str, course_id: int) -> list[str]:
+    """v3.1: Convert full course text into chunked spoken narration scripts.
+    Returns a list of script strings, each fitting within edge-tts limits.
+    Empty list means no valid script could be generated.
     """
     text = _clean_course_text(content)
     if not text.strip():
-        return f"这一讲我们来看{title}。课程内容暂时无法加载，请稍后再试。"
+        return [f"这一讲我们来看{title}。课程内容暂时无法加载，请稍后再试。"]
 
-    # Split into natural spoken segments (sentences/phrases)
+    # Split into natural spoken segments
     sentences = [s.strip() for s in re.split(r'[。！？；\n]+', text) if s.strip()]
+    if not sentences:
+        return [text[:SCRIPT_MAX_CHARS]]
     
-    if len(sentences) < 2:
-        return text[:SCRIPT_MAX_CHARS]
-    
-    # Build natural spoken script with pauses
-    script_parts = []
-    # Opening: course title as intro
-    script_parts.append(f"帝王学课程。{title}。")
+    # Build chunks, each <= SCRIPT_MAX_CHARS
+    chunks = []
+    current = f"帝王学课程。{title}。"
     
     for s in sentences:
         clean = s.strip('，、：； ""''「」()[]')
-        if not clean and s:
-            continue  # skip empty after cleaning punctuation
-        if clean and len(clean) >= 2:
-            script_parts.append(clean)
+        if not clean or len(clean) < 2:
+            continue
+        candidate = current + "。" + clean
+        if len(candidate) > SCRIPT_MAX_CHARS - 50 and current:
+            # Finalize current chunk
+            if not current.endswith("。"):
+                current += "。"
+            chunks.append(current)
+            # Start new chunk with overlap
+            current = clean
+        else:
+            current = candidate
     
-    full_script = "。".join(script_parts)
+    # Add final chunk
+    if current:
+        if not current.endswith("。"):
+            current += "。"
+        chunks.append(current)
     
-    # Enforce max length
-    if len(full_script) > SCRIPT_MAX_CHARS:
-        full_script = full_script[:SCRIPT_MAX_CHARS]
-        # Try to end at a natural break
-        last_period = full_script.rfind("。")
-        if last_period > SCRIPT_MAX_CHARS * 0.7:
-            full_script = full_script[:last_period+1]
+    if not chunks:
+        chunks = [f"帝王学课程。{title}。全文朗读。"]
     
-    if len(full_script) < SCRIPT_MIN_CHARS:
-        # Fallback: use cleaned text directly
-        full_script = text[:SCRIPT_MAX_CHARS]
-    
-    return full_script
+    print(f"  📝 #{course_id}: {len(chunks)} chunks, {sum(len(c) for c in chunks)} total chars")
+    return chunks
 
 
 def _clean_course_text(text: str) -> str:
@@ -360,16 +362,58 @@ def process_course(course_id: int, title: str, content: str, outdir: str, force:
         if audit["grade"] == "A":
             return course_id, final_path, "skipped (A-grade)", audit["specs"]["duration"]
 
-    # Layer 1: DeepSeek spoken script
-    print(f"  [{course_id}] L1: Generating spoken script...", flush=True)
-    script = generate_spoken_script(title, content, course_id)
-    print(f"  [{course_id}] L1: Script {len(script)} chars", flush=True)
+    # Layer 1: Generate chunked spoken scripts
+    print(f"  [{course_id}] L1: Generating spoken scripts...", flush=True)
+    chunks = generate_spoken_script(title, content, course_id)
+    if not chunks:
+        return course_id, final_path, "FAILED (no script)", "0s"
+    print(f"  [{course_id}] L1: {len(chunks)} chunks, {sum(len(c) for c in chunks)} total chars", flush=True)
 
-    # Layer 2: edge-tts synthesis
-    raw_path = os.path.join(outdir, f"lesson{course_id}_raw.mp3")
-    print(f"  [{course_id}] L2: TTS synthesis...", flush=True)
-    if not synthesize_audio(script, raw_path, course_id):
-        return course_id, final_path, "FAILED (TTS)", "0s"
+    # Layer 2: edge-tts synthesis per chunk
+    chunk_paths = []
+    for ci, chunk in enumerate(chunks):
+        chunk_path = os.path.join(outdir, f"lesson{course_id}_c{ci}.mp3")
+        if not synthesize_audio(chunk, chunk_path, course_id):
+            # Try with cleanup
+            chunk_path = os.path.join(outdir, f"lesson{course_id}_c{ci}.mp3")
+            if not synthesize_audio(chunk[:500], chunk_path, course_id):
+                print(f"  [{course_id}] L2: chunk {ci} TTS failed, skipping", flush=True)
+                continue
+        chunk_paths.append(chunk_path)
+    
+    if not chunk_paths:
+        return course_id, final_path, "FAILED (all TTS chunks failed)", "0s"
+    
+    # If single chunk, just use it directly
+    if len(chunk_paths) == 1:
+        raw_path = chunk_paths[0]
+        print(f"  [{course_id}] L2: Single chunk, no concat needed", flush=True)
+    else:
+        # Concatenate chunks with ffmpeg
+        raw_path = os.path.join(outdir, f"lesson{course_id}_raw.mp3")
+        print(f"  [{course_id}] L2: Concatenating {len(chunk_paths)} chunks...", flush=True)
+        concat_list = os.path.join(outdir, f"lesson{course_id}_list.txt")
+        with open(concat_list, "w") as f:
+            for cp in chunk_paths:
+                f.write(f"file '{os.path.abspath(cp)}'\n")
+        concat_cmd = [
+            "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+            "-i", concat_list, "-c", "copy", raw_path
+        ]
+        result = subprocess.run(concat_cmd, capture_output=True, text=True, timeout=60)
+        # Clean up temp files
+        os.remove(concat_list)
+        for cp in chunk_paths:
+            try:
+                os.remove(cp)
+            except OSError:
+                pass
+        if not os.path.exists(raw_path) or os.path.getsize(raw_path) < 1000:
+            # Fallback: use first chunk
+            raw_path = chunk_paths[0]
+            print(f"  [{course_id}] L2: Concat failed, using first chunk", flush=True)
+        else:
+            print(f"  [{course_id}] L2: Concat OK ({os.path.getsize(raw_path)/1024:.0f}KB)", flush=True)
 
     # Layer 3: ffmpeg loudnorm
     print(f"  [{course_id}] L3: ffmpeg normalize...", flush=True)
