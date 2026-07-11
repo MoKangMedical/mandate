@@ -31,6 +31,11 @@ def load_api_key():
     try:
         import yaml
         data = yaml.safe_load(Path(config_path).read_text()) or {}
+        # Check top-level model section
+        model = data.get("model", {})
+        if isinstance(model, dict) and model.get("api_key"):
+            return str(model["api_key"]).strip()
+        # Check providers
         providers = data.get("providers", {})
         deepseek = providers.get("deepseek", {})
         if isinstance(deepseek, dict) and deepseek.get("api_key"):

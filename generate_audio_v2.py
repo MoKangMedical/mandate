@@ -43,6 +43,10 @@ def _load_api_key():
     if yaml is not None:
         try:
             data = yaml.safe_load(Path(config_path).read_text()) or {}
+            # Check top-level model section first
+            model = data.get("model", {})
+            if isinstance(model, dict) and model.get("api_key"):
+                return str(model["api_key"]).strip()
             providers = data.get("providers", {})
             deepseek = providers.get("deepseek", {})
             if isinstance(deepseek, dict):
@@ -53,18 +57,8 @@ def _load_api_key():
                     for model_cfg in models.values():
                         if isinstance(model_cfg, dict) and model_cfg.get("api_key"):
                             return str(model_cfg["api_key"]).strip()
-            model_cfg = data.get("model", {})
-            if isinstance(model_cfg, dict) and model_cfg.get("provider") == "deepseek" and model_cfg.get("api_key"):
-                return str(model_cfg["api_key"]).strip()
         except Exception:
             pass
-
-    text = Path(config_path).read_text(errors="ignore")
-    block = re.search(r'(?ms)^\\s*deepseek:\\s*\\n(?P<body>(?:^\\s{4}.*\\n?)*)', text)
-    if block:
-        key_match = re.search(r'(?m)^\\s{4}api_key:\\s*(.+?)\\s*$', block.group("body"))
-        if key_match:
-            return key_match.group(1).strip().strip("'\"")
     return ""
 
 DEEPSEEK_KEY = _load_api_key()
