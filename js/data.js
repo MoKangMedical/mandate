@@ -276,7 +276,7 @@ const EMPERORS = [
 // ═══════════════ Select top 8 for avatar spotlight ═══════════════
 const AVATAR_SPOTLIGHT = [
   "qin-shi-huang","han-wudi","caocao","tang-taizong",
-  "wu-zetian","ming-taizu","kangxi","puyi"
+  "wu-zetian","ming-taizu","kangxi","qianlong"
 ];
 
 // ═══════════════ Course data ═══════════════
