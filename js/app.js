@@ -159,10 +159,11 @@ function renderAvatarGrid() {
   grid.innerHTML = AVATAR_SPOTLIGHT.map(id => {
     const e = EMPERORS.find(emp => emp.id === id);
     if(!e) return '';
+    const displayName = e.temple || e.name;
     return `
     <div class="avatar-card" onclick="openChat('${e.id}')">
-      <div class="avatar-icon">帝</div>
-      <h3>${e.name}</h3>
+      <div class="avatar-icon">${e.name[0]}</div>
+      <h3>${displayName}</h3>
       <div class="avatar-dynasty">${getDynastyName(e.dynasty)} · ${e.reign}</div>
       <div class="avatar-quote">「${e.avatar.quote}」</div>
       <div style="margin-top:12px;font-size:0.75rem;color:var(--red)">
@@ -173,7 +174,10 @@ function renderAvatarGrid() {
 }
 
 function openChat(emperorId) {
-  window.location.href = `chat.html?id=${emperorId}`;
+  const emp = EMPERORS.find(e => e.id === emperorId);
+  // Use temple name (庙号) for chat, which matches LOCAL_EMPERORS
+  const chatName = emp ? (emp.temple || emp.name) : emperorId;
+  window.location.href = `chat.html?emperor=${encodeURIComponent(chatName)}`;
 }
 
 // ═══════ Toast ═══════
