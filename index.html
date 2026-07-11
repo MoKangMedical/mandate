@@ -58,8 +58,13 @@ h3{font-size:1.2rem;font-weight:600}
 .nav-links a:hover{color:var(--text)}
 .nav-cta{background:var(--gold);color:#000;padding:8px 20px;border-radius:8px;font-weight:600;font-size:0.85rem;transition:all .2s}
 .nav-cta:hover{background:var(--gold2);transform:translateY(-1px)}
-@media(max-width:768px){.nav-links{display:none}}
-.hamburger{display:none;cursor:pointer;padding:8px}@media(max-width:768px){.hamburger{display:block}}
+@media(max-width:768px){
+  .nav-links{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(9,9,11,0.96);backdrop-filter:blur(20px);flex-direction:column;gap:0;padding:8px 0;border-bottom:1px solid var(--border)}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:14px 24px;font-size:0.9rem;border-bottom:1px solid var(--border)}
+  .nav-links .nav-cta{margin:12px 24px;text-align:center;display:block}
+}
+.hamburger{display:none;cursor:pointer;padding:8px;background:none;border:none;color:var(--text2);font-size:1.5rem}@media(max-width:768px){.hamburger{display:block}}
 
 /* ═══════════════ HERO (inside 3D overlay) ═══════════════ */
 .hero-content{position:relative;z-index:1;text-align:center;max-width:900px;margin:0 auto;padding:0 24px 60px}
@@ -82,7 +87,46 @@ h3{font-size:1.2rem;font-weight:600}
 .hero-stat{text-align:center}
 .hero-stat .num{font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hero-stat .desc{font-size:0.8rem;color:var(--text3);margin-top:4px}
-@media(max-width:768px){.hero-stats{gap:20px}.hero-stat .num{font-size:1.4rem}}
+/* ═══════════════ GHIBLI FIREFLY PARTICLES ═══════════════ */
+.fireflies{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.firefly{position:absolute;width:3px;height:3px;background:var(--gold);border-radius:50%;
+  filter:blur(1px);animation:fireflyFloat 12s ease-in-out infinite;opacity:0}
+.firefly:nth-child(1){left:10%;top:20%;animation-delay:0s;animation-duration:14s}
+.firefly:nth-child(2){left:25%;top:60%;animation-delay:2s;animation-duration:11s}
+.firefly:nth-child(3){left:45%;top:30%;animation-delay:4s;animation-duration:13s}
+.firefly:nth-child(4){left:65%;top:50%;animation-delay:1s;animation-duration:15s}
+.firefly:nth-child(5){left:80%;top:15%;animation-delay:3s;animation-duration:12s}
+.firefly:nth-child(6){left:90%;top:70%;animation-delay:5s;animation-duration:10s}
+.firefly:nth-child(7){left:15%;top:85%;animation-delay:2.5s;animation-duration:16s}
+.firefly:nth-child(8){left:55%;top:75%;animation-delay:6s;animation-duration:9s}
+.firefly:nth-child(9){left:35%;top:10%;animation-delay:3.5s;animation-duration:14s}
+.firefly:nth-child(10){left:70%;top:40%;animation-delay:1.5s;animation-duration:11s}
+@keyframes fireflyFloat{
+  0%{opacity:0;transform:translate(0,0) scale(1)}
+  10%{opacity:0.8}
+  30%{opacity:0.3;transform:translate(30px,-40px) scale(2)}
+  50%{opacity:0.9;transform:translate(-20px,-80px) scale(1.5)}
+  70%{opacity:0.2;transform:translate(15px,-120px) scale(2.5)}
+  90%{opacity:0.7;transform:translate(-10px,-60px) scale(1)}
+  100%{opacity:0;transform:translate(0,0) scale(1)}
+}
+
+/* Golden section dividers */
+.section-divider{position:relative;height:1px;background:linear-gradient(90deg,transparent,rgba(226,182,79,0.15),transparent);margin:0 auto;max-width:800px}
+
+/* Enhanced card glow on hover */
+.emperor-card:hover,.hc-card:hover,.course-card:hover,.imperial-card:hover,.avatar-card:hover{
+  box-shadow:0 12px 40px rgba(226,182,79,0.1),0 0 80px rgba(226,182,79,0.04),0 0 120px rgba(226,182,79,0.02)}
+
+/* Warm radial overrides for section backgrounds */
+.section-alt{background:linear-gradient(180deg,var(--bg) 0%,rgba(20,15,5,0.5) 30%,rgba(20,15,5,0.3) 70%,var(--bg) 100%)}
+
+@media(max-width:768px){
+  .fireflies{display:none}
+  .hero-stats{gap:16px}
+  .hero-stat .num{font-size:1.3rem}
+  h1{font-size:clamp(1.6rem,6vw,2.5rem)}
+}
 
 /* ═══════════════ IMPERIAL ROBE GALLERY ═══════════════ */
 .imperial-section{background:var(--bg);position:relative;overflow:hidden}
@@ -368,6 +412,14 @@ h3{font-size:1.2rem;font-weight:600}
 </head>
 <body>
 
+<!-- Firefly particles -->
+<div class="fireflies">
+  <div class="firefly"></div><div class="firefly"></div><div class="firefly"></div>
+  <div class="firefly"></div><div class="firefly"></div><div class="firefly"></div>
+  <div class="firefly"></div><div class="firefly"></div><div class="firefly"></div>
+  <div class="firefly"></div>
+</div>
+
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav class="nav">
   <div class="nav-inner">
@@ -380,16 +432,17 @@ h3{font-size:1.2rem;font-weight:600}
       </svg>
       Mandate
     </a>
-    <div class="nav-links">
+    <div class="nav-links" id="navMenu">
       <a href="#timeline3d">3D时间线</a>
       <a href="#emperors">帝王录</a>
       <a href="#avatars">数字分身</a>
       <a href="#audio-collection">音频合集</a>
-      <a href="#courses">课程</a>
+      <a href="courses.html">课程</a>
+      <a href="chat.html">群聊</a>
       <a href="#pricing">定价</a>
-      <a href="#avatars" class="nav-cta">与帝王对话</a>
+      <a href="chat.html" class="nav-cta">与帝王对话</a>
     </div>
-    <div class="hamburger" onclick="document.getElementById('navLinks')?.classList.toggle('open')">菜单</div>
+    <button class="hamburger" onclick="document.getElementById('navMenu').classList.toggle('open')" aria-label="菜单">☰</button>
   </div>
 </nav>
 
@@ -423,6 +476,8 @@ h3{font-size:1.2rem;font-weight:600}
     <div class="tl3d-year" id="tl3dYear"></div>
   </div>
 </section>
+
+<div class="section-divider"></div>
 
 <!-- ═══════════════ QUOTE ═══════════════ -->
 <div class="quote-block">

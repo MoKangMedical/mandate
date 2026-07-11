@@ -155,7 +155,7 @@ function renderEmperor(emp) {
   document.getElementById('app').innerHTML = `
     <!-- HEADER -->
     <div class="emperor-header">
-      <div class="emperor-portrait">帝</div>
+      <div class="emperor-portrait">${emp.name[0]}</div>
       <h1>${emp.name}</h1>
       <div class="sub">${emp.temple} · ${getDynastyName(emp.dynasty)} · ${emp.reign}</div>
       <div class="rating"><span class="stars">${stars}</span><span class="score">${emp.score}</span><span style="color:var(--text3);font-size:0.9rem">/10</span></div>
@@ -165,6 +165,27 @@ function renderEmperor(emp) {
     <div class="tagline-quote container">「${emp.tagline}」</div>
     
     <div class="container">
+      <!-- AVATAR PERSONALITY -->
+      ${emp.avatar ? `
+      <div class="section">
+        <div class="section-title">AI 数字人格</div>
+        <div class="ach-grid">
+          <div class="ach-card">
+            <h4>性格特征</h4>
+            <p>${emp.avatar.personality}</p>
+          </div>
+          <div class="ach-card">
+            <h4>说话风格</h4>
+            <p>${emp.avatar.style}</p>
+          </div>
+          <div class="ach-card" style="grid-column:1/-1">
+            <h4>经典语录</h4>
+            <p style="font-style:italic">「${emp.avatar.quote}」</p>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+      
       <!-- DIMENSIONS -->
       <div class="section">
         <div class="section-title">五维评价</div>
@@ -212,7 +233,7 @@ function renderEmperor(emp) {
       <div class="chat-cta-content">
         <h2>想和${emp.name}直接对话吗？</h2>
         <p>基于DeepSeek AI，${emp.name}的数字分身已就绪。<br>你可以问TA任何历史问题、政治理念，甚至进行跨越时空的辩论。</p>
-        <a href="chat.html?id=${emp.id}" class="btn btn-red">与${emp.name}对话</a>
+        <a href="chat.html?emperor=${encodeURIComponent(emp.name)}" class="btn btn-red">与${emp.name}对话</a>
         <a href="index.html#emperors" class="btn btn-secondary">← 浏览更多帝王</a>
       </div>
     </div>
