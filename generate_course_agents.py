@@ -411,54 +411,6 @@ def pipeline_generate(course_id: int, openings_only: bool = False):
 # ═══════════════════════════════════════════════════════════════
 # CLI
 # ═══════════════════════════════════════════════════════════════
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Mandate 三 Agent 课程生产流水线")
-    parser.add_argument("--course", type=int, help="单门课程编号")
-    parser.add_argument("--batch", type=str, help="批量课程，逗号分隔，如 7,8,9")
-    parser.add_argument("--all", action="store_true", help="处理全部94门课程")
-    parser.add_argument("--openings-only", action="store_true", help="只改写开头，不重写全文")
-    parser.add_argument("--preview", action="store_true", help="预览模式，不实际写入文件")
-    args = parser.parse_args()
-
-    if not API_KEY:
-        print("❌ 未找到 DeepSeek API Key")
-        print("请设置 DEEPSEEK_API_KEY 环境变量或在 ~/.hermes/config.yaml 中配置")
-        sys.exit(1)
-
-    course_ids = []
-    if args.course:
-        course_ids = [args.course]
-    elif args.batch:
-        course_ids = [int(x.strip()) for x in args.batch.split(",")]
-    elif args.all:
-        course_ids = list(range(7, 101))  # Courses 7-100
-
-    if not course_ids:
-        print("请指定 --course, --batch, 或 --all")
-        sys.exit(1)
-
-    results = {}
-    for cid in course_ids:
-        try:
-            result = pipeline_generate(cid, openings_only=args.openings_only)
-            if result:
-                results[cid] = result
-                if not args.preview:
-                    if result.get("mode") == "full":
-                        write_course_content(cid, result)
-                    elif result.get("mode") == "opening_only":
-                        write_course_opening(cid, result["opening"])
-        except Exception as e:
-            print(f"✗ 课程 #{cid} 错误: {e}")
-
-    print(f"\n{'='*60}")
-    print(f"流水线完成: {len(results)}/{len(course_ids)} 门课程成功")
-    if not args.preview:
-        print(f"  已写入 courses-data.js")
-
-
 def write_course_content(course_id: int, result: dict):
     """Write full course content back to courses-data.js."""
     with open(COURSES_FILE) as f:
@@ -543,3 +495,52 @@ def write_course_opening(course_id: int, new_opening: str):
         f.write(new_content)
     
     print(f"  💾 #{course_id}: 开头已替换")
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Mandate 三 Agent 课程生产流水线")
+    parser.add_argument("--course", type=int, help="单门课程编号")
+    parser.add_argument("--batch", type=str, help="批量课程，逗号分隔，如 7,8,9")
+    parser.add_argument("--all", action="store_true", help="处理全部94门课程")
+    parser.add_argument("--openings-only", action="store_true", help="只改写开头，不重写全文")
+    parser.add_argument("--preview", action="store_true", help="预览模式，不实际写入文件")
+    args = parser.parse_args()
+
+    if not API_KEY:
+        print("❌ 未找到 DeepSeek API Key")
+        print("请设置 DEEPSEEK_API_KEY 环境变量或在 ~/.hermes/config.yaml 中配置")
+        sys.exit(1)
+
+    course_ids = []
+    if args.course:
+        course_ids = [args.course]
+    elif args.batch:
+        course_ids = [int(x.strip()) for x in args.batch.split(",")]
+    elif args.all:
+        course_ids = list(range(7, 101))  # Courses 7-100
+
+    if not course_ids:
+        print("请指定 --course, --batch, 或 --all")
+        sys.exit(1)
+
+    results = {}
+    for cid in course_ids:
+        try:
+            result = pipeline_generate(cid, openings_only=args.openings_only)
+            if result:
+                results[cid] = result
+                if not args.preview:
+                    if result.get("mode") == "full":
+                        write_course_content(cid, result)
+                    elif result.get("mode") == "opening_only":
+                        write_course_opening(cid, result["opening"])
+        except Exception as e:
+            print(f"✗ 课程 #{cid} 错误: {e}")
+
+    print(f"\n{'='*60}")
+    print(f"流水线完成: {len(results)}/{len(course_ids)} 门课程成功")
+    if not args.preview:
+        print(f"  已写入 courses-data.js")
+
+
