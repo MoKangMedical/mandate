@@ -456,11 +456,12 @@ def write_course_content(course_id: int, result: dict):
 
 
 def write_course_opening(course_id: int, new_opening: str):
-    """Replace only the first paragraph (after title) with new opening."""
+    """Prepend a unique opening quote before the existing course content."""
     with open(COURSES_FILE) as f:
         content = f.read()
     
-    # Find the course block
+    # Find the exact content block for this course
+    # Pattern: content: `...`  (template literal)
     start_marker = f"id: {course_id},"
     pos = content.find(start_marker)
     if pos < 0:
@@ -468,33 +469,36 @@ def write_course_opening(course_id: int, new_opening: str):
         return
     
     # Find content start
-    content_start = content.find("## ", pos)
-    if content_start < 0:
-        content_start = content.find("# ", pos)
-    if content_start < 0:
-        print(f"  ✗ 未找到课程 #{course_id} 的正文")
+    content_key = "content: `"
+    cs = content.find(content_key, pos)
+    if cs < 0:
+        print(f"  ✗ 未找到课程 #{course_id} 的 content 字段")
         return
     
-    # Find first paragraph after headers
-    first_header_end = content.find("\\n", content_start)
-    if first_header_end < 0:
-        first_header_end = content_start + 50
+    cs += len(content_key)
     
-    # Find end of first paragraph
-    first_para_end = content.find("\\n\\n", first_header_end)
-    if first_para_end < 0:
-        first_para_end = content.find("\\n## ", first_header_end)
-    if first_para_end < 0:
-        first_para_end = first_header_end + 200
+    # Find first ## or ### header - the new opening goes before this
+    first_header = content.find("## ", cs)
+    if first_header < 0 or first_header > cs + 200:
+        first_header = content.find("### ", cs)
+    if first_header < 0 or first_header > cs + 200:
+        # No header found - just prepend after content start
+        insert_pos = cs
+        opening_text = f"## 开场\\n\\n{new_opening}\\n\\n"
+    else:
+        # Insert before the first header
+        insert_pos = first_header
+        opening_text = f"{new_opening}\\n\\n"
     
-    # Replace: keep headers, replace first paragraph
-    escape_opening = new_opening.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
-    new_content = content[:first_header_end+1] + escape_opening + content[first_para_end:]
+    # Escape for JS template literal
+    escaped = opening_text.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
+    
+    new_content = content[:insert_pos] + escaped + content[insert_pos:]
     
     with open(COURSES_FILE, "w") as f:
         f.write(new_content)
     
-    print(f"  💾 #{course_id}: 开头已替换")
+    print(f"  💾 #{course_id} 开头已插入 ({len(new_opening)}字)")
 
 if __name__ == "__main__":
     import argparse
